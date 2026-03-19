@@ -1,0 +1,374 @@
+/* Importar estilos base de Ant Design primero */
+@import 'antd/dist/reset.css';
+
+/* Tailwind directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Tus estilos personalizados */
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--app-body-bg);
+  color: #111827;
+}
+
+/* Colores base de la app */
+:root {
+  --app-body-bg: #f0f2f5;
+  --app-shell-bg: #f0f2f5;
+  --app-content-bg: #ffffff;
+  --app-footer-bg: #ffffff;
+  --app-footer-border: #f0f0f0;
+}
+
+body[data-theme="dark"] {
+  --app-body-bg: #0b0f16;
+  --app-shell-bg: #0b0f16;
+  --app-content-bg: #0f1724;
+  --app-footer-bg: #0b0f16;
+  --app-footer-border: #1f2a3a;
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .ant-layout {
+  background: var(--app-shell-bg);
+}
+
+body[data-theme="dark"] .app-content {
+  background: var(--app-content-bg);
+}
+
+body[data-theme="dark"] .ant-layout-footer {
+  background: var(--app-footer-bg);
+  border-top-color: var(--app-footer-border);
+  color: #9fb0c2;
+}
+
+body[data-theme="dark"] .ant-progress-text {
+  color: #ffffff !important;
+}
+
+body[data-theme="dark"] .ant-select-selector,
+body[data-theme="dark"] .ant-select-single .ant-select-selector,
+body[data-theme="dark"] .ant-picker {
+  background: #0c141f !important;
+  border-color: #1f2b3a !important;
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .ant-select:not(.ant-select-customize-input) .ant-select-selector,
+body[data-theme="dark"] .ant-select-single:not(.ant-select-customize-input) .ant-select-selector,
+body[data-theme="dark"] .ant-select-multiple .ant-select-selector {
+  background: #0c141f !important;
+  border-color: #1f2b3a !important;
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .ant-select .ant-select-selection-placeholder,
+body[data-theme="dark"] .ant-select .ant-select-selection-item {
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .ant-select .ant-select-arrow {
+  color: #9fb0c2 !important;
+}
+
+body[data-theme="dark"] .ant-select-selection-placeholder,
+body[data-theme="dark"] .ant-select-selection-item {
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .ant-picker-input > input {
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .ant-picker-input > input::placeholder {
+  color: #9fb0c2 !important;
+}
+
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+body[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: #0b0f16;
+}
+
+body[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: #2a3a4f;
+}
+
+body[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: #3a4b63;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Estilos para los estados de los partidos */
+.status-scheduled {
+  border-left: 4px solid #faad14;
+}
+
+.status-ongoing {
+  border-left: 4px solid #1890ff;
+}
+
+.status-finished {
+  border-left: 4px solid #52c41a;
+}
+
+.status-cancelled {
+  border-left: 4px solid #ff4d4f;
+}
+
+/* Estilos para tarjetas */
+.ant-card {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.ant-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para botones */
+.ant-btn-primary {
+  border-radius: 6px;
+}
+
+/* Botón outline azul (texto y borde azules en blanco) */
+.btn-outline-primary {
+  color: #1890ff !important;
+  border-color: #1890ff !important;
+  background: #fff !important;
+}
+
+.btn-outline-primary span,
+.btn-outline-primary .anticon {
+  color: inherit !important;
+}
+
+.btn-outline-primary * {
+  color: inherit !important;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+  color: #fff !important;
+  border-color: #1890ff !important;
+  background: #1890ff !important;
+}
+
+.btn-outline-primary:hover *,
+.btn-outline-primary:focus * {
+  color: #fff !important;
+}
+
+.btn-outline-primary:disabled,
+.btn-outline-primary.ant-btn-disabled {
+  color: rgba(24, 144, 255, 0.5);
+  border-color: rgba(24, 144, 255, 0.3);
+  background: #fff;
+}
+
+.btn-outline-primary-active {
+  color: #1890ff !important;
+  border-color: #1890ff !important;
+  background: rgba(24, 144, 255, 0.08) !important;
+}
+
+/* Estilos para tablas */
+.ant-table-thead > tr > th {
+  font-weight: 600;
+  background: #fafafa;
+}
+
+.ant-table-tbody > tr:hover > td {
+  background: #f6f8fa;
+}
+
+/* Estilos para badges */
+.ant-badge-count {
+  box-shadow: 0 0 0 1px #fff;
+}
+
+/* Estilos para inputs */
+.ant-input-affix-wrapper:focus,
+.ant-input-affix-wrapper-focused {
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+/* Estilos para selects */
+.ant-select-selector {
+  border-radius: 6px !important;
+}
+
+/* Estilos para modales */
+.ant-modal-content {
+  border-radius: 8px;
+}
+
+/* Estilos para los tooltips */
+.ant-tooltip-inner {
+  border-radius: 6px;
+}
+
+/* Estilos para los tags */
+.ant-tag {
+  border-radius: 12px;
+  padding: 2px 8px;
+  font-size: 12px;
+}
+
+/* Estilos para los avatares */
+.ant-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Estilos para los progress bars */
+.ant-progress-inner {
+  border-radius: 10px;
+}
+
+/* Estilos para los timeline */
+.ant-timeline-item-head {
+  width: 12px;
+  height: 12px;
+}
+
+/* Estilos para los calendar */
+.ant-picker-calendar-header {
+  padding: 16px !important;
+}
+
+/* Estilos para los date picker */
+.ant-picker {
+  border-radius: 6px;
+}
+
+/* Estilos para los tabs */
+.ant-tabs-tab {
+  font-weight: 500;
+}
+
+/* Estilos para los dropdown */
+.ant-dropdown-menu {
+  border-radius: 8px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Estilos para los alert */
+.ant-alert {
+  border-radius: 8px;
+}
+
+/* Estilos para los message */
+.ant-message-notice-content {
+  border-radius: 8px;
+}
+
+/* Estilos para los notification */
+.ant-notification-notice {
+  border-radius: 8px;
+}
+
+/* Estilos para los popover */
+.ant-popover-inner {
+  border-radius: 8px;
+}
+
+/* Estilos para los drawer */
+.ant-drawer-content-wrapper {
+  border-radius: 8px 0 0 8px;
+}
+
+/* Estilos para los spin */
+.ant-spin-dot-item {
+  background-color: #1890ff;
+}
+
+/* Estilos para los skeleton */
+.ant-skeleton-paragraph > li {
+  background: linear-gradient(90deg, #f2f2f2 25%, #e6e6e6 37%, #f2f2f2 63%);
+}
+
+/* Responsive utilities */
+@media (max-width: 768px) {
+  .app-content {
+    margin: 12px 8px !important;
+    padding: 12px !important;
+    border-radius: 12px !important;
+  }
+
+  .ant-col-xs-24 {
+    width: 100%;
+  }
+  
+  .ant-table {
+    font-size: 12px;
+  }
+  
+  .ant-card-head-title {
+    font-size: 14px;
+  }
+  
+  .ant-btn {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 576px) {
+  .app-content {
+    margin: 8px 6px !important;
+    padding: 10px !important;
+  }
+
+  .ant-statistic-title {
+    font-size: 12px;
+  }
+  
+  .ant-statistic-content {
+    font-size: 20px;
+  }
+  
+  .ant-tag {
+    font-size: 10px;
+    padding: 1px 6px;
+  }
+}

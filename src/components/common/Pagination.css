@@ -1,0 +1,109 @@
+.pagination-wrapper {
+  display: flex;
+  align-items: center;
+  padding: 16px 0;
+  margin-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.pagination-wrapper.justify-start {
+  justify-content: flex-start;
+}
+
+.pagination-wrapper.justify-center {
+  justify-content: center;
+}
+
+.pagination-wrapper.justify-end {
+  justify-content: flex-end;
+}
+
+.pagination-total {
+  min-width: 120px;
+}
+
+.pagination-size-changer {
+  background: #fafafa;
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid #f0f0f0;
+}
+
+.pagination-quick-jumper {
+  background: #fafafa;
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid #f0f0f0;
+}
+
+.pagination-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+
+.pagination-icon:hover {
+  background: #f0f0f0;
+}
+
+.ant-pagination-item {
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+
+.ant-pagination-item:hover {
+  border-color: #1890ff;
+}
+
+.ant-pagination-item-active {
+  border-color: #1890ff;
+  background: #1890ff;
+}
+
+.ant-pagination-item-active a {
+  color: white;
+}
+
+.ant-pagination-item-active:hover {
+  border-color: #40a9ff;
+  background: #40a9ff;
+}
+
+/* Estilos para paginación simple */
+.ant-pagination-simple .ant-pagination-simple-pager input {
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+
+.ant-pagination-simple .ant-pagination-simple-pager input:hover {
+  border-color: #1890ff;
+}
+
+.ant-pagination-simple .ant-pagination-simple-pager input:focus {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .pagination-wrapper {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .pagination-total,
+  .pagination-size-changer,
+  .pagination-quick-jumper {
+    width: 100%;
+    text-align: center;
+  }
+
+  .ant-pagination {
+    overflow-x: auto;
+  }
+}

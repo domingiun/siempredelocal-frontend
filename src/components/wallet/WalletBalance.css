@@ -1,0 +1,22 @@
+.wallet-quick-actions .ant-row {
+  align-items: stretch;
+}
+
+.wallet-quick-actions .ant-col {
+  display: flex;
+}
+
+.wallet-quick-actions .ant-btn {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 10px;
+  font-size: 13px;
+  line-height: 1.2;
+  white-space: normal;
+}
+
+.wallet-quick-actions .ant-btn > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}

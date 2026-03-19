@@ -1,0 +1,105 @@
+.trigger {
+  padding: 0 24px;
+  font-size: 18px;
+  line-height: 64px;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.trigger:hover {
+  color: #1890ff;
+}
+
+.logo {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.logo:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Estilos para las filas de la tabla de clasificación */
+.promotion-row {
+  background-color: #f6ffed !important;
+}
+
+.promotion-row:hover {
+  background-color: #d9f7be !important;
+}
+
+.international-row {
+  background-color: #e6f7ff !important;
+}
+
+.international-row:hover {
+  background-color: #bae7ff !important;
+}
+
+.playoff-row {
+  background-color: #f0f5ff !important;
+}
+
+.playoff-row:hover {
+  background-color: #d6e4ff !important;
+}
+
+.relegation-row {
+  background-color: #fff1f0 !important;
+}
+
+.relegation-row:hover {
+  background-color: #ffccc7 !important;
+}
+
+/* Estilos para las tarjetas de estadísticas */
+.stats-card {
+  transition: all 0.3s;
+}
+
+.stats-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Estilos para el calendario */
+.match-card {
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.match-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Estilos para los filtros */
+.filter-section {
+  margin-bottom: 16px;
+  padding: 16px;
+  background: #fafafa;
+  border-radius: 6px;
+  border: 1px solid #f0f0f0;
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+  .ant-table {
+    overflow-x: auto;
+  }
+  
+  .ant-card-head-title {
+    font-size: 14px;
+  }
+  
+  .ant-space {
+    flex-wrap: wrap;
+  }
+}

@@ -1,0 +1,211 @@
+.breadcrumb-container {
+  padding: 16px 24px;
+  background: white;
+  border-bottom: 1px solid #f0f0f0;
+  margin: -24px -24px 24px -24px;
+  border-radius: 8px 8px 0 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+body[data-theme="dark"] .breadcrumb-container {
+  background: #0c141f;
+  border-bottom: 1px solid #1f2b3a;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+}
+
+.breadcrumb-actions {
+  opacity: 0.8;
+  transition: opacity 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.breadcrumb-container:hover .breadcrumb-actions {
+  opacity: 1;
+}
+
+.breadcrumb-actions .ant-btn {
+  color: #666;
+  transition: all 0.3s;
+  border-radius: 4px;
+}
+body[data-theme="dark"] .breadcrumb-actions .ant-btn {
+  color: #cbd5e1;
+}
+
+.breadcrumb-actions .ant-btn:hover {
+  color: #1890ff;
+  background: rgba(24, 144, 255, 0.1);
+  transform: translateY(-1px);
+}
+body[data-theme="dark"] .breadcrumb-actions .ant-btn:hover {
+  background: rgba(24, 144, 255, 0.2);
+}
+
+/* Estilos para los items del breadcrumb */
+.ant-breadcrumb {
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.breadcrumb-link {
+  color: #666;
+  transition: all 0.3s;
+  text-decoration: none;
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+body[data-theme="dark"] .breadcrumb-link {
+  color: #cbd5e1;
+}
+
+.breadcrumb-link:hover {
+  color: #1890ff;
+  background: rgba(24, 144, 255, 0.1);
+}
+body[data-theme="dark"] .breadcrumb-link:hover {
+  background: rgba(24, 144, 255, 0.2);
+}
+
+.breadcrumb-current {
+  color: #1890ff;
+  font-weight: 500;
+  padding: 2px 4px;
+}
+body[data-theme="dark"] .breadcrumb-current {
+  color: #93c5fd;
+}
+
+.ant-breadcrumb-separator {
+  margin: 0 8px;
+  color: #d9d9d9;
+}
+body[data-theme="dark"] .ant-breadcrumb-separator,
+body[data-theme="dark"] .custom-separator {
+  color: #5b6b7f;
+}
+
+/* Estilos para el separador personalizado */
+.custom-separator {
+  color: #d9d9d9;
+  font-size: 10px;
+}
+
+/* Estilos para breadcrumb con fondo */
+.breadcrumb-container.breadcrumb-with-bg {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-bottom: none;
+}
+
+.breadcrumb-container.breadcrumb-with-bg .ant-breadcrumb a,
+.breadcrumb-container.breadcrumb-with-bg .ant-breadcrumb li:last-child a,
+.breadcrumb-container.breadcrumb-with-bg .ant-breadcrumb-separator {
+  color: white;
+}
+
+.breadcrumb-container.breadcrumb-with-bg .breadcrumb-actions .ant-btn {
+  color: white;
+}
+
+.breadcrumb-container.breadcrumb-with-bg .breadcrumb-actions .ant-btn:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Estilos para breadcrumb compacto */
+.breadcrumb-container.breadcrumb-compact {
+  padding: 12px 16px;
+}
+
+.breadcrumb-container.breadcrumb-compact .ant-breadcrumb {
+  font-size: 12px;
+}
+
+/* Estilos para breadcrumb con borde */
+.breadcrumb-container.breadcrumb-bordered {
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+  margin: 0 0 16px 0;
+}
+body[data-theme="dark"] .breadcrumb-container.breadcrumb-bordered {
+  border-color: #1f2b3a;
+}
+
+/* Información adicional */
+.breadcrumb-info {
+  padding-top: 8px;
+  margin-top: 8px;
+  border-top: 1px dashed #f0f0f0;
+}
+body[data-theme="dark"] .breadcrumb-info {
+  border-top-color: #1f2b3a;
+  color: #9fb0c2;
+}
+
+/* Animación para breadcrumb */
+@keyframes fadeInBreadcrumb {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.breadcrumb-container {
+  animation: fadeInBreadcrumb 0.3s ease-out;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .breadcrumb-container {
+    padding: 12px 16px;
+    margin: -16px -16px 16px -16px;
+    position: relative;
+  }
+
+  .breadcrumb-container .ant-space {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .breadcrumb-actions {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .ant-breadcrumb {
+    font-size: 12px;
+  }
+
+  .breadcrumb-info {
+    font-size: 11px;
+  }
+}
+
+/* Estilos para pantallas pequeñas */
+@media (max-width: 576px) {
+  .breadcrumb-container {
+    padding: 8px 12px;
+    margin: -12px -12px 12px -12px;
+  }
+
+  .breadcrumb-actions .ant-btn-text {
+    padding: 4px 8px;
+  }
+
+  .breadcrumb-actions .ant-btn-text span {
+    display: none;
+  }
+
+  .breadcrumb-actions .ant-btn-text .anticon {
+    margin-right: 0;
+  }
+}

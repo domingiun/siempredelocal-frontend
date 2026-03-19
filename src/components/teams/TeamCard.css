@@ -1,0 +1,87 @@
+/* frontend/src/components/teams/TeamCard.css */
+.team-card {
+  transition: all 0.3s ease;
+  cursor: pointer;
+  margin-bottom: 16px;
+}
+
+.team-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.team-card.compact {
+  padding: 12px;
+}
+
+.team-card.compact:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.team-header {
+  margin-bottom: 16px;
+}
+
+.team-stats {
+  background: #fafafa;
+  padding: 16px;
+  border-radius: 8px;
+  margin: 16px 0;
+  border: 1px solid #f0f0f0;
+}
+
+.stat-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #666;
+}
+
+.form-badge {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+}
+
+.form-w {
+  background-color: #52c41a; /* Verde para victorias */
+}
+
+.form-d {
+  background-color: #faad14; /* Amarillo para empates */
+}
+
+.form-l {
+  background-color: #ff4d4f; /* Rojo para derrotas */
+}
+
+.team-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .team-card {
+    margin-bottom: 12px;
+  }
+  
+  .team-stats {
+    padding: 12px;
+  }
+  
+  .form-badge {
+    width: 20px;
+    height: 20px;
+    font-size: 10px;
+  }
+}

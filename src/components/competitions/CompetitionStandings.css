@@ -1,0 +1,288 @@
+/* frontend/src/components/competitions/CompetitionStandings.css */
+
+/* Contenedor principal */
+.competition-standings-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* Tabla de posiciones */
+.competition-standings-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/* Filas con colores según posición */
+.competition-standings-table .first-place-row {
+  background: linear-gradient(90deg, #fffbe6 0%, #fffbe6 100%) !important;
+  font-weight: 700;
+  border-left: 3px solid #faad14;
+}
+
+.competition-standings-table .first-place-row:hover {
+  background: linear-gradient(90deg, #fff8d9 0%, #fff8d9 100%) !important;
+}
+
+.competition-standings-table .champions-league-row {
+  background: linear-gradient(90deg, #f6ffed 0%, #f6ffed 100%) !important;
+  border-left: 3px solid #52c41a;
+}
+
+.competition-standings-table .champions-league-row:hover {
+  background: linear-gradient(90deg, #e8f7d9 0%, #e8f7d9 100%) !important;
+}
+
+.competition-standings-table .relegation-row {
+  background: linear-gradient(90deg, #fff1f0 0%, #fff1f0 100%) !important;
+  border-left: 3px solid #ff4d4f;
+}
+
+.competition-standings-table .relegation-row:hover {
+  background: linear-gradient(90deg, #ffe6e5 0%, #ffe6e5 100%) !important;
+}
+
+/* Efecto hover para todas las filas */
+.competition-standings-table .ant-table-row:hover {
+  background-color: #fafafa !important;
+}
+
+/* Encabezados de columna */
+.competition-standings-table .ant-table-thead > tr > th {
+  background-color: #fafafa;
+  font-weight: 600;
+  color: #000000d9;
+  border-bottom: 2px solid #f0f0f0;
+  padding: 12px 8px;
+  white-space: nowrap;
+}
+
+.competition-standings-table .ant-table-thead > tr > th:first-child {
+  border-radius: 8px 0 0 0;
+}
+
+.competition-standings-table .ant-table-thead > tr > th:last-child {
+  border-radius: 0 8px 0 0;
+}
+
+/* Celdas de la tabla */
+.competition-standings-table .ant-table-tbody > tr > td {
+  padding: 12px 8px;
+  border-bottom: 1px solid #f0f0f0;
+  transition: all 0.3s;
+}
+
+/* Badges de forma (estado reciente) */
+.form-badge-container {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.form-badge {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: default;
+  transition: all 0.2s cubic-bezier(0.215, 0.61, 0.355, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Efecto de brillo en hover */
+.form-badge::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.form-badge:hover::after {
+  left: 100%;
+}
+
+.form-badge:hover {
+  transform: scale(1.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Colores de badges */
+.form-badge.form-w {
+  background: linear-gradient(135deg, #52c41a, #73d13d);
+}
+
+.form-badge.form-d {
+  background: linear-gradient(135deg, #faad14, #ffc53d);
+}
+
+.form-badge.form-l {
+  background: linear-gradient(135deg, #ff4d4f, #ff7875);
+}
+
+/* Tags de posición */
+.position-tag {
+  margin: 0 !important;
+  padding: 2px 8px !important;
+  font-weight: 700 !important;
+  min-width: 32px;
+  text-align: center;
+  border-radius: 4px !important;
+  border: none !important;
+}
+
+/* Dark mode for top positions */
+body[data-theme="dark"] .competition-standings-table .position-tag.first-place-tag {
+  background: #3b2b0f !important;
+  color: #fde68a !important;
+}
+
+body[data-theme="dark"] .competition-standings-table .position-tag.second-place-tag {
+  background: #2b2f36 !important;
+  color: #e5e7eb !important;
+}
+
+body[data-theme="dark"] .competition-standings-table .position-tag.third-place-tag {
+  background: #3b2414 !important;
+  color: #fdba74 !important;
+}
+
+/* Avatar de equipo */
+.team-avatar {
+  background: linear-gradient(135deg, #fdfeff, #87bafd) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Leyenda al pie */
+.standings-legend {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 2px solid #f0f0f0;
+  font-size: 12px;
+  color: #595959;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
+
+/* Dark mode */
+body[data-theme="dark"] .competition-standings-table .ant-table-thead > tr > th {
+  background-color: #111b2a;
+  color: #e6edf3;
+  border-bottom-color: #1f2b3a;
+}
+
+body[data-theme="dark"] .competition-standings-table .ant-table-tbody > tr > td {
+  background: #0f1724;
+  border-bottom-color: #1f2b3a;
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .competition-standings-table .ant-table-row:hover {
+  background-color: #132133 !important;
+}
+
+body[data-theme="dark"] .competition-standings-table .first-place-row {
+  background: linear-gradient(90deg, #2f2a10 0%, #2f2a10 100%) !important;
+  border-left-color: #faad14;
+}
+
+body[data-theme="dark"] .competition-standings-table .first-place-row:hover {
+  background: linear-gradient(90deg, #3b3414 0%, #3b3414 100%) !important;
+}
+
+body[data-theme="dark"] .competition-standings-table .champions-league-row {
+  background: linear-gradient(90deg, #1a2a1a 0%, #1a2a1a 100%) !important;
+  border-left-color: #52c41a;
+}
+
+body[data-theme="dark"] .competition-standings-table .champions-league-row:hover {
+  background: linear-gradient(90deg, #203420 0%, #203420 100%) !important;
+}
+
+body[data-theme="dark"] .competition-standings-table .relegation-row {
+  background: linear-gradient(90deg, #2b191a 0%, #2b191a 100%) !important;
+  border-left-color: #ff4d4f;
+}
+
+body[data-theme="dark"] .competition-standings-table .relegation-row:hover {
+  background: linear-gradient(90deg, #362021 0%, #362021 100%) !important;
+}
+
+body[data-theme="dark"] .team-avatar {
+  background: linear-gradient(135deg, #1b2a40, #2f4b7c) !important;
+}
+
+body[data-theme="dark"] .standings-legend {
+  border-top-color: #1f2b3a;
+  color: #9fb0c2;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-color {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .competition-standings-table .ant-table-thead > tr > th,
+  .competition-standings-table .ant-table-tbody > tr > td {
+    padding: 8px 6px;
+    font-size: 13px;
+  }
+  
+  .form-badge {
+    width: 20px;
+    height: 20px;
+    font-size: 10px;
+  }
+  
+  .position-tag {
+    padding: 1px 6px !important;
+    min-width: 28px;
+    font-size: 12px !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .competition-standings-table {
+    font-size: 12px;
+  }
+  
+  .form-badge {
+    width: 18px;
+    height: 18px;
+    font-size: 9px;
+  }
+  
+  .standings-legend {
+    font-size: 11px;
+    gap: 12px;
+  }
+  
+  .legend-color {
+    width: 12px;
+    height: 12px;
+  }
+}

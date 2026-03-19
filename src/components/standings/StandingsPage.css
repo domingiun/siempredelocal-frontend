@@ -1,0 +1,101 @@
+.standings-page {
+  padding: 24px;
+}
+
+.standings-header {
+  margin-bottom: 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+}
+
+.standings-header .ant-card-head {
+  border: none;
+}
+
+.standings-header .ant-typography {
+  color: white !important;
+}
+
+.standings-header .ant-tag {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+}
+
+.stat-card {
+  transition: all 0.3s;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border-radius: 4px;
+  background: #fafafa;
+}
+
+.legend-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+}
+
+.legend-color.promotion {
+  background: #f6ffed;
+  border: 2px solid #b7eb8f;
+}
+
+.legend-color.international {
+  background: #e6f7ff;
+  border: 2px solid #91d5ff;
+}
+
+.legend-color.playoff {
+  background: #f0f5ff;
+  border: 2px solid #adc6ff;
+}
+
+.legend-color.relegation {
+  background: #fff1f0;
+  border: 2px solid #ffa39e;
+}
+
+.key-match {
+  padding: 12px;
+  background: #fafafa;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  transition: all 0.3s;
+}
+
+.key-match:hover {
+  background: #f0f0f0;
+  transform: translateX(4px);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .standings-page {
+    padding: 12px;
+  }
+  
+  .standings-header .ant-row {
+    flex-direction: column;
+  }
+  
+  .standings-header .ant-col {
+    width: 100%;
+  }
+  
+  .stat-card {
+    margin-bottom: 12px;
+  }
+}

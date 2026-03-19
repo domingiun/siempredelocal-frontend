@@ -1,0 +1,223 @@
+.create-round {
+  width: 100%;
+}
+
+/* Light defaults previously inline */
+.create-round .ant-btn {
+  color: #1f2937;
+}
+
+.create-round .ant-btn-default {
+  background: #ffffff;
+  border-color: #d1d5db;
+  color: #1f2937;
+}
+
+.create-round .ant-btn-default:hover {
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+
+.create-round .ant-btn-primary {
+  background: #0958d9;
+  border-color: #0958d9;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.create-round .ant-btn-link {
+  color: #2563eb;
+}
+
+/* Dark mode */
+body[data-theme="dark"] .create-round .ant-card {
+  background: #0f1724;
+  border-color: #1f2b3a;
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .create-round .ant-card-head {
+  background: #111b2a;
+  border-bottom-color: #1f2b3a;
+}
+
+body[data-theme="dark"] .create-round .ant-card-head-title,
+body[data-theme="dark"] .create-round .ant-card-extra,
+body[data-theme="dark"] .create-round .ant-typography {
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .create-round .ant-typography-secondary {
+  color: #9fb0c2;
+}
+
+body[data-theme="dark"] .create-round .ant-input,
+body[data-theme="dark"] .create-round .ant-input-affix-wrapper,
+body[data-theme="dark"] .create-round .ant-input-number,
+body[data-theme="dark"] .create-round .ant-select-selector,
+body[data-theme="dark"] .create-round .ant-select-single .ant-select-selector,
+body[data-theme="dark"] .create-round .ant-select-multiple .ant-select-selector,
+body[data-theme="dark"] .create-round .ant-picker {
+  background: #0f1724 !important;
+  border-color: #1f2b3a !important;
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .create-round .ant-select-single .ant-select-selector,
+body[data-theme="dark"] .create-round .ant-select-single:not(.ant-select-customize-input) .ant-select-selector {
+  background: #0f1724 !important;
+  border-color: #1f2b3a !important;
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .create-round .ant-select-selection-item,
+body[data-theme="dark"] .create-round .ant-select-selection-placeholder {
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .create-round .ant-input::placeholder,
+body[data-theme="dark"] .create-round .ant-select-selection-placeholder,
+body[data-theme="dark"] .create-round .ant-picker-input > input::placeholder {
+  color: #9fb0c2 !important;
+}
+
+body[data-theme="dark"] .create-round .ant-select-selection-item,
+body[data-theme="dark"] .create-round .ant-picker-input > input,
+body[data-theme="dark"] .create-round .ant-input-number-input {
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .create-round .ant-select-arrow,
+body[data-theme="dark"] .create-round .ant-picker-suffix {
+  color: #9fb0c2 !important;
+}
+
+body[data-theme="dark"] .create-round .ant-select-dropdown {
+  background: #0f1724;
+  border: 1px solid #1f2b3a;
+}
+
+body[data-theme="dark"] .create-round .ant-select-item,
+body[data-theme="dark"] .create-round .ant-select-item-option-content {
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .create-round .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+  background: #132133;
+}
+
+body[data-theme="dark"] .create-round .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  background: #1a2a40;
+}
+
+body[data-theme="dark"] .create-round .ant-form-item-label > label {
+  color: #cbd5e1;
+}
+
+body[data-theme="dark"] .create-round .ant-divider,
+body[data-theme="dark"] .create-round .ant-divider-inner-text {
+  color: #cbd5e1;
+}
+
+body[data-theme="dark"] .create-round .ant-radio-wrapper,
+body[data-theme="dark"] .create-round .ant-radio-wrapper span {
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .create-round .ant-divider {
+  border-color: #1f2b3a;
+}
+
+body[data-theme="dark"] .create-round .ant-alert {
+  background: #111b2a !important;
+  border-color: #1f2b3a !important;
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .create-round .ant-alert-message,
+body[data-theme="dark"] .create-round .ant-alert-description {
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .create-round .ant-alert-description .ant-typography,
+body[data-theme="dark"] .create-round .ant-alert-description span,
+body[data-theme="dark"] .create-round .ant-alert-description div {
+  color: #cbd5e1 !important;
+}
+
+body[data-theme="dark"] .create-round .ant-alert-info {
+  background: #0f1724 !important;
+  border-color: #1f2b3a !important;
+}
+
+body[data-theme="dark"] .create-round .ant-alert-info .ant-alert-icon {
+  color: #60a5fa !important;
+}
+
+body[data-theme="dark"] .create-round .ant-alert-info .ant-alert-message {
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .create-round .ant-alert-info .ant-alert-description {
+  color: #cbd5e1 !important;
+}
+
+body[data-theme="dark"] .create-round .ant-steps-item-title,
+body[data-theme="dark"] .create-round .ant-steps-item-description {
+  color: #cbd5e1;
+}
+
+body[data-theme="dark"] .create-round .ant-btn {
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .create-round .ant-btn-default {
+  background: #111b2a;
+  border-color: #1f2b3a;
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .create-round .ant-btn-default:hover {
+  border-color: #334155;
+  color: #ffffff;
+}
+
+body[data-theme="dark"] .create-round .ant-btn-link {
+  color: #93c5fd;
+}
+
+body[data-theme="dark"] .create-round .ant-btn-link:hover {
+  color: #bfdbfe;
+}
+
+body[data-theme="dark"] .create-round .ant-tag {
+  background: #111b2a;
+  border-color: #1f2b3a;
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .create-round .ant-tag-green {
+  background: rgba(34, 197, 94, 0.15);
+  border-color: rgba(34, 197, 94, 0.35);
+  color: #86efac;
+}
+
+body[data-theme="dark"] .create-round .ant-tag-orange {
+  background: rgba(249, 115, 22, 0.18);
+  border-color: rgba(249, 115, 22, 0.35);
+  color: #fdba74;
+}
+
+body[data-theme="dark"] .create-round .ant-tag-blue {
+  background: rgba(59, 130, 246, 0.18);
+  border-color: rgba(59, 130, 246, 0.35);
+  color: #93c5fd;
+}
+
+body[data-theme="dark"] .create-round .ant-tag-default,
+body[data-theme="dark"] .create-round .ant-tag-gray,
+body[data-theme="dark"] .create-round .ant-tag-grey {
+  background: #111827;
+  border-color: #1f2b3a;
+  color: #cbd5e1;
+}

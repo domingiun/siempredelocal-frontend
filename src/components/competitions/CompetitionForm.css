@@ -1,0 +1,202 @@
+.competition-form-page {
+  width: 100%;
+}
+
+body[data-theme="dark"] .competition-form-page .ant-card {
+  background: #0f1724;
+  border-color: #1f2b3a;
+}
+
+body[data-theme="dark"] .competition-form-page .ant-card-head {
+  background: #111b2a;
+  border-bottom-color: #1f2b3a;
+}
+
+body[data-theme="dark"] .competition-form-page .ant-card-head-title,
+body[data-theme="dark"] .competition-form-page .ant-card-extra,
+body[data-theme="dark"] .competition-form-page .ant-typography {
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .competition-form-page .ant-typography-secondary {
+  color: #9fb0c2;
+}
+
+body[data-theme="dark"] .competition-form-page,
+body[data-theme="dark"] .competition-form-page p,
+body[data-theme="dark"] .competition-form-page span,
+body[data-theme="dark"] .competition-form-page label,
+body[data-theme="dark"] .competition-form-page .ant-form-item-label > label,
+body[data-theme="dark"] .competition-form-page .ant-form-item-explain,
+body[data-theme="dark"] .competition-form-page .ant-form-item-extra {
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .competition-form-page .ant-form-item-explain,
+body[data-theme="dark"] .competition-form-page .ant-form-item-extra,
+body[data-theme="dark"] .competition-form-page .ant-typography-secondary {
+  color: #9fb0c2;
+}
+
+body[data-theme="dark"] .competition-form-page .ant-tag {
+  background: #111b2a;
+  border-color: #1f2b3a;
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .competition-form-page .ant-btn-text,
+body[data-theme="dark"] .competition-form-page .ant-btn-link {
+  color: #cbd5e1;
+}
+
+body[data-theme="dark"] .competition-form-page .ant-btn-text:hover,
+body[data-theme="dark"] .competition-form-page .ant-btn-link:hover {
+  color: #ffffff;
+}
+
+body[data-theme="dark"] .competition-form-page .competition-form-label {
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .competition-form-page .ant-btn-link {
+  color: #cbd5e1;
+}
+
+body[data-theme="dark"] .competition-form-page .ant-btn-link:hover {
+  color: #ffffff;
+}
+
+body[data-theme="dark"] .competition-form-page .ant-input,
+body[data-theme="dark"] .competition-form-page .ant-input-affix-wrapper,
+body[data-theme="dark"] .competition-form-page .ant-input-number,
+body[data-theme="dark"] .competition-form-page .ant-select-selector,
+body[data-theme="dark"] .competition-form-page .ant-select-single .ant-select-selector,
+body[data-theme="dark"] .competition-form-page .ant-select-multiple .ant-select-selector,
+body[data-theme="dark"] .competition-form-page .ant-picker {
+  background: #0f1724 !important;
+  border-color: #1f2b3a !important;
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .competition-form-page .ant-input::placeholder,
+body[data-theme="dark"] .competition-form-page .ant-select-selection-placeholder,
+body[data-theme="dark"] .competition-form-page .ant-picker-input > input::placeholder {
+  color: #9fb0c2 !important;
+}
+
+body[data-theme="dark"] .competition-form-page .ant-select-selection-item,
+body[data-theme="dark"] .competition-form-page .ant-picker-input > input {
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .competition-form-page .ant-input-number-input,
+body[data-theme="dark"] .competition-form-page .ant-select-single .ant-select-selector .ant-select-selection-item,
+body[data-theme="dark"] .competition-form-page .ant-select-multiple .ant-select-selection-item,
+body[data-theme="dark"] .competition-form-page .ant-select-multiple .ant-select-selection-item-content {
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .competition-form-page .ant-select-single .ant-select-selector .ant-select-selection-placeholder,
+body[data-theme="dark"] .competition-form-page .ant-select-multiple .ant-select-selection-placeholder {
+  color: #9fb0c2 !important;
+}
+
+body[data-theme="dark"] .competition-form-page .ant-select-single .ant-select-selector {
+  background: #0f1724 !important;
+  border-color: #1f2b3a !important;
+}
+
+body[data-theme="dark"] .competition-form-page .ant-select .ant-select-selector {
+  background: #0f1724 !important;
+  border-color: #1f2b3a !important;
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .competition-form-page .ant-select-single.ant-select-open .ant-select-selector,
+body[data-theme="dark"] .competition-form-page .ant-select-focused .ant-select-selector,
+body[data-theme="dark"] .competition-form-page .ant-select-single:not(.ant-select-customize-input) .ant-select-selector {
+  background: #0f1724 !important;
+  border-color: #1f2b3a !important;
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .competition-form-page .ant-select-single .ant-select-selector .ant-select-selection-item {
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .competition-form-page .competition-form-select .ant-select-selector {
+  background: #0f1724 !important;
+  border-color: #1f2b3a !important;
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .competition-form-page .competition-form-select .ant-select-selection-item {
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .competition-form-page .competition-form-select .ant-select-selection-placeholder {
+  color: #9fb0c2 !important;
+}
+
+body[data-theme="dark"] .competition-form-page .ant-select-single .ant-select-selector .ant-select-selection-placeholder {
+  color: #9fb0c2 !important;
+}
+
+body[data-theme="dark"] .competition-form-page .ant-select-arrow,
+body[data-theme="dark"] .competition-form-page .ant-picker-suffix {
+  color: #9fb0c2 !important;
+}
+
+body[data-theme="dark"] .competition-form-page .ant-select-dropdown {
+  background: #0f1724;
+  border: 1px solid #1f2b3a;
+}
+
+body[data-theme="dark"] .competition-form-page .ant-select-item,
+body[data-theme="dark"] .competition-form-page .ant-select-item-option-content {
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .competition-form-page .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+  background: #132133;
+}
+
+body[data-theme="dark"] .competition-form-page .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  background: #1a2a40;
+}
+
+body[data-theme="dark"] .competition-form-page .ant-tabs-nav,
+body[data-theme="dark"] .competition-form-page .ant-tabs-tab {
+  color: #cbd5e1;
+}
+
+body[data-theme="dark"] .competition-form-page .ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .competition-form-page .ant-tabs-ink-bar {
+  background: #2563eb;
+}
+
+body[data-theme="dark"] .competition-form-page .ant-form-item-label > label {
+  color: #cbd5e1;
+}
+
+body[data-theme="dark"] .competition-form-page .ant-divider {
+  border-color: #1f2b3a;
+}
+
+body[data-theme="dark"] .competition-form-page .ant-alert {
+  background: #111b2a;
+  border-color: #1f2b3a;
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .competition-form-page .ant-upload {
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .competition-form-page .ant-upload-list-item,
+body[data-theme="dark"] .competition-form-page .ant-upload-list-item-name {
+  color: #e6edf3;
+}

@@ -1,0 +1,203 @@
+.bet-page {
+  padding: 24px;
+  min-height: 100vh;
+  background:
+    radial-gradient(1200px 520px at -10% -10%, rgba(16, 185, 129, 0.18), transparent 55%),
+    radial-gradient(900px 420px at 110% 0%, rgba(59, 130, 246, 0.18), transparent 55%),
+    linear-gradient(180deg, #f7fafc 0%, #ffffff 100%);
+}
+body[data-theme="dark"] .bet-page {
+  background:
+    radial-gradient(1200px 520px at -10% -10%, rgba(16, 185, 129, 0.08), transparent 55%),
+    radial-gradient(900px 420px at 110% 0%, rgba(59, 130, 246, 0.08), transparent 55%),
+    linear-gradient(180deg, #0b0f16 0%, #0f1824 100%);
+  color: #e6edf3;
+}
+
+.bet-hero {
+  position: relative;
+  padding: 28px 32px;
+  margin-bottom: 24px;
+  border-radius: 16px;
+  border: 1px solid rgba(16, 185, 129, 0.18);
+  background: linear-gradient(135deg, #ffffff 0%, #ecfff6 60%, #eef6ff 100%);
+  overflow: hidden;
+  font-family: "Space Grotesk", "IBM Plex Sans", "Segoe UI", sans-serif;
+}
+body[data-theme="dark"] .bet-hero {
+  border: 1px solid #1f2b3a;
+  background: linear-gradient(135deg, #0c141f 0%, #0f1b2a 60%, #111b28 100%);
+}
+
+.bet-hero__eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 12px;
+  color: #0f766e;
+  margin-bottom: 8px;
+}
+body[data-theme="dark"] .bet-hero__eyebrow {
+  color: #7dd3fc;
+}
+
+.bet-hero__title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #0b1b2b;
+  margin-bottom: 8px;
+}
+body[data-theme="dark"] .bet-hero__title {
+  color: #e6edf3;
+}
+
+.bet-hero__subtitle {
+  font-size: 15px;
+  color: #38516b;
+  max-width: 640px;
+}
+body[data-theme="dark"] .bet-hero__subtitle {
+  color: #cbd5e1;
+}
+
+.bet-hero__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+  font-size: 12px;
+  color: #0f4c5c;
+}
+body[data-theme="dark"] .bet-hero__meta {
+  color: #9fb0c2;
+}
+
+.bet-hero__meta span {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  background: rgba(16, 185, 129, 0.12);
+}
+body[data-theme="dark"] .bet-hero__meta span {
+  border-color: rgba(59, 130, 246, 0.35);
+  background: rgba(59, 130, 246, 0.18);
+  color: #e6edf3;
+}
+
+.bet-hero__accent {
+  position: absolute;
+  right: -40px;
+  bottom: -60px;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle at 30% 30%, rgba(59, 130, 246, 0.35), transparent 60%);
+  filter: blur(2px);
+}
+
+.bet-hero__logo {
+  position: absolute;
+  right: 24px;
+  bottom: 10px;
+  width: 220px;
+  height: 220px;
+  opacity: 0.18;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.bet-page__grid {
+  align-items: stretch;
+}
+
+.bet-panel {
+  height: 100%;
+  border-radius: 14px;
+  border: 1px solid #e7eef7;
+  background: #ffffff;
+  box-shadow: 0 14px 34px rgba(12, 38, 76, 0.08);
+  padding: 12px;
+}
+body[data-theme="dark"] .bet-panel {
+  border: 1px solid #1f2b3a;
+  background: #0f1824;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
+}
+
+.bet-panel--wallet {
+  background: linear-gradient(180deg, #ffffff 0%, #f5f9ff 100%);
+  padding: 8px;
+}
+body[data-theme="dark"] .bet-panel--wallet {
+  background: linear-gradient(180deg, #0c141f 0%, #0f1b2a 100%);
+}
+
+.bet-panel--list {
+  background: #ffffff;
+}
+body[data-theme="dark"] .bet-panel--list {
+  background: #0f1824;
+}
+
+@media (max-width: 992px) {
+  .bet-hero {
+    padding: 22px 20px;
+  }
+
+  .bet-hero__title {
+    font-size: 24px;
+  }
+
+  .bet-hero__logo {
+    width: 160px;
+    height: 160px;
+    right: 12px;
+    bottom: 6px;
+    opacity: 0.14;
+  }
+}
+
+@media (max-width: 480px) {
+  .bet-page {
+    padding: 16px;
+  }
+
+  .bet-hero {
+    padding: 20px 18px 18px;
+  }
+
+  .bet-hero__eyebrow {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+  }
+
+  .bet-hero__title {
+    font-size: 20px;
+    line-height: 1.2;
+  }
+
+  .bet-hero__subtitle {
+    font-size: 12.5px;
+    line-height: 1.4;
+  }
+
+  .bet-hero__meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    font-size: 11px;
+  }
+
+  .bet-hero__meta span {
+    width: 100%;
+    text-align: left;
+    font-size: 11px;
+    padding: 5px 8px;
+  }
+
+  .bet-hero__logo {
+    position: static;
+    width: 120px;
+    height: 120px;
+    margin-top: 12px;
+    opacity: 0.12;
+  }
+}

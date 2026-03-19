@@ -1,0 +1,47 @@
+/* frontend/src/components/matches/MatchList.css */
+.match-list-header {
+  background: linear-gradient(135deg, #1890ff 0%, #52c41a 100%);
+  color: white;
+  padding: 16px;
+  border-radius: 8px 8px 0 0;
+}
+
+.match-stats-card {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.match-stats-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.live-match-indicator {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.match-filter-card .ant-card-body {
+  padding: 12px !important;
+}
+
+.match-list-card .btn-outline-primary {
+  color: #1890ff !important;
+  border-color: #1890ff !important;
+  background: #fff !important;
+}
+
+.match-list-card .btn-outline-primary * {
+  color: inherit !important;
+}

@@ -1,0 +1,18 @@
+/* src/antd-theme.css */
+:root {
+  --primary-color: #1890ff;
+  --success-color: #52c41a;
+  --error-color: #ff4d4f;
+  --warning-color: #faad14;
+}
+
+/* Personalización de Ant Design */
+.ant-btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.ant-btn-primary:hover {
+  background-color: #40a9ff;
+  border-color: #40a9ff;
+}

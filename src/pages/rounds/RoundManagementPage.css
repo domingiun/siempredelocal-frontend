@@ -1,0 +1,114 @@
+.rounds-management-page {
+  width: 100%;
+}
+
+body[data-theme="dark"] .rounds-management-page .ant-card {
+  background: #0f1724;
+  border-color: #1f2b3a;
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .rounds-management-page .ant-card-head {
+  background: #111b2a;
+  border-bottom-color: #1f2b3a;
+}
+
+body[data-theme="dark"] .rounds-management-page .ant-card-head-title,
+body[data-theme="dark"] .rounds-management-page .ant-card-extra,
+body[data-theme="dark"] .rounds-management-page .ant-typography {
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .rounds-management-page .ant-typography-secondary {
+  color: #9fb0c2;
+}
+
+body[data-theme="dark"] .rounds-management-page .ant-input,
+body[data-theme="dark"] .rounds-management-page .ant-input-affix-wrapper {
+  background: #0f1724;
+  border-color: #1f2b3a;
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .rounds-management-page .ant-input::placeholder {
+  color: #9fb0c2;
+}
+
+body[data-theme="dark"] .rounds-management-page .ant-table {
+  background: #0f1724;
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .rounds-management-page .ant-table-container {
+  background: #0f1724;
+  border-color: #1f2b3a;
+}
+
+body[data-theme="dark"] .rounds-management-page .ant-table-thead > tr > th {
+  background: #111b2a;
+  color: #e6edf3;
+  border-bottom-color: #1f2b3a;
+}
+
+body[data-theme="dark"] .rounds-management-page .ant-table-tbody > tr > td {
+  background: #0f1724;
+  color: #e6edf3;
+  border-bottom-color: #1f2b3a;
+}
+
+body[data-theme="dark"] .rounds-management-page .ant-table-tbody > tr.ant-table-row:hover > td {
+  background: #132133;
+}
+
+body[data-theme="dark"] .rounds-management-page .ant-pagination-item,
+body[data-theme="dark"] .rounds-management-page .ant-pagination-prev,
+body[data-theme="dark"] .rounds-management-page .ant-pagination-next {
+  background: #0f1724;
+  border-color: #1f2b3a;
+}
+
+body[data-theme="dark"] .rounds-management-page .ant-pagination-item a,
+body[data-theme="dark"] .rounds-management-page .ant-pagination-prev a,
+body[data-theme="dark"] .rounds-management-page .ant-pagination-next a {
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .rounds-management-page .ant-btn-link,
+body[data-theme="dark"] .rounds-management-page .ant-btn-text {
+  color: #cbd5e1;
+}
+
+body[data-theme="dark"] .rounds-management-page .ant-btn-link:hover,
+body[data-theme="dark"] .rounds-management-page .ant-btn-text:hover {
+  color: #ffffff;
+}
+
+body[data-theme="dark"] .rounds-management-page .ant-btn-link .anticon,
+body[data-theme="dark"] .rounds-management-page .ant-btn-text .anticon {
+  color: inherit;
+}
+
+body[data-theme="dark"] .rounds-management-page .ant-tag {
+  background: #111b2a;
+  border-color: #1f2b3a;
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .rounds-management-page .ant-tag-green,
+body[data-theme="dark"] .rounds-management-page .ant-tag.ant-tag-green {
+  background: rgba(34, 197, 94, 0.15);
+  border-color: rgba(34, 197, 94, 0.35);
+  color: #86efac;
+}
+
+body[data-theme="dark"] .rounds-management-page .ant-tag-blue,
+body[data-theme="dark"] .rounds-management-page .ant-tag.ant-tag-blue {
+  background: rgba(59, 130, 246, 0.18);
+  border-color: rgba(59, 130, 246, 0.35);
+  color: #93c5fd;
+}
+
+body[data-theme="dark"] .rounds-management-page .ant-empty,
+body[data-theme="dark"] .rounds-management-page .ant-empty-description {
+  color: #9fb0c2;
+}

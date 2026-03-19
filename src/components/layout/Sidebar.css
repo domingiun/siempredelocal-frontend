@@ -1,0 +1,186 @@
+/* frontend/src/components/layout/Sidebar.css */
+.app-sidebar {
+  height: 100vh;
+  width: 100%;
+  background: #001529;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 2px 0 8px 0 rgba(29, 35, 41, 0.05);
+}
+
+/* El resto del CSS se mantiene igual */
+.sidebar-logo {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.sidebar-logo:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.logo-collapsed {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.logo-expanded {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.logo-icon {
+  margin-right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.sidebar-collapse-btn {
+  position: absolute;
+  bottom: 64px;
+  right: 0;
+  z-index: 1000;
+}
+
+.collapse-btn {
+  width: 100%;
+  height: 40px;
+  border-radius: 0;
+}
+
+.sidebar-menu-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.sidebar-menu-container::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar-menu-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.sidebar-menu-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.main-menu {
+  border-right: none;
+  background: transparent;
+}
+
+.main-menu .ant-menu-item {
+  margin: 4px 8px !important;
+  border-radius: 6px;
+  height: 40px;
+  line-height: 40px;
+}
+
+.main-menu .ant-menu-item-selected {
+  background: rgba(24, 144, 255, 0.2) !important;
+}
+
+.main-menu .ant-menu-submenu-title {
+  margin: 4px 8px !important;
+  border-radius: 6px;
+  height: 40px;
+  line-height: 40px;
+}
+
+.main-menu .ant-menu-submenu-selected > .ant-menu-submenu-title {
+  background: rgba(24, 144, 255, 0.1) !important;
+}
+
+.credits-widget {
+  margin: 12px;
+  transition: all 0.3s ease;
+}
+
+.credits-widget:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.sidebar-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  background: #001529;
+}
+
+.bottom-menu {
+  border-right: none;
+  background: transparent;
+}
+
+.bottom-menu .ant-menu-item {
+  margin: 4px 8px !important;
+  border-radius: 6px;
+  height: 40px;
+  line-height: 40px;
+}
+
+.bottom-menu .ant-menu-item:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+.user-info-bottom {
+  padding: 12px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.quick-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .app-sidebar {
+    z-index: 1000;
+  }
+  
+  .sidebar-collapse-btn {
+    display: none;
+  }
+}
+
+/* Animations */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(82, 196, 26, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(82, 196, 26, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(82, 196, 26, 0);
+  }
+}
+
+.credits-low {
+  animation: pulse 2s infinite;
+}

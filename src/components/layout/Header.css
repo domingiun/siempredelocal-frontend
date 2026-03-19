@@ -1,0 +1,73 @@
+.app-header__left,
+.app-header__actions {
+  min-width: 0;
+}
+
+.app-header__brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.credits-badge-wrapper {
+  display: inline-flex;
+  align-items: center;
+}
+
+.credits-badge--compact {
+  display: none;
+}
+
+.header-bets-text {
+  display: inline;
+}
+
+.user-meta {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+@media (max-width: 768px) {
+  .app-header {
+    padding: 0 12px !important;
+  }
+
+  .credits-badge--full {
+    display: none;
+  }
+
+  .credits-badge--compact {
+    display: inline-flex;
+  }
+
+  .credits-badge-wrapper .ant-badge-count {
+    font-size: 11px;
+    padding: 0 6px;
+  }
+
+  .header-hide-mobile {
+    display: none !important;
+  }
+
+  .header-bets-text {
+    display: none;
+  }
+
+  .user-meta {
+    display: none;
+  }
+}
+
+@media (max-width: 576px) {
+  .app-header {
+    height: 56px;
+    line-height: 56px;
+  }
+
+  .app-header__left .ant-btn {
+    width: 48px;
+    height: 48px;
+  }
+}

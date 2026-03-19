@@ -1,0 +1,75 @@
+/* frontend/src/components/CalendarPage.css */
+.calendar-view {
+  max-height: 600px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.calendar-view::-webkit-scrollbar {
+  width: 6px;
+}
+
+.calendar-view::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.calendar-view::-webkit-scrollbar-thumb {
+  background: #1890ff;
+  border-radius: 3px;
+}
+
+.calendar-view::-webkit-scrollbar-thumb:hover {
+  background: #40a9ff;
+}
+
+.match-card {
+  transition: all 0.3s ease;
+  border-left: 4px solid transparent;
+}
+
+.match-card:hover {
+  border-left-color: #1890ff;
+  cursor: pointer;
+}
+
+.match-card.scheduled {
+  border-left-color: #1890ff;
+}
+
+.match-card.in_progress {
+  border-left-color: #faad14;
+}
+
+.match-card.finished {
+  border-left-color: #52c41a;
+}
+
+.match-card.postponed {
+  border-left-color: #8c8c8c;
+}
+
+.match-card.cancelled {
+  border-left-color: #ff4d4f;
+}
+
+/* Ajustes para la línea de tiempo */
+.ant-timeline-item-head {
+  width: 16px;
+  height: 16px;
+}
+
+.ant-timeline-item-tail {
+  left: 7px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .calendar-view .ant-card-small .ant-card-head-title {
+    font-size: 14px;
+  }
+  
+  .match-card .ant-card-body {
+    padding: 12px;
+  }
+}
