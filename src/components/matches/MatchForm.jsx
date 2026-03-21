@@ -734,9 +734,10 @@ const MatchForm = ({
               >
                 {renderFieldWithEditMode(
                   'home_team_id',
-                  <Select 
-                    placeholder="Seleccionar equipo local" 
-                    showSearch
+                <Select 
+                  className="dark-select"
+                  placeholder="Seleccionar equipo local" 
+                  showSearch
                     optionFilterProp="label"
                     optionLabelProp="label"
                     loading={!teams.length}
@@ -807,6 +808,7 @@ const MatchForm = ({
               {renderFieldWithEditMode(
                 'away_team_id',
                 <Select 
+                  className="dark-select"
                   placeholder="Seleccionar equipo visitante" 
                   showSearch
                   optionFilterProp="label"
@@ -856,6 +858,7 @@ const MatchForm = ({
               normalize={(value) => value}
             >
               <DatePicker
+                className="dark-datepicker"
                 showTime={{ 
                   format: 'hh:mm',
                   use12Hours: true
@@ -889,6 +892,7 @@ const MatchForm = ({
                 "Opcional: Selecciona una jornada para organizar los partidos"}
             >
               <Select 
+                className="dark-select"
                 placeholder={
                   competitionRounds.length > 0 ? 
                   "Seleccionar jornada (opcional)" : 
@@ -935,9 +939,10 @@ const MatchForm = ({
                   }
                   rules={isWorldCup ? [{ required: true, message: 'Ingrese el estadio' }] : []}
                 >
-                  <Input 
-                    placeholder={isWorldCup ? "Estadio del mundial" : "Nombre del estadio"} 
-                    list="worldcup-stadiums"
+                <Input 
+                  className="dark-input"
+                  placeholder={isWorldCup ? "Estadio del mundial" : "Nombre del estadio"} 
+                  list="worldcup-stadiums"
                   />
                 </Form.Item>
               </Col>
@@ -953,9 +958,10 @@ const MatchForm = ({
                   }
                   rules={isWorldCup ? [{ required: true, message: 'Ingrese la ciudad' }] : []}
                 >
-                  <Input 
-                    placeholder={isWorldCup ? "Ciudad sede" : "Nombre de la ciudad"} 
-                    list="worldcup-cities"
+                <Input 
+                  className="dark-input"
+                  placeholder={isWorldCup ? "Ciudad sede" : "Nombre de la ciudad"} 
+                  list="worldcup-cities"
                   />
                 </Form.Item>
               </Col>
@@ -973,7 +979,7 @@ const MatchForm = ({
           ) : (
             // Mostrar solo información del estadio (no editable)
             <Col span={24}>
-              <Card size="small" style={{ background: '#fafafa' }}>
+            <Card size="small" className="stadium-card" style={{ background: '#fafafa' }}>
                 <Space orientation="vertical" size="small" style={{ width: '100%' }}>
                   <Text type="secondary">
                     <EnvironmentOutlined /> Estadio y Ciudad
@@ -1005,6 +1011,7 @@ const MatchForm = ({
               rules={[{ required: true }]}
             >
               <Select
+                className="dark-select"
                 onChange={handleStatusChange}
                 placeholder="Seleccionar estado"
               >
@@ -1030,6 +1037,7 @@ const MatchForm = ({
           {/* Marcador - NUEVO: Con lógica mejorada para edición completa */}
           <Col span={24}>
             <Card 
+              className="score-card"
               style={{ 
                 background: status === 'scheduled' && !allowFullEdit ? '#f0f9ff' : 
                           status === 'finished' ? '#f6ffed' : '#fff',

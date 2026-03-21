@@ -105,3 +105,39 @@ body[data-theme="dark"] .create-match-page .ant-btn-primary[disabled] {
   color: #6b7788 !important;
   border-color: #1f2b3a !important;
 }
+
+/* Stronger overrides for MatchForm fields */
+body[data-theme="dark"] .create-match-page .dark-select .ant-select-selector,
+body[data-theme="dark"] .create-match-page .dark-select.ant-select .ant-select-selector {
+  background-color: #0c141f !important;
+  border-color: #1f2b3a !important;
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .create-match-page .dark-datepicker .ant-picker-input > input {
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .create-match-page .dark-input {
+  background-color: #0c141f !important;
+  border-color: #1f2b3a !important;
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .create-match-page .stadium-card {
+  background: #0c141f !important;
+  border-color: #1f2b3a !important;
+}
+
+body[data-theme="dark"] .create-match-page .stadium-card * {
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .create-match-page .score-card {
+  background: #0c141f !important;
+  border-color: #1f2b3a !important;
+}
+
+body[data-theme="dark"] .create-match-page .score-card * {
+  color: #e6edf3 !important;
+}
