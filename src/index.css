@@ -68,6 +68,12 @@ body[data-theme="dark"] .ant-select-multiple .ant-select-selector {
   color: #e6edf3 !important;
 }
 
+body[data-theme="dark"] .ant-select .ant-select-selector {
+  background: #0c141f !important;
+  border-color: #1f2b3a !important;
+  color: #e6edf3 !important;
+}
+
 body[data-theme="dark"] .ant-select .ant-select-selection-placeholder,
 body[data-theme="dark"] .ant-select .ant-select-selection-item {
   color: #e6edf3 !important;
