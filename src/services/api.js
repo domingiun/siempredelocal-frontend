@@ -131,7 +131,7 @@ export const roundsAPI = {
   
   // Crear jornada
   create: (competitionId, data) => 
-    api.post(`/competitions/${competitionId}/rounds`, data),
+    api.post(`/competitions/${competitionId}/rounds/`, data),
   
   // Actualizar jornada
   update: (competitionId, roundId, data) => 
