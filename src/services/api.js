@@ -119,7 +119,7 @@ export const matchesAPI = {
 export const roundsAPI = {
   // Obtener jornadas de una competencia
   getByCompetition: (competitionId, params) => 
-    api.get(`/competitions/${competitionId}/rounds`, { params }),
+    api.get(`/competitions/${competitionId}/rounds/`, { params }),
   
   // Obtener jornada por ID (global)
   getById: (competitionId, roundId) => 

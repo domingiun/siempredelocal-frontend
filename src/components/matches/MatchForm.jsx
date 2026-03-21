@@ -292,7 +292,7 @@ const MatchForm = ({
         return;
       }
       
-      const response = await api.get(`/competitions/${compId}/rounds`, {  
+      const response = await api.get(`/competitions/${compId}/rounds/`, {  
         params: { limit: 50 }
       });
       
