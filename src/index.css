@@ -90,6 +90,69 @@ body[data-theme="dark"] .ant-picker-input > input::placeholder {
   color: #9fb0c2 !important;
 }
 
+/* Ant Design dropdowns/popovers in dark mode (portals render outside page scope) */
+body[data-theme="dark"] .ant-select-dropdown,
+body[data-theme="dark"] .ant-dropdown,
+body[data-theme="dark"] .ant-picker-dropdown {
+  background: #0f1724 !important;
+  color: #e6edf3 !important;
+  border: 1px solid #1f2b3a !important;
+}
+
+body[data-theme="dark"] .ant-select-item,
+body[data-theme="dark"] .ant-select-item-option-content {
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  background: #172235 !important;
+}
+
+body[data-theme="dark"] .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+  background: #141f30 !important;
+}
+
+body[data-theme="dark"] .ant-picker-panel,
+body[data-theme="dark"] .ant-picker-panel-container,
+body[data-theme="dark"] .ant-picker-panel-layout,
+body[data-theme="dark"] .ant-picker-time-panel,
+body[data-theme="dark"] .ant-picker-time-panel-column,
+body[data-theme="dark"] .ant-picker-footer,
+body[data-theme="dark"] .ant-picker-header {
+  background: #0f1724 !important;
+  color: #e6edf3 !important;
+  border-color: #1f2b3a !important;
+}
+
+body[data-theme="dark"] .ant-picker-header button,
+body[data-theme="dark"] .ant-picker-header-view,
+body[data-theme="dark"] .ant-picker-content th {
+  color: #c9d4e3 !important;
+}
+
+body[data-theme="dark"] .ant-picker-cell-in-view .ant-picker-cell-inner {
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .ant-picker-cell-disabled .ant-picker-cell-inner {
+  color: #556070 !important;
+}
+
+body[data-theme="dark"] .ant-picker-time-panel-cell-inner {
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .ant-picker-time-panel-cell-selected .ant-picker-time-panel-cell-inner {
+  background: #1b2a40 !important;
+}
+
+body[data-theme="dark"] .ant-input-number,
+body[data-theme="dark"] .ant-input-number-input {
+  background: #0c141f !important;
+  border-color: #1f2b3a !important;
+  color: #e6edf3 !important;
+}
+
 /* Scrollbar personalizada */
 ::-webkit-scrollbar {
   width: 8px;
