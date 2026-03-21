@@ -50,12 +50,26 @@ body[data-theme="dark"] .create-match-page .ant-select-open .ant-select-selector
   color: #e6edf3 !important;
 }
 
+body[data-theme="dark"] .create-match-page .ant-form .ant-select .ant-select-selector,
+body[data-theme="dark"] .create-match-page .ant-select-outlined .ant-select-selector {
+  background-color: #0c141f !important;
+  border-color: #1f2b3a !important;
+  color: #e6edf3 !important;
+}
+
 body[data-theme="dark"] .create-match-page .ant-select-selection-search-input {
   color: #e6edf3 !important;
 }
 
 body[data-theme="dark"] .create-match-page .ant-select-selection-placeholder {
   color: #9fb0c2 !important;
+}
+
+body[data-theme="dark"] .create-match-page .ant-select .ant-tag,
+body[data-theme="dark"] .create-match-page .ant-select .ant-tag-blue {
+  background: #1b2a40 !important;
+  border-color: #2f6fed !important;
+  color: #e6edf3 !important;
 }
 
 body[data-theme="dark"] .create-match-page .ant-input::placeholder,
