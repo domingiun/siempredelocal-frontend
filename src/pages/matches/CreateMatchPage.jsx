@@ -11,6 +11,7 @@ import {
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import MatchForm from '../../components/matches/MatchForm';
+import './CreateMatchPage.css';
 import competitionService from '../../services/competitionService';
 
 const { Title, Text } = Typography;
@@ -310,7 +311,7 @@ const CreateMatchPage = () => {
   ];
 
   return (
-    <div style={{ padding: '24px' }}>
+    <div className="create-match-page" style={{ padding: '24px' }}>
       {/* Breadcrumb y navegación */}
       <Breadcrumb
         style={{ marginBottom: 12 }}

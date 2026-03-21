@@ -1,0 +1,54 @@
+/* Dark mode readability for Create Match module */
+body[data-theme="dark"] .create-match-page .ant-card {
+  background: #0f1724;
+  border-color: #1f2b3a;
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .create-match-page .ant-card-head {
+  background: #0f1724;
+  border-bottom-color: #1f2b3a;
+}
+
+body[data-theme="dark"] .create-match-page .ant-typography,
+body[data-theme="dark"] .create-match-page .ant-typography * {
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .create-match-page .ant-form-item-label > label,
+body[data-theme="dark"] .create-match-page label {
+  color: #c9d4e3;
+}
+
+body[data-theme="dark"] .create-match-page .ant-input,
+body[data-theme="dark"] .create-match-page .ant-input-number,
+body[data-theme="dark"] .create-match-page .ant-input-number-input,
+body[data-theme="dark"] .create-match-page .ant-picker,
+body[data-theme="dark"] .create-match-page .ant-select-selector {
+  background: #0c141f !important;
+  border-color: #1f2b3a !important;
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .create-match-page .ant-input::placeholder,
+body[data-theme="dark"] .create-match-page .ant-picker-input > input::placeholder {
+  color: #9fb0c2 !important;
+}
+
+body[data-theme="dark"] .create-match-page .ant-select-selection-placeholder,
+body[data-theme="dark"] .create-match-page .ant-select-selection-item {
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .create-match-page .ant-steps-item-title {
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .create-match-page .ant-steps-item-description {
+  color: #9fb0c2 !important;
+}
+
+body[data-theme="dark"] .create-match-page .ant-btn {
+  border-color: #2b3a4f;
+}
+
