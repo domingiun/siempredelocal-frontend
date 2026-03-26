@@ -3,7 +3,7 @@ import {
   Card, Row, Col, Tabs, Tag, Space, Button, Statistic, 
   Descriptions, Table, Avatar, Progress, 
   Modal, message, Divider, Typography, Select,
-  Empty
+  Empty, Grid
 } from 'antd';
 import { 
   TrophyOutlined, TeamOutlined, CalendarOutlined, 
@@ -13,6 +13,7 @@ import {
 import { useParams, useNavigate } from 'react-router-dom';
 import competitionService from '../../services/competitionService';
 import moment from 'moment';
+import './CompetitionDetail.css';
 
 const { Title, Text, Paragraph } = Typography;
 const { TabPane } = Tabs;
@@ -21,6 +22,8 @@ const { Option } = Select;
 const CompetitionDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const screens = Grid.useBreakpoint();
+  const isMobile = !screens.md;
 
   const [competition, setCompetition] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -160,19 +163,22 @@ const CompetitionDetail = () => {
   }
 
   return (
-    <div style={{ padding: 24 }}>
+    <div className="competition-detail-page" style={{ padding: 24 }}>
 
       {/* HEADER */}
-      <Card style={{ background: '#1e1e2f', color: '#fff', marginBottom: 24 }}>
+      <Card className="competition-detail-header" style={{ background: '#1e1e2f', color: '#fff', marginBottom: 24 }}>
         <Row justify="space-between" align="middle">
           <Col>
             <Space>
-              <TrophyOutlined style={{ fontSize: 32 }} />
-              <Title level={2} style={{ color: '#fff', margin: 0 }}>
+              <TrophyOutlined style={{ fontSize: isMobile ? 24 : 32 }} />
+              <Title level={isMobile ? 3 : 2} style={{ color: '#fff', margin: 0 }}>
                 {competition.name}
               </Title>
             </Space>
             <Space>
+              {competition.status && (
+                <Tag color={getStatusColor(competition.status)}>{competition.status}</Tag>
+              )}
               <Tag color="blue">{competition.season}</Tag>
               <Tag color="geekblue">{competition.country}</Tag>
             </Space>
@@ -188,6 +194,21 @@ const CompetitionDetail = () => {
       </Card>
 
       <Card>
+        {isMobile ? (
+          <Row gutter={24}>
+            <Col span={24}>
+              <Card title="Información General">
+                <Descriptions column={1}>
+                  <Descriptions.Item label="Tipo">{competition.competition_type}</Descriptions.Item>
+                  <Descriptions.Item label="Formato">{competition.competition_format}</Descriptions.Item>
+                  <Descriptions.Item label="Temporada">{competition.season}</Descriptions.Item>
+                  <Descriptions.Item label="País">{competition.country}</Descriptions.Item>
+                  <Descriptions.Item label="Equipos">{competition.total_teams || competition.teams?.length || 0}</Descriptions.Item>
+                </Descriptions>
+              </Card>
+            </Col>
+          </Row>
+        ) : (
         <Tabs activeKey={activeTab} onChange={setActiveTab}>
 
           {/* RESUMEN */}
@@ -195,11 +216,12 @@ const CompetitionDetail = () => {
             <Row gutter={24}>
               <Col span={16}>
                 <Card title="Información General">
-                  <Descriptions column={2}>
+                  <Descriptions column={isMobile ? 1 : 2}>
                     <Descriptions.Item label="Tipo">{competition.competition_type}</Descriptions.Item>
                     <Descriptions.Item label="Formato">{competition.competition_format}</Descriptions.Item>
                     <Descriptions.Item label="Temporada">{competition.season}</Descriptions.Item>
                     <Descriptions.Item label="País">{competition.country}</Descriptions.Item>
+                    <Descriptions.Item label="Equipos">{competition.total_teams || competition.teams?.length || 0}</Descriptions.Item>
                   </Descriptions>
                 </Card>
 
@@ -294,6 +316,7 @@ const CompetitionDetail = () => {
           </TabPane>
 
         </Tabs>
+        )}
       </Card>
     </div>
   );

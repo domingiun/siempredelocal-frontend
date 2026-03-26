@@ -1,0 +1,25 @@
+.competition-detail-page .competition-detail-header .ant-space {
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .competition-detail-page {
+    padding: 16px !important;
+  }
+
+  .competition-detail-page .competition-detail-header .ant-row {
+    row-gap: 12px;
+  }
+
+  .competition-detail-page .competition-detail-header .ant-col {
+    width: 100%;
+  }
+
+  .competition-detail-page .competition-detail-header .ant-space {
+    row-gap: 8px;
+  }
+
+  .competition-detail-page .competition-detail-header .ant-btn {
+    width: 100%;
+  }
+}
