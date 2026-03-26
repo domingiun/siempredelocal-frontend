@@ -21,6 +21,7 @@ import {
 } from '@ant-design/icons';
 import { useAuth } from '../../context/AuthContext';
 import reportService from '../../services/reportService';
+import './PerformanceReportPage.css';
 
 const { Title, Text } = Typography;
 const sectionCardStyle = {
@@ -80,7 +81,8 @@ const PerformanceReportPage = () => {
   }
 
   return (
-    <Space orientation="vertical" size={16} style={{ width: '100%' }}>
+    <div className="performance-report-page">
+      <Space orientation="vertical" size={16} style={{ width: '100%' }}>
       <Card
         style={{
           ...sectionCardStyle,
@@ -204,7 +206,8 @@ const PerformanceReportPage = () => {
           </Card>
         </Col>
       </Row>
-    </Space>
+      </Space>
+    </div>
   );
 };
 

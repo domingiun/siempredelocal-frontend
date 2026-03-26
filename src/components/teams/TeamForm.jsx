@@ -13,6 +13,7 @@ import {
 } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import competitionService from '../../services/competitionService';
+import './TeamForm.css';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -140,7 +141,7 @@ const TeamForm = () => {
   };
 
   return (
-    <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
+    <div className="team-form-page" style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
       {/* Header */}
       <Space orientation="vertical" style={{ width: '100%', marginBottom: '24px' }}>
         <Button

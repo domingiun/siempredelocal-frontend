@@ -32,6 +32,7 @@ import {
 } from '@ant-design/icons';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
+import './AdminSystemPage.css';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -244,7 +245,7 @@ const AdminSystemPage = () => {
   }
 
   return (
-    <div style={{ padding: '24px' }}>
+    <div className="admin-system-page" style={{ padding: '24px' }}>
       <Row gutter={[16, 16]}>
         <Col span={24}>
           <Card>

@@ -27,6 +27,7 @@ import { useNavigate } from 'react-router-dom';
 import competitionService from '../../services/competitionService';
 
 import { usePermissions } from '../../hooks/usePermissions';
+import './TeamList.css';
 
 const { Option } = Select;
 
@@ -558,7 +559,7 @@ const TeamsList = () => {
 
   return (
 
-    <div style={{ padding: '24px' }}>
+    <div className="teams-page" style={{ padding: '24px' }}>
 
       <Row gutter={[16, 16]}>
 
@@ -641,6 +642,8 @@ const TeamsList = () => {
                 <Card
 
                   size="small"
+
+                  className="teams-filter-card"
 
                   style={{ textAlign: 'center', background: '#fafafa' }}
 

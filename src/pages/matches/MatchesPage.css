@@ -84,3 +84,11 @@ body[data-theme="dark"] .ant-select-item-option-selected:not(.ant-select-item-op
   background: #172235 !important;
 }
 
+/* Mobile: hide controls for non-admin users */
+@media (max-width: 768px) {
+  .matches-page--limited .matches-action-refresh,
+  .matches-page--limited .matches-action-create,
+  .matches-page--limited .matches-filter-date {
+    display: none !important;
+  }
+}

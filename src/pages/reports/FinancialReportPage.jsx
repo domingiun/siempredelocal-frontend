@@ -18,6 +18,7 @@ import {
 import { DollarOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useAuth } from '../../context/AuthContext';
 import reportService from '../../services/reportService';
+import './FinancialReportPage.css';
 
 const { Title, Text } = Typography;
 const { RangePicker } = DatePicker;
@@ -156,7 +157,8 @@ const FinancialReportPage = () => {
   }
 
   return (
-    <Space orientation="vertical" size={16} style={{ width: '100%' }}>
+    <div className="financial-report-page">
+      <Space orientation="vertical" size={16} style={{ width: '100%' }}>
       <Card
         style={{
           ...sectionCardStyle,
@@ -289,7 +291,8 @@ const FinancialReportPage = () => {
           </Col>
         </Row>
       </Card>
-    </Space>
+      </Space>
+    </div>
   );
 };
 

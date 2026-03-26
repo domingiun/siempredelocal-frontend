@@ -1,0 +1,175 @@
+/* Dark mode for Wallet (Mi Cajón) */
+body[data-theme="dark"] .wallet-page {
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .wallet-page .wallet-card,
+body[data-theme="dark"] .wallet-page .ant-card {
+  background: #0f1724;
+  border-color: #1f2b3a;
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .wallet-page .ant-card-head {
+  background: #0f1724;
+  border-bottom-color: #1f2b3a;
+}
+
+body[data-theme="dark"] .wallet-page .ant-typography,
+body[data-theme="dark"] .wallet-page .ant-typography * {
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .wallet-page .ant-typography-secondary {
+  color: #9fb0c2 !important;
+}
+
+body[data-theme="dark"] .wallet-page .wallet-primary,
+body[data-theme="dark"] .wallet-page .wallet-primary:hover {
+  background: #2f6fed !important;
+  border-color: #2f6fed !important;
+  color: #ffffff !important;
+}
+
+body[data-theme="dark"] .wallet-page .ant-btn {
+  background: #111a28;
+  border-color: #2b3a4f;
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .wallet-page .ant-btn:hover {
+  background: #162235;
+  border-color: #3a4b63;
+  color: #ffffff;
+}
+
+body[data-theme="dark"] .wallet-page .ant-tabs-card > .ant-tabs-nav .ant-tabs-tab {
+  background: #0c141f;
+  border-color: #1f2b3a;
+  color: #c9d4e3;
+}
+
+body[data-theme="dark"] .wallet-page .ant-tabs-card > .ant-tabs-nav .ant-tabs-tab-active {
+  background: #142132;
+  border-color: #2f6fed;
+  color: #ffffff;
+}
+
+/* Historial (tabla, filtros, alertas) */
+body[data-theme="dark"] .wallet-page .ant-table {
+  background: #0f1724;
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .wallet-page .ant-table-thead > tr > th {
+  background: #0c141f;
+  color: #e6edf3;
+  border-color: #1f2b3a;
+}
+
+body[data-theme="dark"] .wallet-page .ant-table-tbody > tr > td {
+  background: #0f1724;
+  color: #e6edf3;
+  border-color: #1f2b3a;
+}
+
+body[data-theme="dark"] .wallet-page .ant-table-tbody > tr:hover > td {
+  background: #132033;
+}
+
+body[data-theme="dark"] .wallet-page .ant-table-summary td {
+  background: #0c141f;
+  border-color: #1f2b3a;
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .wallet-page .ant-pagination .ant-pagination-item {
+  background: #0c141f;
+  border-color: #1f2b3a;
+}
+
+body[data-theme="dark"] .wallet-page .ant-pagination .ant-pagination-item a {
+  color: #c9d4e3;
+}
+
+body[data-theme="dark"] .wallet-page .ant-pagination .ant-pagination-item-active {
+  border-color: #2f6fed;
+}
+
+body[data-theme="dark"] .wallet-page .ant-pagination .ant-pagination-item-active a {
+  color: #ffffff;
+}
+
+body[data-theme="dark"] .wallet-page .ant-input,
+body[data-theme="dark"] .wallet-page .ant-select-selector,
+body[data-theme="dark"] .wallet-page .ant-picker {
+  background: #0b1624 !important;
+  border-color: #2b3a4f !important;
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .wallet-page .ant-input::placeholder {
+  color: #9fb0c2;
+}
+
+body[data-theme="dark"] .wallet-page .ant-select-selection-placeholder {
+  color: #9fb0c2;
+}
+
+body[data-theme="dark"] .wallet-page .ant-select-selection-item {
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .wallet-page .ant-picker input {
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .wallet-page .ant-picker input::placeholder {
+  color: #9fb0c2;
+}
+
+body[data-theme="dark"] .wallet-page .ant-alert {
+  background: #142132;
+  border-color: #2b3a4f;
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .wallet-page .ant-alert-message,
+body[data-theme="dark"] .wallet-page .ant-alert-description,
+body[data-theme="dark"] .wallet-page .ant-alert-description * {
+  color: #e6edf3;
+}
+
+/* Dropdowns (Select/DatePicker) in dark mode */
+body[data-theme="dark"] .ant-select-dropdown {
+  background: #0f1724;
+  border-color: #1f2b3a;
+}
+
+body[data-theme="dark"] .ant-select-item-option-content {
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .ant-select-item-option-active {
+  background: #132033;
+}
+
+body[data-theme="dark"] .ant-picker-panel {
+  background: #0f1724;
+  border-color: #1f2b3a;
+}
+
+body[data-theme="dark"] .ant-picker-header,
+body[data-theme="dark"] .ant-picker-footer,
+body[data-theme="dark"] .ant-picker-content th {
+  color: #e6edf3;
+  border-color: #1f2b3a;
+}
+
+body[data-theme="dark"] .ant-picker-cell-in-view {
+  color: #c9d4e3;
+}
+
+body[data-theme="dark"] .ant-picker-cell-in-view.ant-picker-cell-selected .ant-picker-cell-inner {
+  background: #2f6fed;
+}

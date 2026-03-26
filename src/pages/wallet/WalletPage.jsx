@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import WalletBalance from '../../components/wallet/WalletBalance';
 import PurchaseCredits from '../../components/wallet/PurchaseCredits';
 import TransactionHistoryList from '../../components/wallet/TransactionHistoryList';
+import './WalletPage.css';
 
 const { Title, Text } = Typography;
 
@@ -93,8 +94,8 @@ const WalletPage = () => {
   ];
 
   return (
-    <div style={{ padding: '24px' }}>
-      <Card style={{ marginBottom: 24 }}>
+    <div className="wallet-page" style={{ padding: '24px' }}>
+      <Card className="wallet-card wallet-card--header" style={{ marginBottom: 24 }}>
         <Row justify="space-between" align="middle">
           <Col>
             <Title level={2}>
@@ -106,7 +107,7 @@ const WalletPage = () => {
             </Text>
           </Col>
           <Col>
-            <Button type="primary" href="/help/security" icon={<QuestionCircleOutlined />}>
+            <Button type="primary" className="wallet-primary" href="/help/security" icon={<QuestionCircleOutlined />}>
               Tratamiento de datos y seguridad
             </Button>
           </Col>

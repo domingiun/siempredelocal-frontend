@@ -5,6 +5,7 @@ import { CalendarOutlined, ReloadOutlined, FireOutlined } from '@ant-design/icon
 import api from '../../services/api';
 import MatchCard from '../../components/matches/MatchCard';
 import { usePermissions } from '../../hooks/usePermissions';
+import './MatchesTodayPage.css';
 
 const { Title, Text } = Typography;
 
@@ -31,8 +32,8 @@ const MatchesTodayPage = () => {
   }, []);
 
   return (
-    <div style={{ padding: '24px' }}>
-      <Card style={{ marginBottom: 24 }}>
+    <div className="matches-today-page" style={{ padding: '24px' }}>
+      <Card className="matches-today-card" style={{ marginBottom: 24 }}>
         <Row justify="space-between" align="middle">
           <Col>
             <Title level={2}>

@@ -15,6 +15,7 @@ import { TeamOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar } from 'antd';
 import { useAuth } from '../../context/AuthContext';
 import reportService from '../../services/reportService';
+import './AttendanceReportPage.css';
 
 const { Title, Text } = Typography;
 const sectionCardStyle = {
@@ -120,7 +121,8 @@ const AttendanceReportPage = () => {
   }
 
   return (
-    <Space orientation="vertical" size={16} style={{ width: '100%' }}>
+    <div className="attendance-report-page">
+      <Space orientation="vertical" size={16} style={{ width: '100%' }}>
       <Card
         style={{
           ...sectionCardStyle,
@@ -200,7 +202,8 @@ const AttendanceReportPage = () => {
           pagination={{ pageSize: 10 }}
         />
       </Card>
-    </Space>
+      </Space>
+    </div>
   );
 };
 

@@ -1,0 +1,64 @@
+/* Dark mode for Purchase Credits */
+body[data-theme="dark"] .purchase-credits-page {
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .purchase-credits-page .purchase-credits-card,
+body[data-theme="dark"] .purchase-credits-page .ant-card {
+  background: #0f1724;
+  border-color: #1f2b3a;
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .purchase-credits-page .ant-card-head {
+  background: #0f1724;
+  border-bottom-color: #1f2b3a;
+}
+
+body[data-theme="dark"] .purchase-credits-page .ant-typography,
+body[data-theme="dark"] .purchase-credits-page .ant-typography * {
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .purchase-credits-page .ant-typography-secondary {
+  color: #9fb0c2 !important;
+}
+
+body[data-theme="dark"] .purchase-credits-page .plan-card {
+  background: #0c141f;
+  border-color: #1f2b3a;
+}
+
+body[data-theme="dark"] .purchase-credits-page .plan-credits {
+  background: #111a28 !important;
+  border-color: #2b3a4f !important;
+}
+
+body[data-theme="dark"] .purchase-credits-page .purchase-info-card {
+  background: #0c141f;
+  border-color: #1f2b3a;
+}
+
+body[data-theme="dark"] .purchase-credits-page .ant-btn {
+  background: #111a28;
+  border-color: #2b3a4f;
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .purchase-credits-page .ant-btn:hover {
+  background: #162235;
+  border-color: #3a4b63;
+  color: #ffffff;
+}
+
+body[data-theme="dark"] .purchase-credits-page .btn-outline-primary {
+  background: #2f6fed !important;
+  border-color: #2f6fed !important;
+  color: #ffffff !important;
+}
+
+body[data-theme="dark"] .purchase-credits-page .btn-outline-primary:hover {
+  background: #3a7bff !important;
+  border-color: #3a7bff !important;
+  color: #ffffff !important;
+}

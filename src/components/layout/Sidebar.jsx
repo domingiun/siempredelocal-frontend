@@ -280,11 +280,6 @@ const Sidebar = ({ collapsed, onCollapse, isMobile }) => {
             label: 'Configuración',
           },
           {
-            key: '/admin/backup',
-            icon: <ContainerOutlined />,
-            label: 'Respaldo',
-          },
-          {
             key: '/admin/bets',
             icon: <ControlOutlined />,
             label: 'Admin Recargas',

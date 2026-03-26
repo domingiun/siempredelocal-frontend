@@ -1,0 +1,174 @@
+/* Dark mode for Edit Match Page (Admin) */
+body[data-theme="dark"] .edit-match-page {
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .edit-match-page .ant-breadcrumb,
+body[data-theme="dark"] .edit-match-page .ant-breadcrumb a,
+body[data-theme="dark"] .edit-match-page .ant-breadcrumb span {
+  color: #c9d4e3 !important;
+}
+
+body[data-theme="dark"] .edit-match-page .ant-card {
+  background: #0f1724;
+  border-color: #1f2b3a;
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .edit-match-page .ant-card-head {
+  background: #0f1724;
+  border-bottom-color: #1f2b3a;
+}
+
+body[data-theme="dark"] .edit-match-page .ant-card-inner .ant-card-head {
+  background: #0c141f;
+}
+
+body[data-theme="dark"] .edit-match-page .ant-card-head-title,
+body[data-theme="dark"] .edit-match-page .ant-card-head-title * {
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .edit-match-page .ant-typography,
+body[data-theme="dark"] .edit-match-page .ant-typography * {
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .edit-match-page .ant-form-item-label > label {
+  color: #c9d4e3 !important;
+}
+
+body[data-theme="dark"] .edit-match-page .ant-form-item-extra,
+body[data-theme="dark"] .edit-match-page .ant-form-item-explain,
+body[data-theme="dark"] .edit-match-page .ant-form-item-explain-error {
+  color: #9fb0c2 !important;
+}
+
+body[data-theme="dark"] .edit-match-page .ant-descriptions,
+body[data-theme="dark"] .edit-match-page .ant-descriptions * {
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .edit-match-page .ant-descriptions-item-label {
+  color: #9fb0c2 !important;
+}
+
+body[data-theme="dark"] .edit-match-page .ant-descriptions-item-content {
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .edit-match-page .ant-alert {
+  background: #111a28;
+  border-color: #2b3a4f;
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .edit-match-page .ant-alert-message {
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .edit-match-page .ant-alert-description {
+  color: #c9d4e3;
+}
+
+body[data-theme="dark"] .edit-match-page .ant-alert-icon {
+  color: #f5c542;
+}
+
+body[data-theme="dark"] .edit-match-page .ant-input,
+body[data-theme="dark"] .edit-match-page .ant-input-number,
+body[data-theme="dark"] .edit-match-page .ant-input-number-input,
+body[data-theme="dark"] .edit-match-page .ant-picker,
+body[data-theme="dark"] .edit-match-page .ant-select-selector,
+body[data-theme="dark"] .edit-match-page .ant-select:not(.ant-select-customize-input) .ant-select-selector {
+  background: #0c141f !important;
+  border-color: #1f2b3a !important;
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .edit-match-page .ant-select-selection-placeholder,
+body[data-theme="dark"] .edit-match-page .ant-input::placeholder,
+body[data-theme="dark"] .edit-match-page .ant-picker-input > input::placeholder {
+  color: #9fb0c2 !important;
+}
+
+body[data-theme="dark"] .edit-match-page .ant-btn {
+  background: #111a28;
+  border-color: #2b3a4f;
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .edit-match-page .ant-btn:hover {
+  background: #162235;
+  border-color: #3a4b63;
+  color: #ffffff;
+}
+
+body[data-theme="dark"] .edit-match-page .edit-match-primary,
+body[data-theme="dark"] .edit-match-page .edit-match-primary:hover {
+  background: #2f6fed !important;
+  border-color: #2f6fed !important;
+  color: #ffffff !important;
+}
+
+/* Make outline buttons blue in edit mode (Cancelar / Actualizar) */
+body[data-theme="dark"] .edit-match-page .btn-outline-primary {
+  background: #2f6fed !important;
+  border-color: #2f6fed !important;
+  color: #ffffff !important;
+}
+
+body[data-theme="dark"] .edit-match-page .btn-outline-primary:hover,
+body[data-theme="dark"] .edit-match-page .btn-outline-primary:focus {
+  background: #3a7bff !important;
+  border-color: #3a7bff !important;
+  color: #ffffff !important;
+}
+
+/* Score card (Marcador) contrast in dark mode */
+body[data-theme="dark"] .edit-match-page .score-card {
+  background: #0c141f !important;
+  border-color: #1f2b3a !important;
+}
+
+body[data-theme="dark"] .edit-match-page .ant-btn-dangerous {
+  background: #2a1212;
+  border-color: #5a1f1f;
+  color: #ffd6d6;
+}
+
+body[data-theme="dark"] .edit-match-page .ant-btn-dangerous:hover {
+  background: #3a1717;
+  border-color: #7a2a2a;
+  color: #ffffff;
+}
+
+body[data-theme="dark"] .edit-match-page .ant-tag {
+  background: #142132;
+  border-color: #2b3a4f;
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .edit-match-page .ant-tag-blue {
+  background: #177ddc !important;
+  border-color: #177ddc !important;
+  color: #ffffff !important;
+}
+
+body[data-theme="dark"] .edit-match-page .ant-tag-green {
+  background: #49aa19 !important;
+  border-color: #49aa19 !important;
+  color: #ffffff !important;
+}
+
+body[data-theme="dark"] .edit-match-page .ant-tag-orange {
+  background: #d48806 !important;
+  border-color: #d48806 !important;
+  color: #ffffff !important;
+}
+
+body[data-theme="dark"] .edit-match-page .ant-tag-red {
+  background: #a61d24 !important;
+  border-color: #a61d24 !important;
+  color: #ffffff !important;
+}

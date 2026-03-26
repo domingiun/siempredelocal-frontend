@@ -18,6 +18,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import MatchForm from '../../components/matches/MatchForm';
 import competitionService from '../../services/competitionService';
+import './EditMatchPage.css';
 
 const { Title, Text } = Typography;
 
@@ -286,7 +287,7 @@ const EditMatchPage = () => {
   };
 
   return (
-    <div style={{ padding: '24px' }}>
+    <div className="edit-match-page" style={{ padding: '24px' }}>
       {/* Breadcrumb */}
       <Breadcrumb
         style={{ marginBottom: 24 }}
@@ -318,8 +319,9 @@ const EditMatchPage = () => {
             extra={
               <Space>
                 <Button 
+                  type="primary"
                   icon={<ArrowLeftOutlined />}
-                  className="btn-outline-primary"
+                  className="edit-match-primary"
                   onClick={() => navigate(`/matches/${id}`)}
                 >
                   Ver Partido

@@ -30,6 +30,7 @@ import { useAuth } from '../../../context/AuthContext';
 import betService from '../../../services/betService';
 import dayjs from 'dayjs';
 import { formatDateTimeShort, formatForInputUTC } from '../../../utils/dateFormatter';
+import './CreateBetDatePage.css';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -368,7 +369,7 @@ const CreateBetDateAdmin = () => {
   ];
 
   return (
-    <div style={{ padding: '24px' }}>
+    <div className="create-betdate-page" style={{ padding: '24px' }}>
       <Title level={2}>Crear Nueva Fecha de Pronósticos</Title>
       <Text type="secondary">
         Crea una nueva fecha con 10 partidos para que los usuarios apuesten

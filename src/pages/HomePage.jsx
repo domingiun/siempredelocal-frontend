@@ -516,12 +516,7 @@ const HomePage = () => {
               <Text style={{ color: '#cfd6e6' }}>Medellín, Colombia</Text>
             </Space>
             <div style={{ marginTop: 12 }}>
-              <Text style={{ color: '#cfd6e6', display: 'block', marginBottom: 6 }}>Redes sociales</Text>
-              <Space size={12}>
-                <a href="https://facebook.com" style={{ color: '#cfd6e6' }}>Facebook</a>
-                <a href="https://instagram.com" style={{ color: '#cfd6e6' }}>Instagram</a>
-                <a href="https://x.com" style={{ color: '#cfd6e6' }}>X</a>
-              </Space>
+              
             </div>
           </Col>
         </Row>

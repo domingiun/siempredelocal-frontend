@@ -1,0 +1,162 @@
+/* Dark mode for Teams page */
+body[data-theme="dark"] .teams-page {
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .teams-page .ant-card {
+  background: #0f1724;
+  border-color: #1f2b3a;
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .teams-page .ant-card-head {
+  background: #0f1724;
+  border-bottom-color: #1f2b3a;
+}
+
+body[data-theme="dark"] .teams-page .ant-card-head-title,
+body[data-theme="dark"] .teams-page .ant-card-head-title * {
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .teams-page .ant-typography,
+body[data-theme="dark"] .teams-page .ant-typography * {
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .teams-page .ant-statistic-title {
+  color: #9fb0c2;
+}
+
+body[data-theme="dark"] .teams-page .ant-statistic-content {
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .teams-page .teams-filter-card {
+  background: #0c141f !important;
+  border-color: #1f2b3a;
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .teams-page .teams-filter-card * {
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .teams-page .ant-input,
+body[data-theme="dark"] .teams-page .ant-select-selector {
+  background: #0b1624 !important;
+  border-color: #2b3a4f !important;
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .teams-page .ant-input::placeholder {
+  color: #9fb0c2;
+}
+
+body[data-theme="dark"] .teams-page .ant-select-selection-placeholder {
+  color: #9fb0c2;
+}
+
+body[data-theme="dark"] .teams-page .ant-select-selection-item {
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .teams-page .ant-table {
+  background: #0f1724;
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .teams-page .ant-table-thead > tr > th {
+  background: #0c141f;
+  color: #e6edf3;
+  border-color: #1f2b3a;
+}
+
+body[data-theme="dark"] .teams-page .ant-table-thead > tr > th .ant-table-column-title {
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .teams-page .ant-table-tbody > tr > td {
+  background: #0f1724;
+  color: #e6edf3;
+  border-color: #1f2b3a;
+}
+
+body[data-theme="dark"] .teams-page .ant-table-tbody > tr:hover > td {
+  background: #132033;
+}
+
+body[data-theme="dark"] .teams-page small {
+  color: #9fb0c2 !important;
+}
+
+body[data-theme="dark"] .teams-page .ant-tag {
+  background: #142132 !important;
+  border-color: #2b3a4f !important;
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .teams-page .ant-tag-blue {
+  background: #123a6b !important;
+  border-color: #1f5aa6 !important;
+  color: #e6f2ff !important;
+}
+
+body[data-theme="dark"] .teams-page .ant-tag-green {
+  background: #123b2a !important;
+  border-color: #1f6b48 !important;
+  color: #e8fff5 !important;
+}
+
+body[data-theme="dark"] .teams-page .ant-tag-red {
+  background: #4a1f23 !important;
+  border-color: #7a2b32 !important;
+  color: #ffecec !important;
+}
+
+body[data-theme="dark"] .teams-page .ant-btn {
+  background: #111a28;
+  border-color: #2b3a4f;
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .teams-page .ant-btn:hover {
+  background: #162235;
+  border-color: #3a4b63;
+  color: #ffffff;
+}
+
+body[data-theme="dark"] .teams-page .ant-btn-link {
+  color: #cfe1ff;
+}
+
+body[data-theme="dark"] .teams-page .ant-pagination .ant-pagination-item {
+  background: #0c141f;
+  border-color: #1f2b3a;
+}
+
+body[data-theme="dark"] .teams-page .ant-pagination .ant-pagination-item a {
+  color: #c9d4e3;
+}
+
+body[data-theme="dark"] .teams-page .ant-pagination .ant-pagination-item-active {
+  border-color: #2f6fed;
+}
+
+body[data-theme="dark"] .teams-page .ant-pagination .ant-pagination-item-active a {
+  color: #ffffff;
+}
+
+/* Dropdowns */
+body[data-theme="dark"] .ant-select-dropdown {
+  background: #0f1724;
+  border-color: #1f2b3a;
+}
+
+body[data-theme="dark"] .ant-select-item-option-content {
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .ant-select-item-option-active {
+  background: #132033;
+}

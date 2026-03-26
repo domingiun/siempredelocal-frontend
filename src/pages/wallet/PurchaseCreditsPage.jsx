@@ -5,6 +5,7 @@ import { ArrowLeftOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useWallet } from '../../context/WalletContext';
 import betService from '../../services/betService';
+import './PurchaseCreditsPage.css';
 
 const { Title, Text } = Typography;
 
@@ -72,7 +73,7 @@ const PurchaseCreditsPage = () => {
 
   if (loading) {
     return (
-      <div style={{ padding: '24px', textAlign: 'center' }}>
+      <div className="purchase-credits-page" style={{ padding: '24px', textAlign: 'center' }}>
         <Spin size="large" />
         <p>Cargando planes...</p>
       </div>
@@ -80,7 +81,7 @@ const PurchaseCreditsPage = () => {
   }
 
   return (
-    <div style={{ padding: '24px' }}>
+    <div className="purchase-credits-page" style={{ padding: '24px' }}>
       <Button 
         icon={<ArrowLeftOutlined />} 
         onClick={() => navigate('/wallet')}
@@ -90,7 +91,7 @@ const PurchaseCreditsPage = () => {
         Volver a Mi Cajón
       </Button>
 
-      <Card>
+      <Card className="purchase-credits-card">
         <Title level={2}>Recargar Créditos</Title>
         <Text type="secondary">
           Selecciona un plan para recargar créditos y comenzar a pronosticar
@@ -101,6 +102,7 @@ const PurchaseCreditsPage = () => {
             <Col xs={24} md={8} key={plan.id}>
               <Card
                 hoverable
+                className="plan-card"
                 style={{
                   border: selectedPlan?.id === plan.id ? '2px solid #1677ff' : '1px solid #e6e8ec',
                   boxShadow: selectedPlan?.id === plan.id 
@@ -124,6 +126,7 @@ const PurchaseCreditsPage = () => {
                 </div>
 
                 <div
+                  className="plan-credits"
                   style={{
                     margin: '0 18px 16px',
                     padding: '14px 16px',
@@ -201,7 +204,7 @@ const PurchaseCreditsPage = () => {
           ))}
         </Row>
 
-        <Card style={{ marginTop: 18 }}>
+        <Card className="purchase-info-card" style={{ marginTop: 18 }}>
           <Title level={4}>Información importante</Title>
           <ul>
             <li><strong>Selecciona el plan</strong> que prefieras: <strong>Básico, Plus o Gold</strong>.</li>

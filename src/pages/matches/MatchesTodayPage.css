@@ -1,0 +1,33 @@
+/* Dark mode for Matches Today page */
+body[data-theme="dark"] .matches-today-page {
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .matches-today-page .matches-today-card,
+body[data-theme="dark"] .matches-today-page .ant-card {
+  background: #0f1724;
+  border-color: #1f2b3a;
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .matches-today-page .ant-card-head {
+  background: #0f1724;
+  border-bottom-color: #1f2b3a;
+}
+
+body[data-theme="dark"] .matches-today-page .ant-typography,
+body[data-theme="dark"] .matches-today-page .ant-typography * {
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .matches-today-page .ant-btn {
+  background: #111a28;
+  border-color: #2b3a4f;
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .matches-today-page .ant-btn:hover {
+  background: #162235;
+  border-color: #3a4b63;
+  color: #ffffff;
+}

@@ -6,6 +6,7 @@ import {
 } from 'antd';
 import { useAuth } from '../../../context/AuthContext';
 import api from '../../../services/api';
+import './BetAdminPage.css';
 
 const BetAdminPage = () => {
   const { user } = useAuth();
@@ -379,7 +380,7 @@ const BetAdminPage = () => {
   ]), [submitting]);
 
   return (
-    <div style={{ padding: '24px' }}>
+    <div className="bet-admin-page" style={{ padding: '24px' }}>
       <Card style={{ marginBottom: 16 }}>
         <Typography.Title level={3} style={{ margin: 0 }}>
           Administración de Créditos

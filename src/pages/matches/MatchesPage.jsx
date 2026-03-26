@@ -529,7 +529,10 @@ const MatchesPage = () => {
   ];
 
   return (
-    <div className="matches-page" style={{ padding: '24px' }}>
+    <div
+      className={`matches-page${isAdmin ? '' : ' matches-page--limited'}`}
+      style={{ padding: '24px' }}
+    >
       <Card style={{ marginBottom: 24 }}>
         <Row justify="space-between" align="middle" style={{ marginBottom: 16 }}>
           <Col>
@@ -545,25 +548,28 @@ const MatchesPage = () => {
           </Col>
           
           <Col>
-            <Space>
-              <Button
-                icon={<ReloadOutlined />}
-                onClick={fetchMatches}
-                loading={loading}
-              >
-                Actualizar
-              </Button>
-              {canCreateMatch && ( // Cambiado de isAdmin a canCreateMatch
+            {isAdmin && (
+              <Space>
                 <Button
-                  type="default"
-                  className="btn-outline-primary"
-                  icon={<PlusOutlined />}
-                  onClick={() => navigate('/matches/new')}
+                  icon={<ReloadOutlined />}
+                  onClick={fetchMatches}
+                  loading={loading}
+                  className="matches-action-refresh"
                 >
-                  Nuevo Partido
+                  Actualizar
                 </Button>
-              )}
-            </Space>
+                {canCreateMatch && ( // Cambiado de isAdmin a canCreateMatch
+                  <Button
+                    type="default"
+                    className="btn-outline-primary matches-action-create"
+                    icon={<PlusOutlined />}
+                    onClick={() => navigate('/matches/new')}
+                  >
+                    Nuevo Partido
+                  </Button>
+                )}
+              </Space>
+            )}
           </Col>
         </Row>
 
@@ -610,14 +616,16 @@ const MatchesPage = () => {
             />
           </Col>
           
-          <Col xs={24} md={7}>
-            <RangePicker
-              style={{ width: '100%' }}
-              placeholder={['Fecha desde', 'Fecha hasta']}
-              onChange={(dates) => setFilters({ ...filters, dateRange: dates })}
-              value={filters.dateRange}
-            />
-          </Col>
+          {isAdmin && (
+            <Col xs={24} md={7} className="matches-filter-date">
+              <RangePicker
+                style={{ width: '100%' }}
+                placeholder={['Fecha desde', 'Fecha hasta']}
+                onChange={(dates) => setFilters({ ...filters, dateRange: dates })}
+                value={filters.dateRange}
+              />
+            </Col>
+          )}
 
           <Col xs={24} md={4}>
             <Select

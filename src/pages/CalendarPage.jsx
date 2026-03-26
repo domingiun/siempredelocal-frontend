@@ -27,6 +27,7 @@ import 'dayjs/locale/es';
 import CompetitionService from '../services/competitionService'; 
 import matchService from '../services/matchService';
 import { formatDateTime, formatDateOnlyUTC, formatTimeOnlyUTC } from '../utils/dateFormatter';
+import './CalendarPage.css';
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
@@ -180,6 +181,7 @@ const CalendarPage = () => {
         size="small"
         hoverable
         onClick={() => handleMatchClick(match)}
+        className={`calendar-match-card ${statusValue}`}
         style={{ marginBottom: '12px', cursor: 'pointer' }}
       >
         <div style={{ padding: '8px' }}>
@@ -291,11 +293,12 @@ const CalendarPage = () => {
     }
 
     return (
-      <div style={{ maxHeight: '600px', overflowY: 'auto', paddingRight: '8px' }}>
+      <div className="calendar-view">
         {sortedDates.map(date => (
           <Card 
             key={date}
             size="small"
+            className="calendar-date-card"
             title={
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <CalendarOutlined />
@@ -411,9 +414,9 @@ const CalendarPage = () => {
   ];
 
   return (
-    <div style={{ padding: '24px' }}>
+    <div className="calendar-page" style={{ padding: '24px' }}>
       {/* Encabezado */}
-      <Card style={{ marginBottom: '24px' }}>
+      <Card className="calendar-card calendar-card--header" style={{ marginBottom: '24px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <Title level={2}>
@@ -436,7 +439,7 @@ const CalendarPage = () => {
       </Card>
 
       {/* Filtros */}
-      <Card style={{ marginBottom: '24px' }}>
+      <Card className="calendar-card calendar-card--filters" style={{ marginBottom: '24px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', alignItems: 'center' }}>
           <Select
             placeholder="Todas las competencias"
@@ -489,8 +492,8 @@ const CalendarPage = () => {
       </Card>
 
       {/* Estadísticas */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '24px' }}>
-        <Card size="small">
+      <div className="calendar-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+        <Card size="small" className="calendar-card calendar-stat">
           <div style={{ textAlign: 'center' }}>
             <Text type="secondary">Total Partidos</Text>
             <Title level={3} style={{ margin: '8px 0 0 0', color: '#1890ff' }}>
@@ -498,7 +501,7 @@ const CalendarPage = () => {
             </Title>
           </div>
         </Card>
-        <Card size="small">
+        <Card size="small" className="calendar-card calendar-stat">
           <div style={{ textAlign: 'center' }}>
             <Text type="secondary">Mostrando</Text>
             <Title level={3} style={{ margin: '8px 0 0 0', color: '#52c41a' }}>
@@ -506,7 +509,7 @@ const CalendarPage = () => {
             </Title>
           </div>
         </Card>
-        <Card size="small">
+        <Card size="small" className="calendar-card calendar-stat">
           <div style={{ textAlign: 'center' }}>
             <Text type="secondary">Partidos Hoy</Text>
             <Title level={3} style={{ margin: '8px 0 0 0', color: '#faad14' }}>
@@ -518,96 +521,36 @@ const CalendarPage = () => {
 
       {/* Contenido principal */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '24px' }}>
-        <div>
-          <Card
-            title={
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Tabs 
-                  activeKey={viewMode} 
-                  onChange={setViewMode}
-                  items={tabItems}
-                  type="card"
-                />
-                <Text type="secondary">
-                  Mostrando {filteredMatches.length} partidos
-                </Text>
-              </div>
-            }
-          >
-            {loading ? (
-              <div style={{ textAlign: 'center', padding: '50px' }}>
-                <Spin size="large" />
-              </div>
-            ) : (
-              <div>
-                {viewMode === 'calendar' && renderCalendarView()}
-                {viewMode === 'list' && renderListView()}
-                {viewMode === 'timeline' && renderTimelineView()}
-              </div>
-            )}
-          </Card>
-        </div>
-
-        {/* Panel lateral */}
-        <div>
-          <Card
-            title={<><FireOutlined /> Partidos de Hoy</>}
-            style={{ marginBottom: '16px' }}
-          >
-            {(todayMatches.length === 0 && upcomingMatches.length === 0) ? (
-              <Empty description="No hay partidos programados para hoy" />
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                {todayMatches.length > 0 && (
-                  <div>
-                    <Text strong style={{ display: 'block', marginBottom: '8px' }}>
-                      <FireOutlined /> Hoy
-                    </Text>
-                    {todayMatches.map(match => renderMatchCard(match))}
-                  </div>
-                )}
-                
-                {upcomingMatches.length > 0 && (
-                  <div>
-                    <Text strong style={{ display: 'block', marginBottom: '8px' }}>
-                      <ClockCircleOutlined /> Próximos
-                    </Text>
-                    {upcomingMatches.map(match => renderMatchCard(match))}
-                  </div>
-                )}
-              </div>
-            )}
-          </Card>
-
-          <Card title="Estados de Partidos">
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <Button
-                type={selectedStatus === 'scheduled' ? 'primary' : 'default'}
-                icon={<ClockCircleOutlined />}
-                onClick={() => setSelectedStatus('scheduled')}
-                style={{ textAlign: 'left' }}
-              >
-                Programados ({matches.filter(m => m.status === 'scheduled').length})
-              </Button>
-              <Button
-                type={selectedStatus === 'in_progress' ? 'primary' : 'default'}
-                icon={<PlayCircleOutlined />}
-                onClick={() => setSelectedStatus('in_progress')}
-                style={{ textAlign: 'left' }}
-              >
-                En Juego ({matches.filter(m => m.status === 'in_progress').length})
-              </Button>
-              <Button
-                type={selectedStatus === 'finished' ? 'primary' : 'default'}
-                icon={<CheckCircleOutlined />}
-                onClick={() => setSelectedStatus('finished')}
-                style={{ textAlign: 'left' }}
-              >
-                Finalizados ({matches.filter(m => m.status === 'finished').length})
-              </Button>
+        <Card
+          className="calendar-card calendar-card--main"
+          title={
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text strong>Calendario</Text>
+              <Text type="secondary">
+                Mostrando {filteredMatches.length} partidos
+              </Text>
             </div>
-          </Card>
-        </div>
+          }
+        >
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: '50px' }}>
+              <Spin size="large" />
+            </div>
+          ) : (
+            <div>
+              <Tabs
+                activeKey={viewMode}
+                onChange={setViewMode}
+                items={tabItems}
+                type="card"
+                style={{ marginBottom: 12 }}
+              />
+              {viewMode === 'calendar' && renderCalendarView()}
+              {viewMode === 'list' && renderListView()}
+              {viewMode === 'timeline' && renderTimelineView()}
+            </div>
+          )}
+        </Card>
       </div>
 
       {/* Modal de detalle */}
