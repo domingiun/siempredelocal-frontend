@@ -30,7 +30,7 @@ const AppHeader = ({ collapsed, setCollapsed }) => {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/');
   };
 
   const userMenuItems = [

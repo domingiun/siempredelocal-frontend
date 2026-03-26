@@ -63,6 +63,40 @@ body[data-theme="dark"] .create-match-page .ant-picker-input > input::placeholde
   color: #9fb0c2 !important;
 }
 
+/* Select cerrado: fondo oscuro + placeholder claro */
+body[data-theme="dark"] .create-match-page .ant-select-selector,
+body[data-theme="dark"] .create-match-page .ant-select-single .ant-select-selector,
+body[data-theme="dark"] .create-match-page .ant-select:not(.ant-select-customize-input) .ant-select-selector {
+  background-color: #0c141f !important;
+  border-color: #1f2b3a !important;
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .create-match-page .ant-select-selection-placeholder,
+body[data-theme="dark"] .create-match-page .ant-select-selection-item {
+  color: #e6edf3 !important;
+}
+
+/* Extra específico para los selects del paso 1 (Competencia/Jornada) */
+body[data-theme="dark"] .create-match-page .dark-select .ant-select-selector,
+body[data-theme="dark"] .create-match-page .dark-select.ant-select .ant-select-selector {
+  background-color: #0c141f !important;
+  border-color: #1f2b3a !important;
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .create-match-page .dark-select .ant-select-selection-placeholder,
+body[data-theme="dark"] .create-match-page .dark-select .ant-select-selection-item {
+  color: #e6edf3 !important;
+}
+
+/* Ant Select size large puede traer fondo blanco por defecto */
+body[data-theme="dark"] .create-match-page .ant-select-single.ant-select-lg .ant-select-selector {
+  background-color: #0c141f !important;
+  border-color: #1f2b3a !important;
+  color: #e6edf3 !important;
+}
+
 body[data-theme="dark"] .create-match-page .ant-select-selection-placeholder,
 body[data-theme="dark"] .create-match-page .ant-select-selection-item {
   color: #e6edf3 !important;
@@ -140,4 +174,23 @@ body[data-theme="dark"] .create-match-page .score-card {
 
 body[data-theme="dark"] .create-match-page .score-card * {
   color: #e6edf3 !important;
+}
+
+/* Versión más agresiva para asegurar que el placeholder tenga fondo oscuro */
+body[data-theme="dark"] .create-match-page .ant-select-single:not(.ant-select-customize-input) 
+.ant-select-selector .ant-select-selection-placeholder {
+  background-color: #0c141f !important;
+  color: #9fb0c2 !important;
+}
+
+/* También para el caso cuando el Select está enfocado pero cerrado */
+body[data-theme="dark"] .create-match-page .ant-select-focused:not(.ant-select-open) 
+.ant-select-selector .ant-select-selection-placeholder {
+  background-color: #0c141f !important;
+}
+
+/* Para el clear button (la X) también debería verse bien */
+body[data-theme="dark"] .create-match-page .ant-select-clear {
+  background-color: #0c141f !important;
+  color: #9fb0c2 !important;
 }

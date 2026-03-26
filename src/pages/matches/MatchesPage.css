@@ -1,0 +1,86 @@
+/* Dark mode styles for Matches page */
+body[data-theme="dark"] .matches-page {
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .matches-page .ant-card {
+  background: #0f1724;
+  border-color: #1f2b3a;
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .matches-page .ant-card-head {
+  background: #0f1724;
+  border-bottom-color: #1f2b3a;
+}
+
+body[data-theme="dark"] .matches-page .ant-typography,
+body[data-theme="dark"] .matches-page .ant-typography * {
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .matches-page .ant-input,
+body[data-theme="dark"] .matches-page .ant-input-affix-wrapper,
+body[data-theme="dark"] .matches-page .ant-input-number,
+body[data-theme="dark"] .matches-page .ant-picker,
+body[data-theme="dark"] .matches-page .ant-select-selector,
+body[data-theme="dark"] .matches-page .ant-select:not(.ant-select-customize-input) .ant-select-selector {
+  background-color: #0c141f !important;
+  border-color: #1f2b3a !important;
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .matches-page .ant-select-selection-placeholder,
+body[data-theme="dark"] .matches-page .ant-select-selection-item,
+body[data-theme="dark"] .matches-page .ant-input::placeholder,
+body[data-theme="dark"] .matches-page .ant-picker-input > input::placeholder {
+  color: #9fb0c2 !important;
+}
+
+body[data-theme="dark"] .matches-page .ant-select-arrow {
+  color: #9fb0c2 !important;
+}
+
+body[data-theme="dark"] .matches-page .ant-btn {
+  background: #111a28;
+  border-color: #2b3a4f;
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .matches-page .ant-btn:hover {
+  background: #162235;
+  border-color: #3a4b63;
+  color: #ffffff;
+}
+
+body[data-theme="dark"] .matches-page .ant-btn-primary {
+  background: #2f6fed;
+  border-color: #2f6fed;
+  color: #ffffff;
+}
+
+body[data-theme="dark"] .matches-page .ant-btn-primary:hover {
+  background: #3a7bff;
+  border-color: #3a7bff;
+}
+
+/* Dropdowns (Select) in dark mode */
+body[data-theme="dark"] .ant-select-dropdown {
+  background: #0f1724 !important;
+  color: #e6edf3 !important;
+  border: 1px solid #1f2b3a !important;
+}
+
+body[data-theme="dark"] .ant-select-item,
+body[data-theme="dark"] .ant-select-item-option-content {
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+  background: #141f30 !important;
+}
+
+body[data-theme="dark"] .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+  background: #172235 !important;
+}
+

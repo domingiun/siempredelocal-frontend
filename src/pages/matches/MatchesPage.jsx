@@ -17,6 +17,7 @@ import { usePermissions } from '../../hooks/usePermissions';
 import competitionService from '../../services/competitionService';
 import MatchCard from '../../components/matches/MatchCard';
 import { formatDateTableUTC, formatForInputUTC } from '../../utils/dateFormatter';
+import './MatchesPage.css';
 
 const { Title, Text } = Typography;
 const { RangePicker } = DatePicker;
@@ -528,7 +529,7 @@ const MatchesPage = () => {
   ];
 
   return (
-    <div style={{ padding: '24px' }}>
+    <div className="matches-page" style={{ padding: '24px' }}>
       <Card style={{ marginBottom: 24 }}>
         <Row justify="space-between" align="middle" style={{ marginBottom: 16 }}>
           <Col>

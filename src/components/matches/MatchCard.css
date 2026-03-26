@@ -141,6 +141,61 @@
   justify-content: center;
 }
 
+/* Dark mode adjustments for match cards */
+body[data-theme="dark"] .match-card {
+  background: #0f1724 !important;
+  border-color: #1f2b3a !important;
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .match-card .match-header {
+  border-bottom-color: #1f2b3a !important;
+}
+
+body[data-theme="dark"] .match-card .ant-typography,
+body[data-theme="dark"] .match-card .ant-typography * {
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .match-card .ant-tag,
+body[data-theme="dark"] .match-card .ant-tag-blue,
+body[data-theme="dark"] .match-card .ant-tag-green,
+body[data-theme="dark"] .match-card .ant-tag-orange,
+body[data-theme="dark"] .match-card .ant-tag-red {
+  background: #142132 !important;
+  border-color: #2b3a4f !important;
+  color: #e6edf3 !important;
+}
+
+body[data-theme="dark"] .match-card .round-info {
+  background: #0c141f !important;
+  border-color: #1f2b3a !important;
+}
+
+body[data-theme="dark"] .match-card .ant-badge-count {
+  background: #1b2a40 !important;
+  color: #e6edf3 !important;
+  box-shadow: 0 0 0 1px #1f2b3a !important;
+}
+
+body[data-theme="dark"] .match-card .vs-container .ant-typography:first-child {
+  color: #9fb0c2 !important;
+}
+
+body[data-theme="dark"] .match-card .vs-container .ant-typography:last-child {
+  color: #7fb2ff !important;
+}
+
+body[data-theme="dark"] .match-card .match-location {
+  background: #0c141f !important;
+  border-color: #1f2b3a !important;
+}
+
+body[data-theme="dark"] .match-card .competition-info {
+  background: #0c141f !important;
+  border: 1px solid #1f2b3a !important;
+}
+
 /* Responsive */
 @media (max-width: 576px) {
   .team-name {

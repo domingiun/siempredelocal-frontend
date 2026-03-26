@@ -220,6 +220,7 @@ const CreateMatchPage = () => {
                   <TrophyOutlined /> Competencia
                 </Text>
                 <Select
+                  className="dark-select"
                   placeholder="Seleccionar competencia..."
                   style={{ width: '100%' }}
                   size="large"
@@ -249,6 +250,7 @@ const CreateMatchPage = () => {
                     <CalendarOutlined /> Jornada. Opcional: Selecciona una jornada para organizar los partidos
                   </Text>
                   <Select
+                    className="dark-select"
                     placeholder="Seleccionar jornada (opcional)..."
                     style={{ width: '100%' }}
                     size="large"

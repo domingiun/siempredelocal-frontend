@@ -62,7 +62,7 @@ const Dashboard = () => {
       ] = await Promise.allSettled([
         competitionService.getCompetitions({ limit: 100 }),
         competitionService.getTeams(),
-        competitionService.getMatches({ limit: 20, status: 'Finalizado', order: 'desc' }),
+        competitionService.getMatches({ limit: 100, order: 'desc' }),
         betService.getBetDates(),
         betService.getBetStats(),
         betService.getFinancialSummary(30)
@@ -76,7 +76,7 @@ const Dashboard = () => {
       const financial = financialRes.status === 'fulfilled' ? (financialRes.value.data || {}) : {};
 
       const getMatchTime = (match) => {
-        const raw = match?.match_date || match?.date || match?.start_datetime || match?.created_at;
+        const raw = match?.updated_at || match?.match_date || match?.date || match?.start_datetime || match?.created_at;
         const time = raw ? new Date(raw).getTime() : NaN;
         return Number.isFinite(time) ? time : 0;
       };
@@ -440,6 +440,9 @@ const Dashboard = () => {
           >
             {text}
           </span>
+          <span className="winner-points-mobile">
+            • {record.points ?? 0} pts
+          </span>
         </Space>
       )
     },
@@ -705,6 +708,12 @@ const Dashboard = () => {
           .winners-table .ant-table-tbody > tr > td {
             padding: 4px 6px;
           }
+          .winner-points-mobile {
+            display: inline;
+            font-size: 11px;
+            color: #5f6b7a;
+            margin-left: 4px;
+          }
           .dashboard-shell .ant-btn {
             font-size: 11px;
             height: 30px;
@@ -730,6 +739,11 @@ const Dashboard = () => {
             height: 28px;
             border-radius: 8px;
             margin-right: 8px;
+          }
+        }
+        @media (min-width: 768px) {
+          .winner-points-mobile {
+            display: none;
           }
         }
       `}</style>

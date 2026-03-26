@@ -276,7 +276,7 @@ const MatchCard = ({ match, roundName, size = 'default', showActions = true }) =
 
       {/* Competencia (si está disponible) */}
       {match.competition_name && match.competition_name !== 'Sin competencia' && (
-        <div style={{ 
+        <div className="competition-info" style={{ 
           marginTop: 8, 
           textAlign: 'center',
           padding: '4px 8px',
