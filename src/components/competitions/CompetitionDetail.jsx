@@ -207,6 +207,30 @@ const CompetitionDetail = () => {
                 </Descriptions>
               </Card>
             </Col>
+            <Col span={24}>
+              <Card title="Estadísticas del torneo" style={{ marginTop: 16 }}>
+                <Row gutter={16}>
+                  <Col span={12}>
+                    <Statistic title="Partidos Totales" value={stats.totalMatches} />
+                  </Col>
+                  <Col span={12}>
+                    <Statistic title="Jugados" value={stats.matchesPlayed} />
+                  </Col>
+                  <Col span={12}>
+                    <Statistic title="Goles" value={stats.goalsScored} />
+                  </Col>
+                  <Col span={12}>
+                    <Statistic title="Prom. Goles" value={stats.avgGoals} />
+                  </Col>
+                </Row>
+                <div style={{ marginTop: 16 }}>
+                  <Text type="secondary">Progreso del torneo</Text>
+                  <Progress
+                    percent={stats.totalMatches ? Math.round((stats.matchesPlayed / stats.totalMatches) * 100) : 0}
+                  />
+                </div>
+              </Card>
+            </Col>
           </Row>
         ) : (
         <Tabs activeKey={activeTab} onChange={setActiveTab}>
