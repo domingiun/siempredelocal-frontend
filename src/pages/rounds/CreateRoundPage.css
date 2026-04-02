@@ -2,6 +2,18 @@
   width: 100%;
 }
 
+.create-round-summary {
+  background: #fafafa;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.create-round-summary-box {
+  background: #ffffff;
+  padding: 12px;
+  border-radius: 4px;
+}
+
 /* Light defaults previously inline */
 .create-round .ant-btn {
   color: #1f2937;
@@ -220,4 +232,15 @@ body[data-theme="dark"] .create-round .ant-tag-grey {
   background: #111827;
   border-color: #1f2b3a;
   color: #cbd5e1;
+}
+
+body[data-theme="dark"] .create-round-summary {
+  background: #0c141f;
+  border: 1px solid #1f2b3a;
+}
+
+body[data-theme="dark"] .create-round-summary-box {
+  background: #111b2a;
+  border: 1px solid #1f2b3a;
+  color: #e6edf3;
 }

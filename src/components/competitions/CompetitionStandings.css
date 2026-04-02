@@ -231,6 +231,16 @@ body[data-theme="dark"] .standings-legend {
   color: #9fb0c2;
 }
 
+body[data-theme="dark"] .competition-standings-container .ant-divider,
+body[data-theme="dark"] .competition-standings-container .ant-divider::before,
+body[data-theme="dark"] .competition-standings-container .ant-divider::after {
+  border-top-color: #1f2b3a;
+}
+
+body[data-theme="dark"] .competition-standings-container .ant-divider-inner-text {
+  color: #e6edf3;
+}
+
 .legend-item {
   display: flex;
   align-items: center;

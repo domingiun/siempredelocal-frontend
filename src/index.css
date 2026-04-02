@@ -292,6 +292,26 @@ body[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
   background: rgba(24, 144, 255, 0.08) !important;
 }
 
+body[data-theme="dark"] .btn-outline-primary {
+  color: #93c5fd !important;
+  border-color: #2b3a4f !important;
+  background: #0f1724 !important;
+}
+
+body[data-theme="dark"] .btn-outline-primary:hover,
+body[data-theme="dark"] .btn-outline-primary:focus {
+  color: #e6edf3 !important;
+  border-color: #60a5fa !important;
+  background: #162235 !important;
+}
+
+body[data-theme="dark"] .btn-outline-primary:disabled,
+body[data-theme="dark"] .btn-outline-primary.ant-btn-disabled {
+  color: rgba(147, 197, 253, 0.4) !important;
+  border-color: rgba(59, 130, 246, 0.25) !important;
+  background: #0f1724 !important;
+}
+
 /* Estilos para tablas */
 .ant-table-thead > tr > th {
   font-weight: 600;

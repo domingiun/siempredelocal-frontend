@@ -280,6 +280,31 @@ const BetDateInfo = ({ betDateId }) => {
         .betdate-info--dark .toggle-dark.ant-switch-checked .ant-switch-inner .ant-switch-inner-checked {
           color: #93c5fd;
         }
+        .betdate-info--dark .ant-tag {
+          background: #111b2a;
+          border-color: #1f2b3a;
+          color: #e6edf3;
+        }
+        .betdate-info--dark .ant-tag-blue {
+          background: rgba(59, 130, 246, 0.18);
+          border-color: rgba(59, 130, 246, 0.35);
+          color: #93c5fd;
+        }
+        .betdate-info--dark .ant-tag-green {
+          background: rgba(34, 197, 94, 0.18);
+          border-color: rgba(34, 197, 94, 0.35);
+          color: #86efac;
+        }
+        .betdate-info--dark .ant-tag-orange {
+          background: rgba(249, 115, 22, 0.18);
+          border-color: rgba(249, 115, 22, 0.35);
+          color: #fdba74;
+        }
+        .betdate-info--dark .ant-tag-red {
+          background: rgba(239, 68, 68, 0.18);
+          border-color: rgba(239, 68, 68, 0.35);
+          color: #fca5a5;
+        }
       `}</style>
       {/* Encabezado */}
       <Card style={{ marginBottom: 16 }}>

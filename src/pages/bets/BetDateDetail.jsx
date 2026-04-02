@@ -5,6 +5,7 @@ import { useParams } from 'react-router-dom';
 import BetDateInfo from '../../components/bets/BetDateInfo';
 import PlaceBetForm from '../../components/bets/PlaceBetForm';
 import BetRanking from '../../components/bets/BetRanking';
+import './BetDateDetail.css';
 
 const BetDateDetail = () => {
   const { id } = useParams();
@@ -42,9 +43,10 @@ const BetDateDetail = () => {
   ];
 
   return (
-    <div style={{ padding: '24px' }}>
-      <Card>
+    <div className="bet-date-detail" style={{ padding: '24px' }}>
+      <Card className="bet-date-tabs-card">
         <Tabs 
+          className="bet-date-tabs"
           activeKey={activeTab} 
           onChange={setActiveTab}
           items={tabItems}

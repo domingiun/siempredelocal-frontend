@@ -107,36 +107,36 @@ const ActiveBets = () => {
     const statusConfig = {
       Programado: {
         label: 'Programado',
-        backgroundColor: '#bae7ff',
-        borderColor: '#1890ff',
-        textColor: '#003a8c',
+        backgroundColor: isDark ? 'rgba(59, 130, 246, 0.18)' : '#bae7ff',
+        borderColor: isDark ? 'rgba(59, 130, 246, 0.45)' : '#1890ff',
+        textColor: isDark ? '#93c5fd' : '#003a8c',
       },
       Finalizado: {
         label: 'Finalizado',
-        backgroundColor: '#dcfcae',
-        borderColor: '#8ccf2d',
-        textColor: '#569101'
+        backgroundColor: isDark ? 'rgba(34, 197, 94, 0.18)' : '#dcfcae',
+        borderColor: isDark ? 'rgba(34, 197, 94, 0.45)' : '#8ccf2d',
+        textColor: isDark ? '#86efac' : '#569101'
       },
       'En Juego': {
         label: 'En Juego',
-        backgroundColor: '#d9f7be',
-        borderColor: '#52c41a',
-        textColor: '#135200'
+        backgroundColor: isDark ? 'rgba(16, 185, 129, 0.18)' : '#d9f7be',
+        borderColor: isDark ? 'rgba(16, 185, 129, 0.45)' : '#52c41a',
+        textColor: isDark ? '#6ee7b7' : '#135200'
       },
       Cancelado: {
         label: 'Cancelado',
-        backgroundColor: '#ffccc7',
-        borderColor: '#f5222d',
-        textColor: '#820014'
+        backgroundColor: isDark ? 'rgba(239, 68, 68, 0.18)' : '#ffccc7',
+        borderColor: isDark ? 'rgba(239, 68, 68, 0.45)' : '#f5222d',
+        textColor: isDark ? '#fca5a5' : '#820014'
       }
     };
 
     if (!status) {
       return {
         label: 'Desconocido',
-        backgroundColor: '#f5f5f5',
-        borderColor: '#d9d9d9',
-        textColor: '#000000'
+        backgroundColor: isDark ? '#111b2a' : '#f5f5f5',
+        borderColor: isDark ? '#1f2b3a' : '#d9d9d9',
+        textColor: isDark ? '#e6edf3' : '#000000'
       };
     }
 
@@ -154,9 +154,9 @@ const ActiveBets = () => {
     if (statusLower.includes('aplazado') || statusLower === 'postponed') {
       return {
         label: 'Aplazado',
-        backgroundColor: '#fff7e6',
-        borderColor: '#fa8c16',
-        textColor: '#873800'
+        backgroundColor: isDark ? 'rgba(249, 115, 22, 0.18)' : '#fff7e6',
+        borderColor: isDark ? 'rgba(249, 115, 22, 0.45)' : '#fa8c16',
+        textColor: isDark ? '#fdba74' : '#873800'
       };
     }
     if (statusLower.includes('cancelado') || statusLower === 'cancelled') {
@@ -165,9 +165,9 @@ const ActiveBets = () => {
 
     return {
       label: status,
-      backgroundColor: '#f5f5f5',
-      borderColor: '#d9d9d9',
-      textColor: '#000000'
+      backgroundColor: isDark ? '#111b2a' : '#f5f5f5',
+      borderColor: isDark ? '#1f2b3a' : '#d9d9d9',
+      textColor: isDark ? '#e6edf3' : '#000000'
     };
   };
 
@@ -339,6 +339,31 @@ const ActiveBets = () => {
         }
         .active-bets--dark .toggle-dark .ant-switch-inner .ant-switch-inner-checked {
           color: #93c5fd;
+        }
+        .active-bets--dark .ant-tag {
+          background: #111b2a;
+          border-color: #1f2b3a;
+          color: #e6edf3;
+        }
+        .active-bets--dark .ant-tag-green {
+          background: rgba(34, 197, 94, 0.18);
+          border-color: rgba(34, 197, 94, 0.35);
+          color: #86efac;
+        }
+        .active-bets--dark .ant-tag-blue {
+          background: rgba(59, 130, 246, 0.18);
+          border-color: rgba(59, 130, 246, 0.35);
+          color: #93c5fd;
+        }
+        .active-bets--dark .ant-tag-orange {
+          background: rgba(249, 115, 22, 0.18);
+          border-color: rgba(249, 115, 22, 0.35);
+          color: #fdba74;
+        }
+        .active-bets--dark .ant-tag-red {
+          background: rgba(239, 68, 68, 0.18);
+          border-color: rgba(239, 68, 68, 0.35);
+          color: #fca5a5;
         }
       `}</style>
 

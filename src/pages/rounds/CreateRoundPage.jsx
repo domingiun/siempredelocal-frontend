@@ -475,7 +475,7 @@ const CreateRoundPage = () => {
           )}
           
           {Object.keys(roundData).length > 0 ? (
-            <div style={{ background: '#fafafa', padding: 20, borderRadius: 8 }}>
+            <div className="create-round-summary">
               <Space orientation="vertical" size="middle" style={{ width: '100%' }}>
                 <Row gutter={[16, 8]}>
                   <Col span={12}>
@@ -531,7 +531,7 @@ const CreateRoundPage = () => {
                 {roundData.description && (
                   <>
                     <Divider>Descripción</Divider>
-                    <div style={{ background: 'white', padding: 12, borderRadius: 4 }}>
+                    <div className="create-round-summary-box">
                       {roundData.description}
                     </div>
                   </>

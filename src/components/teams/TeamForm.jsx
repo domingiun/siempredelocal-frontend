@@ -28,36 +28,28 @@ const TeamForm = () => {
   const [logoPreview, setLogoPreview] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
   const [countries] = useState([
-  // CONMEBOL (Sudamérica) - 6 clasificados + 1 repechaje
+  // CONMEBOL (Sudamérica) - 6 clasificados
   'Argentina', 'Brasil', 'Uruguay', 'Colombia', 'Ecuador', 'Paraguay',
-  'Bolivia', // repechaje
 
-  // CONCACAF (Norte, Centroamérica y Caribe) - 3 anfitriones + 3 clasificados + 3 repechajes
-  'Estados Unidos', 'México', 'Canadá',
-  'Panamá', 'Costa Rica', 'Jamaica',
-  'Haití', 'Curazao', 'Honduras', // repechajes
+  // CONCACAF (Norteamérica) - 3 anfitriones + 3 clasificados
+  'Estados Unidos', 'México', 'Canadá',  // anfitriones
+  'Panamá', 'Curazao', 'Haití',          // clasificados
 
-  // UEFA (Europa) - 16 clasificados + 16 repechajes
-  'Alemania', 'Francia', 'España', 'Inglaterra','Portugal',
+  // UEFA (Europa) - 16 clasificados
+  'Alemania', 'Francia', 'España', 'Inglaterra', 'Portugal',
   'Países Bajos', 'Bélgica', 'Croacia', 'Suiza', 'Austria', 'Noruega',
-  'Escocia','Turquía',
-  // Repechajes UEFA (16 equipos)
-  'Italia', 'Irlanda del Norte', 'Gales', 'Bosnia y Herzegovina',
-  'Ucrania', 'Suecia', 'Polonia', 'Albania', 'Rumania', 'Eslovaquia',
-  'Kosovo', 'Dinamarca', 'Macedonia del Norte', 'República Checa',
-  
+  'Escocia', 'Bosnia y Herzegovina', 'Suecia', 'República Checa', 'Turquía',
 
-  // CAF (África) - 9 clasificados + 0 repechajes
+  // CAF (África) - 10 clasificados
   'Marruecos', 'Senegal', 'Egipto', 'Costa de Marfil', 'Ghana',
-  'Túnez', 'Argelia', 'Sudáfrica', 'Cabo Verde',
+  'Túnez', 'Argelia', 'Sudáfrica', 'Cabo Verde', 'RD del Congo',
 
-  // AFC (Asia) - 8 clasificados + 0 repechajes
+  // AFC (Asia) - 9 clasificados
   'Japón', 'Corea del Sur', 'Australia', 'Irán', 'Arabia Saudita',
-  'Catar', 'Uzbekistán', 'Jordania',
+  'Catar', 'Uzbekistán', 'Jordania', 'Irak',
 
-  // OFC (Oceanía) - 1 clasificado + 1 repechaje
-  'Nueva Zelanda',
-  'Nueva Caledonia', // repechaje
+  // OFC (Oceanía) - 1 clasificado
+  'Nueva Zelanda'
 ]);
 
   useEffect(() => {
