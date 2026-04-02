@@ -319,7 +319,7 @@ const CompetitionForm = () => {
   const competitionFormats = [
     { value: 'single_round', label: 'Una vuelta' },
     { value: 'double_round', label: 'Ida y vuelta' },
-    { value: 'home_away', label: 'Partido Ãºnico con sede' },
+    { value: 'home_away', label: 'Partido único con sede' },
   ];
 
   const templates = [

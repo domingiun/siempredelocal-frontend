@@ -1,3 +1,4 @@
+// frontend/src/components/competitions/CompetitionDetail.jsx
 import React, { useState, useEffect } from 'react';
 import { 
   Card, Row, Col, Tabs, Tag, Space, Button, Statistic, 
@@ -166,7 +167,7 @@ const CompetitionDetail = () => {
     <div className="competition-detail-page" style={{ padding: 24 }}>
 
       {/* HEADER */}
-      <Card className="competition-detail-header" style={{ background: '#1e1e2f', color: '#fff', marginBottom: 24 }}>
+      <Card className="competition-detail-header" style={{ background: '#1e1e2f', color: '#fff', marginBottom: 24 }} bodyStyle={{ padding: isMobile ? 16 : 24 }}>
         <Row justify="space-between" align="middle">
           <Col>
             <Space>
@@ -175,13 +176,30 @@ const CompetitionDetail = () => {
                 {competition.name}
               </Title>
             </Space>
-            <Space>
-              {competition.status && (
-                <Tag color={getStatusColor(competition.status)}>{competition.status}</Tag>
-              )}
-              <Tag color="blue">{competition.season}</Tag>
-              <Tag color="geekblue">{competition.country}</Tag>
-            </Space>
+            {isMobile ? (
+              <div style={{ marginTop: 8, display: 'grid', gap: 4 }}>
+                <Text style={{ color: '#cbd5e1' }}>
+                  Estado: <Text style={{ color: '#fff' }}>{competition.status || 'N/A'}</Text>
+                </Text>
+                <Text style={{ color: '#cbd5e1' }}>
+                  Tipo: <Text style={{ color: '#fff' }}>{competition.competition_type || 'N/A'}</Text>
+                </Text>
+                <Text style={{ color: '#cbd5e1' }}>
+                  Temporada: <Text style={{ color: '#fff' }}>{competition.season || 'N/A'}</Text>
+                </Text>
+                <Text style={{ color: '#cbd5e1' }}>
+                  Equipos: <Text style={{ color: '#fff' }}>{competition.total_teams || competition.teams?.length || 0}</Text>
+                </Text>
+              </div>
+            ) : (
+              <Space wrap size={[8, 8]}>
+                {competition.status && (
+                  <Tag color={getStatusColor(competition.status)}>{competition.status}</Tag>
+                )}
+                <Tag color="blue">{competition.season}</Tag>
+                <Tag color="geekblue">{competition.country}</Tag>
+              </Space>
+            )}
           </Col>
 
           <Col>
@@ -194,44 +212,92 @@ const CompetitionDetail = () => {
       </Card>
 
       <Card>
-        {isMobile ? (
-          <Row gutter={24}>
-            <Col span={24}>
-              <Card title="Información General">
-                <Descriptions column={1}>
-                  <Descriptions.Item label="Tipo">{competition.competition_type}</Descriptions.Item>
-                  <Descriptions.Item label="Formato">{competition.competition_format}</Descriptions.Item>
-                  <Descriptions.Item label="Temporada">{competition.season}</Descriptions.Item>
-                  <Descriptions.Item label="País">{competition.country}</Descriptions.Item>
-                  <Descriptions.Item label="Equipos">{competition.total_teams || competition.teams?.length || 0}</Descriptions.Item>
-                </Descriptions>
-              </Card>
-            </Col>
-            <Col span={24}>
-              <Card title="Estadísticas del torneo" style={{ marginTop: 16 }}>
-                <Row gutter={16}>
-                  <Col span={12}>
-                    <Statistic title="Partidos Totales" value={stats.totalMatches} />
-                  </Col>
-                  <Col span={12}>
-                    <Statistic title="Jugados" value={stats.matchesPlayed} />
-                  </Col>
-                  <Col span={12}>
-                    <Statistic title="Goles" value={stats.goalsScored} />
-                  </Col>
-                  <Col span={12}>
-                    <Statistic title="Prom. Goles" value={stats.avgGoals} />
-                  </Col>
-                </Row>
-                <div style={{ marginTop: 16 }}>
-                  <Text type="secondary">Progreso del torneo</Text>
-                  <Progress
-                    percent={stats.totalMatches ? Math.round((stats.matchesPlayed / stats.totalMatches) * 100) : 0}
-                  />
+                {isMobile ? (
+          <>
+            <div className="competition-mobile-tabs" style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 8, marginBottom: 12 }}>
+              <Button size="small" type={activeTab === 'overview' ? 'primary' : 'default'} onClick={() => setActiveTab('overview')}>
+                Resumen
+              </Button>
+              <Button size="small" type={activeTab === 'teams' ? 'primary' : 'default'} onClick={() => setActiveTab('teams')}>
+                Equipos
+              </Button>
+              <Button size="small" type={activeTab === 'matches' ? 'primary' : 'default'} onClick={() => setActiveTab('matches')}>
+                Partidos
+              </Button>
+              <Button size="small" type={activeTab === 'standings' ? 'primary' : 'default'} onClick={() => setActiveTab('standings')}>
+                Tabla
+              </Button>
+              <Button size="small" type={activeTab === 'rounds' ? 'primary' : 'default'} onClick={() => setActiveTab('rounds')}>
+                Jornadas
+              </Button>
+            </div>
+
+            {activeTab === 'overview' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <Text strong style={{ fontSize: 14 }}>Información general</Text>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 6 }}>
+                  <Text><Text type="secondary">Estado:</Text> {competition.status || 'N/A'}</Text>
+                  <Text><Text type="secondary">Tipo:</Text> {competition.competition_type}</Text>
+                  <Text><Text type="secondary">Formato:</Text> {competition.competition_format}</Text>
+                  <Text><Text type="secondary">Temporada:</Text> {competition.season}</Text>
+                  <Text><Text type="secondary">País:</Text> {competition.country}</Text>
+                  <Text><Text type="secondary">Equipos:</Text> {competition.total_teams || competition.teams?.length || 0}</Text>
                 </div>
-              </Card>
-            </Col>
-          </Row>
+              </div>
+            )}
+
+            {activeTab === 'matches' && (
+              <Table
+                columns={matchColumns}
+                dataSource={matches}
+                rowKey="id"
+                pagination={{ pageSize: 10 }}
+              />
+            )}
+
+            {activeTab === 'teams' && (
+              <Row gutter={16}>
+                {competition.teams?.map(team => (
+                  <Col span={12} key={team.id}>
+                    <Card hoverable onClick={() => navigate(`/teams/${team.id}`)}>
+                      <Space orientation="vertical" align="center" style={{ width: '100%' }}>
+                        <Avatar size={48} src={team.logo_url}>{team.name.charAt(0)}</Avatar>
+                        <Text strong style={{ fontSize: 12 }}>{team.name}</Text>
+                        <Text type="secondary" style={{ fontSize: 12 }}>{team.city}</Text>
+                      </Space>
+                    </Card>
+                  </Col>
+                ))}
+              </Row>
+            )}
+
+            {activeTab === 'standings' && (
+              <Table
+                columns={[
+                  { title: '#', dataIndex: 'position' },
+                  {
+                    title: 'Equipo',
+                    render: r => (
+                      <Space>
+                        <Avatar src={r.logo_url} size="small">{r.team?.charAt(0)}</Avatar>
+                        {r.team}
+                      </Space>
+                    )
+                  },
+                  { title: 'PTS', dataIndex: 'points' }
+                ]}
+                dataSource={standings}
+                rowKey="position"
+                pagination={false}
+              />
+            )}
+
+            {activeTab === 'rounds' && (
+              <Paragraph style={{ marginBottom: 0 }}>
+                Jornadas disponibles en esta competencia.
+              </Paragraph>
+            )}
+          </>
         ) : (
         <Tabs activeKey={activeTab} onChange={setActiveTab}>
 

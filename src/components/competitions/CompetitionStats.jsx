@@ -2,7 +2,7 @@
 import React from 'react';
 import { 
   Card, Row, Col, Statistic, Progress, 
-  Typography, Divider, Space 
+  Typography, Divider, Space, Grid 
 } from 'antd';
 import { 
   CalendarOutlined, TrophyOutlined, 
@@ -13,6 +13,8 @@ import {
 const { Title, Text } = Typography;
 
 const CompetitionStats = ({ competition, stats }) => {
+  const screens = Grid.useBreakpoint();
+  const isMobile = !screens.md;
   const progressPercentage = stats.total_matches > 0 
     ? (stats.matches_played / stats.total_matches * 100) 
     : 0;
@@ -59,6 +61,7 @@ const CompetitionStats = ({ competition, stats }) => {
           </Text>
         </Card>
 
+        {!isMobile && (
         <Card className="competition-tab-card" title="Progreso del Torneo" style={{ marginTop: '16px' }}>
           <div style={{ marginBottom: '16px' }}>
             <Text strong>Partidos completados</Text>
@@ -105,9 +108,11 @@ const CompetitionStats = ({ competition, stats }) => {
             </Col>
           </Row>
         </Card>
+      )}
       </Col>
       
       <Col xs={24} lg={8}>
+        {!isMobile && (
         <Card className="competition-tab-card" title="Estadísticas de Goles">
           <Space orientation="vertical" style={{ width: '100%' }}>
             <Statistic
@@ -140,9 +145,11 @@ const CompetitionStats = ({ competition, stats }) => {
             </div>
           </Space>
         </Card>
+      )}
       </Col>
     </Row>
   );
 };
 
 export default CompetitionStats;
+

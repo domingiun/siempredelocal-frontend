@@ -572,7 +572,7 @@ const BetRanking = ({ betDateId }) => {
               <Row justify="space-between" align="middle" gutter={[12, 12]}>
                 <Col>
                   <Space wrap>
-                    <Text type="secondary">Ver ranking de fecha:</Text>
+                    <Text type="secondary">Selecciona aqui la Fecha de Pronóstico para ver el <strong>Ranking</strong>:</Text>
                     <Select
                       style={{ minWidth: 260 }}
                       value={selectedBetDateId}

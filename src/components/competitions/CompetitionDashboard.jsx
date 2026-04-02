@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Tabs, Card, Row, Col, Space, Button, 
-  Typography, Statistic, Tag, message, Switch 
+  Typography, Statistic, Tag, message, Switch, Grid 
 } from 'antd';
 import { 
   TrophyOutlined, TeamOutlined, CalendarOutlined, 
@@ -28,6 +28,8 @@ const CompetitionDashboard = () => {
   const navigate = useNavigate();
   const { mode, setMode } = useTheme();
   const isDark = mode === 'dark';
+  const screens = Grid.useBreakpoint();
+  const isMobile = !screens.md;
   const [competition, setCompetition] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
@@ -224,74 +226,131 @@ const CompetitionDashboard = () => {
           background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
           color: 'white'
         }}
+        bodyStyle={{ padding: isMobile ? 16 : 24 }}
       >
         <Row gutter={[24, 24]} align="middle">
           <Col xs={24} md={16}>
             <Space orientation="vertical" size="small">
               <Space>
-                <TrophyOutlined style={{ fontSize: '32px' }} />
-                <Title level={2} style={{ color: 'white', margin: 0 }}>
+                <TrophyOutlined style={{ fontSize: isMobile ? 22 : 32 }} />
+                <Title level={isMobile ? 4 : 2} style={{ color: 'white', margin: 0 }}>
                   {competition.name}
                 </Title>
               </Space>
-              <Space size="middle">
-                <Tag color={getStatusColor(competition.status)}>
-                  {getStatusText(competition.status)}
-                </Tag>
-                <Tag color="blue">{getCompetitionType(competition.competition_type)}</Tag>
-                <Tag color="geekblue">{competition.season}</Tag>
-                <Space>
-                  <TeamOutlined />
-                  <Text style={{ color: 'white' }}>{competition.total_teams} equipos</Text>
+              {isMobile ? (
+                <div style={{ display: 'grid', gap: 6 }}>
+                  <div>
+                    <Tag color={getStatusColor(competition.status)}>
+                      {getStatusText(competition.status)}
+                    </Tag>
+                  </div>
+                  <Text style={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+                    Tipo: {getCompetitionType(competition.competition_type)}
+                  </Text>
+                  <Text style={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+                    Temporada: {competition.season}
+                  </Text>
+                  <Text style={{ color: 'rgba(255, 255, 255, 0.85)' }}>
+                    Equipos: {competition.total_teams}
+                  </Text>
+                </div>
+              ) : (
+                <Space size="middle">
+                  <Tag color={getStatusColor(competition.status)}>
+                    {getStatusText(competition.status)}
+                  </Tag>
+                  <Tag color="blue">{getCompetitionType(competition.competition_type)}</Tag>
+                  <Tag color="geekblue">{competition.season}</Tag>
+                  <Space>
+                    <TeamOutlined />
+                    <Text style={{ color: 'white' }}>{competition.total_teams} equipos</Text>
+                  </Space>
                 </Space>
-              </Space>
+              )}
               <Text style={{ color: 'rgba(255, 255, 255, 0.85)' }}>
                 {competition.description || 'Sin descripción'}
               </Text>
             </Space>
           </Col>
-          <Col xs={24} md={8}>
-            <Row gutter={[8, 8]}>
-              <Col span={12}>
-                <Statistic
-                  title="Partidos Jugados"
-                  value={stats.matches_played || 0}
-                  styles={{ content: { color: 'white' } }}
-                  prefix={<FireOutlined />}
-                />
-              </Col>
-              <Col span={12}>
-                <Statistic
-                  title="Goles Totales"
-                  value={stats.goals_scored || 0}
-                  styles={{ content: { color: 'white' } }}
-                />
-              </Col>
-            </Row>
-          </Col>
+          {!isMobile && (
+            <Col xs={24} md={8}>
+              <Row gutter={[8, 8]}>
+                <Col span={12}>
+                  <Statistic
+                    title="Partidos Jugados"
+                    value={stats.matches_played || 0}
+                    styles={{ content: { color: 'white' } }}
+                    prefix={<FireOutlined />}
+                  />
+                </Col>
+                <Col span={12}>
+                  <Statistic
+                    title="Goles Totales"
+                    value={stats.goals_scored || 0}
+                    styles={{ content: { color: 'white' } }}
+                  />
+                </Col>
+              </Row>
+            </Col>
+          )}
         </Row>
       </Card>
 
       {/* Navegación principal con nueva API de Tabs */}
       <Card className="competition-tabs-card">
-        <Tabs 
-          activeKey={activeTab} 
-          onChange={setActiveTab}
-          type="card"
-          tabBarExtraContent={(
-            <Space size="small" className="competition-dashboard__toggle">
-              <Text type="secondary">Vista oscura</Text>
-              <Switch
-                checked={isDark}
-                onChange={(checked) => setMode(checked ? 'dark' : 'light')}
-              />
-            </Space>
-          )}
-          items={tabItems}
-        />
+        {isMobile ? (
+          <>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
+              <Space size="small" className="competition-dashboard__toggle">
+                <Text type="secondary">Vista oscura</Text>
+                <Switch
+                  checked={isDark}
+                  onChange={(checked) => setMode(checked ? 'dark' : 'light')}
+                />
+              </Space>
+            </div>
+            <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 8, marginBottom: 12 }}>
+              <Button size="small" type={activeTab === 'overview' ? 'primary' : 'default'} onClick={() => setActiveTab('overview')}>
+                Resumen
+              </Button>
+              <Button size="small" type={activeTab === 'teams' ? 'primary' : 'default'} onClick={() => setActiveTab('teams')}>
+                Equipos
+              </Button>
+              <Button size="small" type={activeTab === 'matches' ? 'primary' : 'default'} onClick={() => setActiveTab('matches')}>
+                Partidos
+              </Button>
+              <Button size="small" type={activeTab === 'standings' ? 'primary' : 'default'} onClick={() => setActiveTab('standings')}>
+                Tabla
+              </Button>
+              <Button size="small" type={activeTab === 'rounds' ? 'primary' : 'default'} onClick={() => setActiveTab('rounds')}>
+                Jornadas
+              </Button>
+            </div>
+            <div className="competition-tab-content">
+              {tabItems.find((item) => item.key === activeTab)?.children}
+            </div>
+          </>
+        ) : (
+          <Tabs 
+            activeKey={activeTab} 
+            onChange={setActiveTab}
+            type="card"
+            tabBarExtraContent={(
+              <Space size="small" className="competition-dashboard__toggle">
+                <Text type="secondary">Vista oscura</Text>
+                <Switch
+                  checked={isDark}
+                  onChange={(checked) => setMode(checked ? 'dark' : 'light')}
+                />
+              </Space>
+            )}
+            items={tabItems}
+          />
+        )}
       </Card>
     </div>
   );
 };
 
 export default CompetitionDashboard;
+

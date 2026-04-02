@@ -28,14 +28,37 @@ const TeamForm = () => {
   const [logoPreview, setLogoPreview] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
   const [countries] = useState([
-    'Argentina', 'Brasil', 'Chile', 'Colombia', 'México', 'Uruguay',
-    'España', 'Italia', 'Alemania', 'Francia', 'Inglaterra', 'Portugal',
-    'Estados Unidos', 'Canadá', 'Perú', 'Ecuador', 'Venezuela', 'Bolivia',
-    'Paraguay', 'Costa Rica', 'Panamá', 'Honduras', 'El Salvador', 'Nicaragua',
-    'Guatemala', 'República Dominicana', 'Puerto Rico', 'Cuba', 'Haití',
-    'Japón', 'Corea del Sur', 'China', 'Australia', 'Nueva Zelanda',
-    // Agrega más países según necesites
-  ]);
+  // CONMEBOL (Sudamérica) - 6 clasificados + 1 repechaje
+  'Argentina', 'Brasil', 'Uruguay', 'Colombia', 'Ecuador', 'Paraguay',
+  'Bolivia', // repechaje
+
+  // CONCACAF (Norte, Centroamérica y Caribe) - 3 anfitriones + 3 clasificados + 3 repechajes
+  'Estados Unidos', 'México', 'Canadá',
+  'Panamá', 'Costa Rica', 'Jamaica',
+  'Haití', 'Curazao', 'Honduras', // repechajes
+
+  // UEFA (Europa) - 16 clasificados + 16 repechajes
+  'Alemania', 'Francia', 'España', 'Inglaterra','Portugal',
+  'Países Bajos', 'Bélgica', 'Croacia', 'Suiza', 'Austria', 'Noruega',
+  'Escocia','Turquía',
+  // Repechajes UEFA (16 equipos)
+  'Italia', 'Irlanda del Norte', 'Gales', 'Bosnia y Herzegovina',
+  'Ucrania', 'Suecia', 'Polonia', 'Albania', 'Rumania', 'Eslovaquia',
+  'Kosovo', 'Dinamarca', 'Macedonia del Norte', 'República Checa',
+  
+
+  // CAF (África) - 9 clasificados + 0 repechajes
+  'Marruecos', 'Senegal', 'Egipto', 'Costa de Marfil', 'Ghana',
+  'Túnez', 'Argelia', 'Sudáfrica', 'Cabo Verde',
+
+  // AFC (Asia) - 8 clasificados + 0 repechajes
+  'Japón', 'Corea del Sur', 'Australia', 'Irán', 'Arabia Saudita',
+  'Catar', 'Uzbekistán', 'Jordania',
+
+  // OFC (Oceanía) - 1 clasificado + 1 repechaje
+  'Nueva Zelanda',
+  'Nueva Caledonia', // repechaje
+]);
 
   useEffect(() => {
     if (id) {
@@ -316,14 +339,6 @@ const TeamForm = () => {
 
               {/* Sección: Logo */}
               <Divider titlePlacement="left">Logo del Equipo</Divider>
-              
-              <Alert
-                title="Logo como URL"
-                description="Ingrese la URL completa de la imagen del logo (ej: https://ejemplo.com/logo.png). La imagen debe ser accesible públicamente."
-                type="info"
-                showIcon
-                style={{ marginBottom: '16px' }}
-              />
 
               <Form.Item
                 name="logo_url"
@@ -533,67 +548,6 @@ const TeamForm = () => {
                 </Space>
               </Form.Item>
             </Form>
-          </Card>
-        </Col>
-
-        {/* Panel lateral: Información y ayuda */}
-        <Col xs={24} lg={8}>
-          <Card title="Información">
-            <Space orientation="vertical" size="middle">
-              <Alert
-                title="Recomendaciones"
-                description={
-                  <ul style={{ margin: 0, paddingLeft: '16px' }}>
-                    <li>Use nombres completos y oficiales del equipo</li>
-                    <li>El país ayuda en filtros y estadísticas</li>
-                    <li>Las estadísticas se pueden actualizar después</li>
-                    <li>El logo debe ser una URL pública</li>
-                  </ul>
-                }
-                type="info"
-                showIcon
-              />
-
-              <div>
-                <Text strong>Logo recomendado:</Text>
-                <ul style={{ margin: 0, paddingLeft: '16px', marginTop: '8px' }}>
-                  <li>Formato: PNG, JPG, SVG</li>
-                  <li>Fondo transparente preferiblemente</li>
-                  <li>Resolución mínima: 200x200px</li>
-                  <li>URL pública accesible</li>
-                </ul>
-              </div>
-
-              <div>
-                <Text strong>Servicios para logos:</Text>
-                <ul style={{ margin: 0, paddingLeft: '16px', marginTop: '8px' }}>
-                  <li>
-                    <a href="https://imgur.com" target="_blank" rel="noopener noreferrer">
-                      Imgur
-                    </a>
-                  </li>
-                  <li>
-                    <a href="https://cloudinary.com" target="_blank" rel="noopener noreferrer">
-                      Cloudinary
-                    </a>
-                  </li>
-                  <li>
-                    <a href="https://postimages.org" target="_blank" rel="noopener noreferrer">
-                      PostImage
-                    </a>
-                  </li>
-                </ul>
-              </div>
-
-              {isEditMode && (
-                <Alert
-                  title="Nota"
-                  description="Al desactivar un equipo, este ya no aparecerá disponible para nuevas competencias."
-                  type="warning"
-                  showIcon
-                />
-              )}
-            </Space>
           </Card>
         </Col>
       </Row>
