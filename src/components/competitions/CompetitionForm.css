@@ -130,6 +130,27 @@ body[data-theme="dark"] .competition-form-page .competition-form-select .ant-sel
   color: #e6edf3 !important;
 }
 
+body[data-theme="dark"] .competition-form-page .competition-form-select-dark .ant-select-selector {
+  background: #1e3a8a !important;
+  border-color: #1d4ed8 !important;
+  color: #ffffff !important;
+}
+
+body[data-theme="dark"] .competition-form-page .competition-form-select-dark .ant-select-selection-item,
+body[data-theme="dark"] .competition-form-page .competition-form-select-dark .ant-select-selection-placeholder {
+  color: #ffffff !important;
+}
+
+body[data-theme="dark"] .competition-form-page .competition-form-select-dark .ant-select-arrow {
+  color: #dbeafe !important;
+}
+
+body[data-theme="dark"] .competition-form-page .competition-form-select-dark.ant-select-open .ant-select-selector {
+  background: #0f1724 !important;
+  border-color: #1f2b3a !important;
+  color: #e6edf3 !important;
+}
+
 body[data-theme="dark"] .competition-form-page .competition-form-select .ant-select-selection-item {
   color: #e6edf3 !important;
 }
@@ -189,6 +210,22 @@ body[data-theme="dark"] .competition-form-page .ant-divider {
 body[data-theme="dark"] .competition-form-page .ant-alert {
   background: #111b2a;
   border-color: #1f2b3a;
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .competition-form-page .ant-alert-message,
+body[data-theme="dark"] .competition-form-page .ant-alert-description,
+body[data-theme="dark"] .competition-form-page .ant-alert-description p,
+body[data-theme="dark"] .competition-form-page .ant-alert-description span,
+body[data-theme="dark"] .competition-form-page .ant-alert-description div {
+  color: #e6edf3;
+}
+
+body[data-theme="dark"] .competition-form-page .ant-alert-info .ant-alert-icon {
+  color: #60a5fa;
+}
+
+body[data-theme="dark"] .competition-form-page h4 {
   color: #e6edf3;
 }
 

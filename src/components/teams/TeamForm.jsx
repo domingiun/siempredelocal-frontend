@@ -2,11 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Card, Button, Form, Input, Select, Space, 
-  Row, Col, Switch, Upload, message, Alert, 
-  Typography, Tooltip, Divider, Avatar 
+  Row, Col, Switch, message, Alert, 
+  Typography, Tooltip, Divider, Avatar, Modal 
 } from 'antd';
 import { 
-  ArrowLeftOutlined, SaveOutlined, UploadOutlined,
+  ArrowLeftOutlined, SaveOutlined,
   GlobalOutlined, EnvironmentOutlined, 
   TrophyOutlined, TeamOutlined, 
   InfoCircleOutlined, LinkOutlined

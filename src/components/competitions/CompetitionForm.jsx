@@ -561,7 +561,7 @@ const CompetitionForm = () => {
                     label="Tipo de Competencia"
                     rules={[{ required: true }]}
                   >
-                    <Select className="competition-form-select" size="large" placeholder="Selecciona el tipo">
+                    <Select className="competition-form-select competition-form-select-dark" size="large" placeholder="Selecciona el tipo">
                       {competitionTypes.map(type => (
                         <Option key={type.value} value={type.value}>
                           {type.label}
@@ -577,7 +577,7 @@ const CompetitionForm = () => {
                     label="Formato"
                     rules={[{ required: true }]}
                   >
-                    <Select className="competition-form-select" size="large" placeholder="Selecciona el formato">
+                    <Select className="competition-form-select competition-form-select-dark" size="large" placeholder="Selecciona el formato">
                       {competitionFormats.map(format => (
                         <Option key={format.value} value={format.value}>
                           {format.label}
@@ -590,7 +590,8 @@ const CompetitionForm = () => {
                 <Col xs={24}>
                   <Divider>Plantillas Predefinidas</Divider>
                   <Select
-                    className="competition-form-select" placeholder="Selecciona una plantilla (opcional)"
+                    className="competition-form-select competition-form-select-dark"
+                    placeholder="Selecciona una plantilla (opcional)"
                     style={{ width: '100%' }}
                     size="large"
                     onChange={handleTemplateChange}

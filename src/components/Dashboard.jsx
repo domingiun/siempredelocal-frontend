@@ -241,30 +241,30 @@ const Dashboard = () => {
   const statusConfig = {
     'Programado': {
       label: 'Programado',
-      backgroundColor: '#bae7ff',
-      borderColor: '#1890ff',
-      textColor: '#003a8c',
-      tagColor: 'green'
+      backgroundColor: isDark ? 'rgba(59, 130, 246, 0.18)' : '#bae7ff',
+      borderColor: isDark ? 'rgba(59, 130, 246, 0.45)' : '#1890ff',
+      textColor: isDark ? '#93c5fd' : '#003a8c',
+      tagColor: 'blue'
     },
     'Finalizado': {
       label: 'Finalizado',
-      backgroundColor: '#cffab6',
-      borderColor: '#88d160',
-      textColor: '#589139',
+      backgroundColor: isDark ? 'rgba(34, 197, 94, 0.18)' : '#cffab6',
+      borderColor: isDark ? 'rgba(34, 197, 94, 0.45)' : '#88d160',
+      textColor: isDark ? '#86efac' : '#589139',
       tagColor: 'green'
     },
     'En Juego': {
       label: 'En Juego',
-      backgroundColor: '#d9f7be',
-      borderColor: '#52c41a',
-      textColor: '#135200',
-      tagColor: 'blue'
+      backgroundColor: isDark ? 'rgba(16, 185, 129, 0.18)' : '#d9f7be',
+      borderColor: isDark ? 'rgba(16, 185, 129, 0.45)' : '#52c41a',
+      textColor: isDark ? '#6ee7b7' : '#135200',
+      tagColor: 'green'
     },
     'Cancelado': {
       label: 'Cancelado',
-      backgroundColor: '#ffccc7',
-      borderColor: '#f5222d',
-      textColor: '#820014',
+      backgroundColor: isDark ? 'rgba(239, 68, 68, 0.18)' : '#ffccc7',
+      borderColor: isDark ? 'rgba(239, 68, 68, 0.45)' : '#f5222d',
+      textColor: isDark ? '#fca5a5' : '#820014',
       tagColor: 'red'
     }
   };
@@ -272,9 +272,9 @@ const Dashboard = () => {
   const getMatchStatusInfo = (status) => {
     if (!status) return {
       label: 'Desconocido',
-      backgroundColor: '#f5f5f5',
-      borderColor: '#d9d9d9',
-      textColor: '#000000',
+      backgroundColor: isDark ? '#111b2a' : '#f5f5f5',
+      borderColor: isDark ? '#1f2b3a' : '#d9d9d9',
+      textColor: isDark ? '#e6edf3' : '#000000',
       tagColor: 'default'
     };
 
@@ -292,9 +292,9 @@ const Dashboard = () => {
     if (statusLower.includes('aplazado') || statusLower === 'postponed') {
       return {
         label: 'Aplazado',
-        backgroundColor: '#fff7e6',
-        borderColor: '#fa8c16',
-        textColor: '#873800',
+        backgroundColor: isDark ? 'rgba(249, 115, 22, 0.18)' : '#fff7e6',
+        borderColor: isDark ? 'rgba(249, 115, 22, 0.45)' : '#fa8c16',
+        textColor: isDark ? '#fdba74' : '#873800',
         tagColor: 'orange'
       };
     }
@@ -304,12 +304,46 @@ const Dashboard = () => {
 
     return {
       label: status,
-      backgroundColor: '#f5f5f5',
-      borderColor: '#d9d9d9',
-      textColor: '#000000',
+      backgroundColor: isDark ? '#111b2a' : '#f5f5f5',
+      borderColor: isDark ? '#1f2b3a' : '#d9d9d9',
+      textColor: isDark ? '#e6edf3' : '#000000',
       tagColor: 'default'
     };
   };
+
+  const getBetDateStatusStyle = (status) => {
+    const value = String(status || '').toLowerCase();
+    if (value === 'open' || value.includes('abierta')) {
+      return {
+        backgroundColor: isDark ? 'rgba(34, 197, 94, 0.18)' : undefined,
+        borderColor: isDark ? 'rgba(34, 197, 94, 0.45)' : undefined,
+        color: isDark ? '#86efac' : undefined
+      };
+    }
+    if (value === 'finished' || value.includes('finalizada')) {
+      return {
+        backgroundColor: isDark ? 'rgba(59, 130, 246, 0.18)' : undefined,
+        borderColor: isDark ? 'rgba(59, 130, 246, 0.45)' : undefined,
+        color: isDark ? '#93c5fd' : undefined
+      };
+    }
+    if (value === 'closed' || value.includes('cerrada')) {
+      return {
+        backgroundColor: isDark ? 'rgba(249, 115, 22, 0.18)' : undefined,
+        borderColor: isDark ? 'rgba(249, 115, 22, 0.45)' : undefined,
+        color: isDark ? '#fdba74' : undefined
+      };
+    }
+    return isDark
+      ? { backgroundColor: '#111b2a', borderColor: '#1f2b3a', color: '#e6edf3' }
+      : undefined;
+  };
+
+  const getResultTagStyle = () => (
+    isDark
+      ? { backgroundColor: '#111b2a', borderColor: '#1f2b3a', color: '#e6edf3' }
+      : undefined
+  );
 
   const parseScoreText = (value) => {
     if (!value) return null;
@@ -874,7 +908,10 @@ const Dashboard = () => {
                 <>
                   <div style={{ marginBottom: 8 }}>
                     <Space>
-                      <Tag color={betdateMatches[0]?.status === 'open' ? 'green' : betdateMatches[0]?.status === 'finished' ? 'blue' : 'default'}>
+                      <Tag
+                        color={betdateMatches[0]?.status === 'open' ? 'green' : betdateMatches[0]?.status === 'finished' ? 'blue' : 'default'}
+                        style={getBetDateStatusStyle(betdateMatches[0]?.status)}
+                      >
                         {betdateMatches[0]?.status}
                       </Tag>
                       <strong>{betdateMatches[0]?.betdate_name}</strong>
@@ -921,10 +958,13 @@ const Dashboard = () => {
                             </Avatar>
                           </Space>
                           <Space size={6}>
-                            <Tag color={row.status === 'open' ? 'green' : row.status === 'finished' ? 'blue' : 'default'}>
+                            <Tag
+                              color={row.status === 'open' ? 'green' : row.status === 'finished' ? 'blue' : 'default'}
+                              style={getBetDateStatusStyle(row.status)}
+                            >
                               {row.status || 'Estado'}
                             </Tag>
-                            <Tag>
+                            <Tag style={getResultTagStyle()}>
                               Resultado: {row.has_score ? `${row.home_score} - ${row.away_score}` : 'Sin resultado'}
                             </Tag>
                           </Space>
@@ -991,7 +1031,9 @@ const Dashboard = () => {
                   style={{ 
                     marginBottom: 6, 
                     borderLeft: `4px solid ${statusInfo.borderColor}`,
-                    backgroundColor: isScheduled ? '#ebf7fa' : '#ffffff',
+                    backgroundColor: isScheduled
+                      ? (isDark ? '#0f1a24' : '#ebf7fa')
+                      : (isDark ? '#0f1824' : '#ffffff'),
                     cursor: 'pointer'
                   }}
                   hoverable
@@ -1054,7 +1096,7 @@ const Dashboard = () => {
                         </Avatar>
                         <strong style={{ 
                           fontSize: '12px',
-                          color: isScheduled ? '#8c8c8c' : (isDark ? '#e6edf3' : '#000')
+                          color: isScheduled ? (isDark ? '#9fb0c2' : '#8c8c8c') : (isDark ? '#e6edf3' : '#000')
                         }}>
                           {getTeamLabel(match.home_team_name)}
                         </strong>
@@ -1070,7 +1112,7 @@ const Dashboard = () => {
                         backgroundColor: isScheduled ? (isDark ? '#1c2533' : '#f0f0f0') : statusInfo.backgroundColor,
                         borderRadius: '6px',
                         border: `1px solid ${isScheduled ? (isDark ? '#2a3a4f' : '#d9d9d9') : statusInfo.borderColor}`,
-                        color: isScheduled ? '#8c8c8c' : statusInfo.textColor,
+                        color: isScheduled ? (isDark ? '#9fb0c2' : '#8c8c8c') : statusInfo.textColor,
                         margin: '0 12px'
                       }}>
                         {isScheduled ? '0 - 0' : `${homeScore} - ${awayScore}`}
@@ -1086,7 +1128,7 @@ const Dashboard = () => {
                       }}>
                         <strong style={{ 
                           fontSize: '12px',
-                          color: isScheduled ? '#8c8c8c' : (isDark ? '#e6edf3' : '#000'),
+                          color: isScheduled ? (isDark ? '#9fb0c2' : '#8c8c8c') : (isDark ? '#e6edf3' : '#000'),
                           textAlign: 'right'
                         }}>
                           {getTeamLabel(match.away_team_name)}
@@ -1105,7 +1147,7 @@ const Dashboard = () => {
                       color: isDark ? '#9fb0c2' : '#8c8c8c',
                       marginTop: '4px',
                       paddingTop: '4px',
-                      borderTop: '1px dashed #f0f0f0'
+                      borderTop: `1px dashed ${isDark ? '#1f2b3a' : '#f0f0f0'}`
                     }} className="match-hr">
                       <span>
                         <strong>{match.match_date ? new Date(match.match_date).toLocaleDateString() : 'Fecha no definida'}</strong>

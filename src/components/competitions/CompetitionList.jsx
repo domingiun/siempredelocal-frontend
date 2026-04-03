@@ -536,6 +536,7 @@ const CompetitionsList = () => {
                 prefix={<SearchOutlined />}
                 onChange={e => handleSearch(e.target.value)}
                 style={{ width: 250 }}
+                className="competitions-search-input"
                 allowClear
                 size="large"
               />

@@ -8,6 +8,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import competitionService from '../../services/competitionService';
+import { useTheme } from '../../context/ThemeContext';
 import { 
   TrophyOutlined, CalendarOutlined, TeamOutlined,
   CheckCircleOutlined, InfoCircleOutlined,
@@ -22,6 +23,8 @@ const { TextArea } = Input;
 const CreateRoundPage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { mode } = useTheme();
+  const isDark = mode === 'dark';
   const [currentStep, setCurrentStep] = useState(0);
   const [competitionId, setCompetitionId] = useState(null);
   const [competition, setCompetition] = useState(null);
@@ -184,7 +187,19 @@ const CreateRoundPage = () => {
               <div style={{ margin: '20px 0' }}>
                 <Select
                   placeholder="Buscar competencia..."
-                  style={{ width: '100%' }}
+                  className="create-round-competition-select"
+                  style={{
+                    width: '100%',
+                    background: isDark ? '#0f1724' : '#ffffff',
+                    borderColor: isDark ? '#1f2b3a' : '#d9d9d9',
+                    color: isDark ? '#ffffff' : '#111827'
+                  }}
+                  dropdownStyle={{
+                    background: isDark ? '#0f1724' : '#ffffff',
+                    color: isDark ? '#e6edf3' : '#111827',
+                    border: isDark ? '1px solid #1f2b3a' : '1px solid #d9d9d9'
+                  }}
+                  dropdownClassName="create-round-competition-dropdown"
                   size="large"
                   value={competitionId}
                   onChange={handleCompetitionSelect}
@@ -210,7 +225,11 @@ const CreateRoundPage = () => {
               
               {competition && (
                 <Alert
-                  title="Información de la competencia seleccionada"
+                  title={
+                    <span style={{ color: '#ffffff', fontWeight: 400 }}>
+                      Información de la competencia seleccionada
+                    </span>
+                  }
                   description={
                     <Space orientation="vertical" size="small" style={{ width: '100%' }}>
                       <Row gutter={[16, 8]}>
@@ -236,7 +255,20 @@ const CreateRoundPage = () => {
                       <Row gutter={[16, 8]}>
                         <Col span={12}>
                           <Text strong>Estado:</Text>
-                          <Tag color={competition.status === 'active' ? 'green' : 'orange'}>
+                          <Tag
+                            color={competition.status === 'active' ? 'green' : 'orange'}
+                            style={isDark ? {
+                              backgroundColor: competition.status === 'active'
+                                ? 'rgba(34, 197, 94, 0.18)'
+                                : 'rgba(249, 115, 22, 0.18)',
+                              borderColor: competition.status === 'active'
+                                ? 'rgba(34, 197, 94, 0.45)'
+                                : 'rgba(249, 115, 22, 0.45)',
+                              color: competition.status === 'active'
+                                ? '#86efac'
+                                : '#fdba74'
+                            } : undefined}
+                          >
                             {competition.status}
                           </Tag>
                         </Col>
@@ -250,7 +282,12 @@ const CreateRoundPage = () => {
                   type="info"
                   showIcon
                   icon={<InfoCircleOutlined />}
-                  style={{ marginTop: 16 }}
+                  style={isDark ? {
+                    marginTop: 16,
+                    background: '#111b2a',
+                    borderColor: '#1f2b3a',
+                    color: '#e6edf3'
+                  } : { marginTop: 16 }}
                 />
               )}
             </>
@@ -277,7 +314,12 @@ const CreateRoundPage = () => {
                   title={`Creando jornada para: ${competition.name}`}
                   type="info"
                   showIcon
-                  style={{ marginBottom: 16 }}
+                  style={isDark ? {
+                    marginBottom: 16,
+                    background: '#111b2a',
+                    borderColor: '#1f2b3a',
+                    color: '#e6edf3'
+                  } : { marginBottom: 16 }}
                 />
               )}
               
@@ -470,7 +512,12 @@ const CreateRoundPage = () => {
               title={`Jornada para: ${competition.name} - ${competition.season}`}
               type="success"
               showIcon
-              style={{ marginBottom: 24 }}
+              style={isDark ? {
+                marginBottom: 24,
+                background: '#111b2a',
+                borderColor: '#1f2b3a',
+                color: '#e6edf3'
+              } : { marginBottom: 24 }}
             />
           )}
           
@@ -491,7 +538,16 @@ const CreateRoundPage = () => {
                 <Row gutter={[16, 8]}>
                   <Col span={12}>
                     <Text strong>Tipo:</Text>
-                    <Tag color="blue">{roundData.round_type}</Tag>
+                    <Tag
+                      color="blue"
+                      style={isDark ? {
+                        backgroundColor: 'rgba(59, 130, 246, 0.18)',
+                        borderColor: 'rgba(59, 130, 246, 0.45)',
+                        color: '#93c5fd'
+                      } : undefined}
+                    >
+                      {roundData.round_type}
+                    </Tag>
                   </Col>
                   <Col span={12}>
                     <Text strong>Fase:</Text>
@@ -503,7 +559,16 @@ const CreateRoundPage = () => {
                   <Row gutter={[16, 8]}>
                     <Col span={12}>
                       <Text strong>Grupo:</Text>
-                      <Tag color="green">Grupo {roundData.group_letter}</Tag>
+                      <Tag
+                        color="green"
+                        style={isDark ? {
+                          backgroundColor: 'rgba(34, 197, 94, 0.18)',
+                          borderColor: 'rgba(34, 197, 94, 0.45)',
+                          color: '#86efac'
+                        } : undefined}
+                      >
+                        Grupo {roundData.group_letter}
+                      </Tag>
                     </Col>
                   </Row>
                 )}
@@ -546,6 +611,11 @@ const CreateRoundPage = () => {
                   }
                   type={roundData.generate_matches ? "success" : "warning"}
                   showIcon
+                  style={isDark ? {
+                    background: '#111b2a',
+                    borderColor: '#1f2b3a',
+                    color: '#e6edf3'
+                  } : undefined}
                 />
               </Space>
             </div>
