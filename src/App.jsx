@@ -82,6 +82,7 @@ import CreateBetDatePage from './pages/admin/bets/CreateBetDatePage';
 
 // Componentes comunes
 import PrivateRoute from './components/common/PrivateRoute';
+import AdminRoute from './components/common/AdminRoute';
 
 function App() {
   return (
@@ -126,10 +127,7 @@ function App() {
                     <Route path="/purchase" element={<PurchaseCreditPage />} />
                     <Route path="/transactions" element={<TransactionHistoryPage />} />
                     
-                    {/* Administración de Pronósticos */}
-                    <Route path="/admin/bets" element={<BetAdminPage />} />
-                    <Route path="/admin/create-betdate" element={<CreateBetDatePage />} />
-                    <Route path="/admin/bets/:id" element={<BetAdminPage />} />
+                    {/* Administración de Pronósticos — SOLO ADMIN (C6) */}
 
                     {/* =========================================== */}
                     {/* SISTEMA DE COMPETENCIAS - EXISTENTES */}
@@ -155,12 +153,7 @@ function App() {
                     <Route path="/matches/edit/:id" element={<EditMatchPage />} />
                     <Route path="/matches/:id" element={<MatchDetail />} />
 
-                    {/* Administración de usuarios y sistema */}
-                    <Route path="/admin/users" element={<AdminUsersPage />} />
-                    <Route path="/admin/system" element={<AdminSystemPage />} />
-                    <Route path="/reports/performance" element={<PerformanceReportPage />} />
-                    <Route path="/reports/financial" element={<FinancialReportPage />} />
-                    <Route path="/reports/attendance" element={<AttendanceReportPage />} />
+                    {/* Reportes (solo admin) — gestionados en el bloque AdminRoute de abajo */}
 
                     {/* Calendario */}
                     <Route path="/matches/calendar" element={<CalendarPage />} />
@@ -176,7 +169,24 @@ function App() {
                     <Route path="/standings/:competitionId" element={<StandingsPage />} />
                   </Route>
                 </Route>
-                
+
+                {/* Rutas exclusivas de ADMIN (C6) — AdminRoute valida rol en frontend */}
+                <Route element={<AdminRoute />}>
+                  <Route element={<MainLayout />}>
+                    {/* Pronósticos admin */}
+                    <Route path="/admin/bets" element={<BetAdminPage />} />
+                    <Route path="/admin/create-betdate" element={<CreateBetDatePage />} />
+                    <Route path="/admin/bets/:id" element={<BetAdminPage />} />
+                    {/* Usuarios y sistema */}
+                    <Route path="/admin/users" element={<AdminUsersPage />} />
+                    <Route path="/admin/system" element={<AdminSystemPage />} />
+                    {/* Reportes */}
+                    <Route path="/reports/performance" element={<PerformanceReportPage />} />
+                    <Route path="/reports/financial" element={<FinancialReportPage />} />
+                    <Route path="/reports/attendance" element={<AttendanceReportPage />} />
+                  </Route>
+                </Route>
+
                 {/* Ruta 404 */}
                 <Route path="*" element={
                   <div style={{ padding: '50px', textAlign: 'center' }}>

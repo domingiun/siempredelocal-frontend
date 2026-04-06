@@ -3,39 +3,29 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
+  timeout: 10000, // A3: 10 segundos — evita peticiones colgadas
+  withCredentials: true, // C5: envía la cookie httpOnly automáticamente
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Interceptor para agregar token
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+// C5: Ya no inyectamos el token desde localStorage.
+// La cookie httpOnly se envía automáticamente por el navegador con withCredentials.
+// Si necesitas compatibilidad con Swagger o clientes API directos, el header Bearer
+// sigue funcionando en el backend como fallback.
 
-// Interceptor para responses - SIN message.error
+// Interceptor de responses — A3/M5
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Solo manejar redirección 401
     if (error.response?.status === 401) {
-      localStorage.removeItem('token');
+      // Limpiar cualquier dato residual de sesión sin exponer detalles
       localStorage.removeItem('user');
-      // Redirigir sin mostrar mensaje aquí
-      if (window.location.pathname !== '/login') {
+      if (window.location.pathname !== '/login' && window.location.pathname !== '/') {
         window.location.href = '/login';
       }
     }
-    
     return Promise.reject(error);
   }
 );
