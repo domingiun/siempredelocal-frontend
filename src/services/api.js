@@ -10,10 +10,20 @@ const api = axios.create({
   },
 });
 
-// C5: Ya no inyectamos el token desde localStorage.
-// La cookie httpOnly se envía automáticamente por el navegador con withCredentials.
-// Si necesitas compatibilidad con Swagger o clientes API directos, el header Bearer
-// sigue funcionando en el backend como fallback.
+// C5: La cookie httpOnly es la vía principal de auth.
+// En iOS Safari, ITP bloquea cookies cross-origin SameSite=None, así que
+// también enviamos el token como Bearer desde sessionStorage como fallback.
+api.interceptors.request.use((config) => {
+  const token = sessionStorage.getItem('_t');
+  if (token) {
+    config.headers = config.headers || {};
+    // Solo añadir si no hay ya un Authorization header explícito
+    if (!config.headers['Authorization']) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+  }
+  return config;
+});
 
 // Interceptor de responses — A3/M5
 api.interceptors.response.use(

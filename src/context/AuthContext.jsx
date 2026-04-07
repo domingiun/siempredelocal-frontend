@@ -47,9 +47,14 @@ export const AuthProvider = ({ children }) => {
   const login = async (username, password) => {
     try {
       setError(null);
-      await authAPI.login(username, password);
-      // C5: No guardamos el token — la cookie httpOnly ya fue establecida por el backend.
-      // Obtenemos el perfil directamente.
+      const loginRes = await authAPI.login(username, password);
+
+      // iOS Safari bloquea cookies SameSite=None con ITP.
+      // Guardamos el token en sessionStorage como fallback para Bearer auth.
+      // La cookie httpOnly sigue siendo la vía principal en Chrome/Firefox.
+      const token = loginRes.data?.access_token;
+      if (token) sessionStorage.setItem('_t', token);
+
       const userResponse = await authAPI.getProfile();
       setUser(userResponse.data);
       return { success: true, data: userResponse.data };
@@ -78,6 +83,7 @@ export const AuthProvider = ({ children }) => {
     } catch {
       // Si falla, igual limpiamos el estado local
     } finally {
+      sessionStorage.removeItem('_t'); // Limpiar token iOS
       setUser(null);
       setError(null);
     }

@@ -49,10 +49,13 @@
   z-index: 5;
   width: 100%;
   max-width: 440px;
-  background: rgba(11,20,34,.85);
+  /* Fondo sólido en iOS para evitar bug de teclado con backdrop-filter */
+  background: #0c1625;
   border: 1px solid rgba(255,255,255,.08);
   border-radius: 20px;
   padding: 40px 36px 32px;
+  /* backdrop-filter solo en navegadores que no sean iOS Safari */
+  -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
   box-shadow:
     0 0 0 1px rgba(22,119,255,.08),
@@ -118,10 +121,14 @@
 
 .auth__form .ant-input-affix-wrapper,
 .auth__form .ant-input-password {
-  background: rgba(255,255,255,.04) !important;
+  background: rgba(255,255,255,.06) !important;
   border-color: rgba(255,255,255,.1) !important;
   border-radius: 10px !important;
   color: #e6edf3 !important;
+  /* iOS Safari: touch-action evita el delay de 300ms y permite foco correcto */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  cursor: text;
 }
 
 .auth__form .ant-input-affix-wrapper:hover,
@@ -139,6 +146,9 @@
   background: transparent !important;
   color: #e6edf3 !important;
   -webkit-text-fill-color: #e6edf3 !important;
+  /* iOS: font-size >= 16px evita el zoom automático al hacer foco */
+  font-size: 16px !important;
+  touch-action: manipulation;
 }
 
 .auth__form .ant-input::placeholder {
