@@ -259,7 +259,7 @@ const PlaceBetForm = () => {
             {match.home_team_logo
               ? <img src={match.home_team_logo} alt="" style={{ width: 30, height: 30, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
               : <TeamOutlined style={{ fontSize: 20, flexShrink: 0 }} />}
-            <Text strong style={{ fontSize: 13, lineHeight: 1.25, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+            <Text style={{ fontSize: 11, lineHeight: 1.25, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
               {match.home_team_name}
             </Text>
           </div>
@@ -271,7 +271,7 @@ const PlaceBetForm = () => {
             {match.away_team_logo
               ? <img src={match.away_team_logo} alt="" style={{ width: 30, height: 30, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
               : <TeamOutlined style={{ fontSize: 20, flexShrink: 0 }} />}
-            <Text strong style={{ fontSize: 13, lineHeight: 1.25, overflow: 'hidden', textAlign: 'right', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+            <Text style={{ fontSize: 11, lineHeight: 1.25, overflow: 'hidden', textAlign: 'right', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
               {match.away_team_name}
             </Text>
           </div>
