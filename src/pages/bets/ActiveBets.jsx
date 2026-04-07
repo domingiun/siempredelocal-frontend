@@ -181,6 +181,26 @@ const ActiveBets = () => {
         ? 'linear-gradient(180deg,#0b0f16 0%,#0f1824 100%)'
         : undefined,
     }}>
+      {/* Forzar fondo oscuro en el Collapse de Ant Design */}
+      {isDark && (
+        <style>{`
+          .ab-collapse .ant-collapse-content {
+            background: #0f1824 !important;
+            border-top-color: #1f2b3a !important;
+          }
+          .ab-collapse .ant-collapse-content-box {
+            background: #0f1824 !important;
+            padding: 0 16px 12px !important;
+          }
+          .ab-collapse .ant-collapse-header {
+            background: #0f1824 !important;
+            border-radius: 12px !important;
+          }
+          .ab-collapse.ant-collapse-item-active > .ant-collapse-header {
+            border-radius: 12px 12px 0 0 !important;
+          }
+        `}</style>
+      )}
       {/* Encabezado */}
       <div style={{ marginBottom: 16 }}>
         <Title level={3} style={{ margin: 0, color: isDark ? '#e6edf3' : undefined }}>
@@ -201,6 +221,7 @@ const ActiveBets = () => {
               <Collapse
                 key={group.bet_date_id}
                 accordion={false}
+                className="ab-collapse"
                 style={{ background: card.bg, border: `1px solid ${card.border}`, borderRadius: 12 }}
                 expandIcon={({ isActive }) => (
                   <RightOutlined style={{ fontSize: 11, color: isDark ? '#64748b' : '#94a3b8', transform: isActive ? 'rotate(90deg)' : 'none', transition: 'transform .2s' }} />
@@ -246,51 +267,46 @@ const ActiveBets = () => {
                                 const ms = matchStatusStyle(match?.status, isDark);
                                 const isLast = idx === sorted.length - 1;
                                 const pointColor = pred.points === 3 ? '#52c41a' : pred.points === 1 ? '#1677ff' : isDark ? '#475569' : '#94a3b8';
+                                const homeName = match?.home_team?.name || '';
+                                const awayName = match?.away_team?.name || '';
                                 return (
                                   <div
                                     key={`${bet.id}-${pred.match_id}`}
                                     style={{
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      gap: 8,
-                                      padding: '7px 0',
-                                      borderBottom: isLast ? 'none' : `1px solid ${isDark ? 'rgba(31,43,58,.7)' : '#f1f5f9'}`,
-                                      flexWrap: 'wrap',
+                                      padding: '8px 0',
+                                      borderBottom: isLast ? 'none' : `1px solid ${isDark ? 'rgba(31,43,58,.8)' : '#f1f5f9'}`,
                                     }}
                                   >
-                                    {/* Logos */}
-                                    {match?.home_team?.logo_url
-                                      ? <img src={match.home_team.logo_url} alt="" style={{ width: 20, height: 20, borderRadius: '50%', flexShrink: 0 }} />
-                                      : null}
-
-                                    {/* Equipos */}
-                                    <Text style={{ fontSize: 11, flex: 1, minWidth: 0, color: isDark ? '#cbd5e1' : '#374151', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                      {match
-                                        ? `${match.home_team?.name || ''} vs ${match.away_team?.name || ''}`
-                                        : `Partido ${pred.match_id}`}
-                                    </Text>
-
-                                    {/* Pronóstico */}
-                                    <Text style={{ fontSize: 11, fontWeight: 700, color: isDark ? '#60a5fa' : '#0958d9', flexShrink: 0 }}>
-                                      {pred.predicted_home_score}-{pred.predicted_away_score}
-                                    </Text>
-
-                                    {/* Resultado real */}
-                                    {pred.hasResult && (
-                                      <Text style={{ fontSize: 11, color: isDark ? '#94a3b8' : '#6b7280', flexShrink: 0 }}>
-                                        ({match.home_score}-{match.away_score})
+                                    {/* Fila 1: logos + equipos completos */}
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5 }}>
+                                      {match?.home_team?.logo_url
+                                        ? <img src={match.home_team.logo_url} alt="" style={{ width: 18, height: 18, borderRadius: '50%', flexShrink: 0 }} />
+                                        : null}
+                                      <Text style={{ fontSize: 12, color: isDark ? '#cbd5e1' : '#374151', flex: 1, lineHeight: 1.3 }}>
+                                        {match ? `${homeName} vs ${awayName}` : `Partido ${pred.match_id}`}
                                       </Text>
-                                    )}
+                                      {match?.away_team?.logo_url
+                                        ? <img src={match.away_team.logo_url} alt="" style={{ width: 18, height: 18, borderRadius: '50%', flexShrink: 0 }} />
+                                        : null}
+                                    </div>
 
-                                    {/* Estado */}
-                                    <Pill s={ms} />
-
-                                    {/* Puntos */}
-                                    {pred.isFinished && (
-                                      <span style={{ fontSize: 12, fontWeight: 800, color: pointColor, flexShrink: 0, minWidth: 28, textAlign: 'right' }}>
-                                        {pred.points}pt
-                                      </span>
-                                    )}
+                                    {/* Fila 2: pronóstico | resultado real | estado | puntos */}
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', paddingLeft: 24 }}>
+                                      <Text style={{ fontSize: 11, fontWeight: 700, color: isDark ? '#60a5fa' : '#0958d9' }}>
+                                        {pred.predicted_home_score}-{pred.predicted_away_score}
+                                      </Text>
+                                      {pred.hasResult && (
+                                        <Text style={{ fontSize: 11, color: isDark ? '#64748b' : '#9ca3af' }}>
+                                          ({match.home_score}-{match.away_score})
+                                        </Text>
+                                      )}
+                                      <Pill s={ms} />
+                                      {pred.isFinished && (
+                                        <span style={{ marginLeft: 'auto', fontSize: 12, fontWeight: 800, color: pointColor }}>
+                                          {pred.points}pt
+                                        </span>
+                                      )}
+                                    </div>
                                   </div>
                                 );
                               })}
