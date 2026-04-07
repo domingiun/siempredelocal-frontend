@@ -608,7 +608,7 @@ const PlaceBetForm = () => {
         />
       )}
 
-      <Card>
+      <div>
         {isOpen ? (
           <>
             <Title level={4}>Pronostica los 10 partidos</Title>
@@ -728,7 +728,7 @@ const PlaceBetForm = () => {
             </Button>
           </div>
         )}
-      </Card>
+      </div>
     </div>
   );
 };
