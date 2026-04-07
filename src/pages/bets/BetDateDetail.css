@@ -1,43 +1,94 @@
-.bet-date-detail {
+/* BetDateDetail — pestañas estilo pill moderno */
+
+.bdd {
   width: 100%;
+  min-height: 100vh;
 }
 
-body[data-theme="dark"] .bet-date-tabs-card {
-  background: #0f1724;
-  border-color: #1f2b3a;
+/* ── Barra de pestañas ── */
+.bdd__tab-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: transparent;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
-body[data-theme="dark"] .bet-date-tabs-card .ant-card-head {
-  background: #0c141f;
-  border-bottom-color: #1f2b3a;
+body:not([data-theme="dark"]) .bdd__tab-bar {
+  border-bottom-color: #e5e7eb;
+  background: rgba(255, 255, 255, 0.88);
 }
 
-body[data-theme="dark"] .bet-date-tabs .ant-tabs-nav {
-  background: #0f1724;
-  border-bottom: 1px solid #1f2b3a;
+body[data-theme="dark"] .bdd__tab-bar {
+  background: rgba(11, 15, 22, 0.88);
 }
 
-body[data-theme="dark"] .bet-date-tabs .ant-tabs-tab {
-  color: #9fb0c2;
+/* ── Pestaña base ── */
+.bdd__tab {
+  padding: 7px 18px;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #64748b;
+  transition: color 0.15s, background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  white-space: nowrap;
 }
 
-body[data-theme="dark"] .bet-date-tabs .ant-tabs-tab-btn {
-  color: inherit;
+body[data-theme="dark"] .bdd__tab {
+  color: #64748b;
 }
 
-body[data-theme="dark"] .bet-date-tabs .ant-tabs-tab-active .ant-tabs-tab-btn {
-  color: #e6edf3;
+.bdd__tab:hover {
+  color: #1677ff;
+  background: rgba(22, 119, 255, 0.08);
 }
 
-body[data-theme="dark"] .bet-date-tabs .ant-tabs-ink-bar {
-  background: #60a5fa;
+body[data-theme="dark"] .bdd__tab:hover {
+  color: #60a5fa;
+  background: rgba(96, 165, 250, 0.1);
 }
 
-body[data-theme="dark"] .bet-date-tabs .ant-tabs-content-holder {
-  background: #0f1724;
+/* ── Pestaña activa ── */
+.bdd__tab--active {
+  background: #1677ff;
+  color: #ffffff !important;
 }
 
-body[data-theme="dark"] .bet-date-tabs .ant-tabs-tab-active {
-  background: rgba(96, 165, 250, 0.12);
-  border-radius: 6px 6px 0 0;
+body[data-theme="dark"] .bdd__tab--active {
+  background: #1677ff;
+  color: #ffffff !important;
+}
+
+.bdd__tab--active:hover {
+  background: #0958d9;
+  color: #ffffff !important;
+}
+
+/* ── Contenido ── */
+.bdd__content {
+  padding: 0;
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .bdd__tab-bar {
+    padding: 8px 10px;
+    gap: 4px;
+  }
+  .bdd__tab {
+    padding: 6px 14px;
+    font-size: 12px;
+  }
 }
