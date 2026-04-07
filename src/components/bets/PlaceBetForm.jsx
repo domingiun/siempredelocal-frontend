@@ -240,70 +240,70 @@ const PlaceBetForm = () => {
         styles={{ body: { padding: '10px 12px' } }}
       >
         {/* Meta: número + competencia + fecha */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10, flexWrap: 'wrap' }}>
-          <Tag color="blue" style={{ margin: 0, fontSize: 11 }}>{index + 1}</Tag>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+          <Tag color="blue" style={{ margin: 0, fontSize: 11, lineHeight: '18px', padding: '0 6px' }}>{index + 1}</Tag>
           {match.competition_name && (
-            <Text type="secondary" style={{ fontSize: 11 }}>{match.competition_name}</Text>
+            <Text type="secondary" style={{ fontSize: 11, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+              {match.competition_name}
+            </Text>
           )}
-          <Text type="secondary" style={{ fontSize: 11, marginLeft: 'auto' }}>
+          <Text type="secondary" style={{ fontSize: 11, flexShrink: 0, whiteSpace: 'nowrap' }}>
             {match.match_date ? formatDateTimeShortUTC(formatForInputUTC(match.match_date)) : '—'}
           </Text>
         </div>
 
-        {/* Fila principal: local — inputs — visitante */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          {/* Equipo local */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, minWidth: 0 }}>
-            {match.home_team_logo ? (
-              <img src={match.home_team_logo} alt={match.home_team_name} style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }} />
-            ) : (
-              <TeamOutlined style={{ fontSize: 22 }} />
-            )}
-            <Text strong style={{ fontSize: 11, textAlign: 'center', lineHeight: 1.2, wordBreak: 'break-word' }}>
+        {/* Fila de equipos: logo + nombre | vs | nombre + logo */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+          {/* Local */}
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
+            {match.home_team_logo
+              ? <img src={match.home_team_logo} alt="" style={{ width: 30, height: 30, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+              : <TeamOutlined style={{ fontSize: 20, flexShrink: 0 }} />}
+            <Text strong style={{ fontSize: 13, lineHeight: 1.25, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
               {match.home_team_name}
             </Text>
           </div>
 
-          {/* Inputs de marcador */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-            <InputNumber
-              min={0} max={15}
-              value={prediction.home_score ?? null}
-              onChange={(value) => handlePredictionChange(match.match_id, 'home_score', value)}
-              controls={false}
-              inputMode="numeric"
-              pattern="[0-9]*"
-              placeholder="0"
-              className="score-input"
-              style={{ width: 52, textAlign: 'center', border: '2px solid #1677ff', borderRadius: 8 }}
-              size="large"
-            />
-            <Text strong style={{ fontSize: 15 }}>-</Text>
-            <InputNumber
-              min={0} max={15}
-              value={prediction.away_score ?? null}
-              onChange={(value) => handlePredictionChange(match.match_id, 'away_score', value)}
-              controls={false}
-              inputMode="numeric"
-              pattern="[0-9]*"
-              placeholder="0"
-              className="score-input"
-              style={{ width: 52, textAlign: 'center', border: '2px solid #1677ff', borderRadius: 8 }}
-              size="large"
-            />
-          </div>
+          <Text type="secondary" style={{ fontSize: 12, flexShrink: 0, padding: '0 2px' }}>vs</Text>
 
-          {/* Equipo visitante */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, minWidth: 0 }}>
-            {match.away_team_logo ? (
-              <img src={match.away_team_logo} alt={match.away_team_name} style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }} />
-            ) : (
-              <TeamOutlined style={{ fontSize: 22 }} />
-            )}
-            <Text strong style={{ fontSize: 11, textAlign: 'center', lineHeight: 1.2, wordBreak: 'break-word' }}>
+          {/* Visitante — logo a la derecha */}
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 7, minWidth: 0, flexDirection: 'row-reverse' }}>
+            {match.away_team_logo
+              ? <img src={match.away_team_logo} alt="" style={{ width: 30, height: 30, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+              : <TeamOutlined style={{ fontSize: 20, flexShrink: 0 }} />}
+            <Text strong style={{ fontSize: 13, lineHeight: 1.25, overflow: 'hidden', textAlign: 'right', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
               {match.away_team_name}
             </Text>
           </div>
+        </div>
+
+        {/* Inputs centrados */}
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10 }}>
+          <InputNumber
+            min={0} max={15}
+            value={prediction.home_score ?? null}
+            onChange={(value) => handlePredictionChange(match.match_id, 'home_score', value)}
+            controls={false}
+            inputMode="numeric"
+            pattern="[0-9]*"
+            placeholder="0"
+            className="score-input"
+            style={{ width: 60, textAlign: 'center', border: '2px solid #1677ff', borderRadius: 8 }}
+            size="large"
+          />
+          <Text strong style={{ fontSize: 18 }}>-</Text>
+          <InputNumber
+            min={0} max={15}
+            value={prediction.away_score ?? null}
+            onChange={(value) => handlePredictionChange(match.match_id, 'away_score', value)}
+            controls={false}
+            inputMode="numeric"
+            pattern="[0-9]*"
+            placeholder="0"
+            className="score-input"
+            style={{ width: 60, textAlign: 'center', border: '2px solid #1677ff', borderRadius: 8 }}
+            size="large"
+          />
         </div>
 
         {/* Estadio */}
@@ -686,17 +686,23 @@ const PlaceBetForm = () => {
                 loading={submitting}
                 disabled={submitting || !hasEnoughCredits() || completedCount < matches.length}
                 style={{
-                  backgroundColor: completedCount === matches.length && hasEnoughCredits()
-                    ? '#0958d9' : undefined,
+                  backgroundColor: !hasEnoughCredits()
+                    ? '#cf1322'
+                    : completedCount === matches.length
+                      ? '#0958d9'
+                      : '#1d4ed8',
+                  borderColor: !hasEnoughCredits() ? '#cf1322' : '#0958d9',
+                  color: '#ffffff',
                   fontWeight: 700,
-                  minWidth: 140,
+                  minWidth: 150,
+                  opacity: 1,
                 }}
               >
                 {!hasEnoughCredits()
                   ? 'Sin Créditos'
                   : completedCount < matches.length
                     ? `Faltan ${matches.length - completedCount}`
-                    : 'Enviar ✓'
+                    : 'Enviar pronósticos'
                 }
               </Button>
             </div>
