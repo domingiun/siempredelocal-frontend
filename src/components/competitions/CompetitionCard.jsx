@@ -1,415 +1,236 @@
 // frontend/src/components/competitions/CompetitionCard.jsx
 import React from 'react';
-import { 
-  Card, Tag, Space, Progress, Avatar, Badge, Image, Popconfirm, Tooltip 
-} from 'antd';
-import { 
+import { Popconfirm, Tooltip } from 'antd';
+import {
   TrophyOutlined, TeamOutlined, CalendarOutlined,
   EyeOutlined, EditOutlined, DeleteOutlined,
-  CrownOutlined, ArrowUpOutlined, ArrowDownOutlined,
   LockOutlined, UserOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import './CompetitionCard.css';
+
+const statusConfig = (status) => {
+  const v = String(status || '').toLowerCase();
+  if (v.includes('curso') || v === 'active' || v === 'ongoing')
+    return { bar: '#22c55e', bg: 'rgba(34,197,94,.13)', border: 'rgba(34,197,94,.35)', text: '#16a34a', label: 'En curso', darkText: '#86efac' };
+  if (v.includes('programado') || v === 'scheduled')
+    return { bar: '#3b82f6', bg: 'rgba(59,130,246,.13)', border: 'rgba(59,130,246,.3)', text: '#1d4ed8', label: 'Programado', darkText: '#93c5fd' };
+  if (v.includes('finalizado') || v === 'completed')
+    return { bar: '#64748b', bg: 'rgba(100,116,139,.13)', border: 'rgba(100,116,139,.3)', text: '#475569', label: 'Finalizado', darkText: '#94a3b8' };
+  if (v.includes('cancelado') || v === 'cancelled')
+    return { bar: '#ef4444', bg: 'rgba(239,68,68,.13)', border: 'rgba(239,68,68,.3)', text: '#dc2626', label: 'Cancelado', darkText: '#fca5a5' };
+  return { bar: '#94a3b8', bg: 'rgba(148,163,184,.1)', border: 'rgba(148,163,184,.3)', text: '#64748b', label: status || '—', darkText: '#94a3b8' };
+};
+
+const typeLabel = (type) => {
+  const map = { league: 'Liga', cup: 'Copa', league_cup: 'Liga + Copa', groups_playoff: 'Grupos + Playoff' };
+  return map[type] || type || '—';
+};
+
+const formatDate = (d) => {
+  if (!d) return null;
+  return new Date(d).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+};
 
 const CompetitionCard = ({ competition, showActions = true, onDelete }) => {
   const navigate = useNavigate();
   const { user, isAdmin } = useAuth();
+  const { mode } = useTheme();
+  const isDark = mode === 'dark';
+
   const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-  const getLogoSrc = (logoUrl) => {
-    if (!logoUrl) return undefined;
-    return logoUrl.startsWith('http') ? logoUrl : `${apiBaseUrl}${logoUrl}`;
-  };
-  const hasLogo = Boolean(competition.logo_url);
+  const logoSrc = competition.logo_url
+    ? (competition.logo_url.startsWith('http') ? competition.logo_url : `${apiBaseUrl}${competition.logo_url}`)
+    : null;
 
+  const sc = statusConfig(competition.status);
+  const isUserComp = competition.created_by === user?.id;
+  const canEdit = isAdmin || competition.created_by === user?.id;
+  const canDelete = isAdmin;
 
-  const normalizeStatus = (status) => {
-    if (!status) return status;
-    const normalized = String(status).trim().toLowerCase();
-    const statusMap = {
-      'draft': 'En curso',
-      'borrador': 'En curso',
-      'active': 'En curso',
-      'en curso': 'En curso',
-      'en_curso': 'En curso',
-      'completed': 'Finalizado',
-      'finalizado': 'Finalizado',
-      'cancelled': 'Cancelado',
-      'cancelado': 'Cancelado',
-      'scheduled': 'Programado',
-      'programado': 'Programado'
-    };
-    return statusMap[normalized] || status;
-  };
-
-  const getStatusConfig = (status) => {
-    const normalizedStatus = normalizeStatus(status);
-    switch (normalizedStatus) {
-      case 'En curso':
-        return { color: 'green', icon: '▶️' };
-      case 'Programado':
-        return { color: 'blue', icon: '📅' };
-      case 'Finalizado':
-        return { color: 'gray', icon: '🏁' };
-      case 'Cancelado':
-        return { color: 'red', icon: '❌' };
-      default:
-        return { color: 'default', icon: '❓' };
-    }
-  };
-
-  const getCompetitionType = (type) => {
-    const types = {
-      'league': { label: 'Liga', color: 'blue', icon: '🏆' },
-      'cup': { label: 'PTSa', color: 'red', icon: '🏆' },
-      'league_cup': { label: 'Liga + PTSa', color: 'purple', icon: '🏆' },
-      'groups_playoff': { label: 'Grupos + Playoff', color: 'orange', icon: '📊' },
-    };
-    return types[type] || { label: type, color: 'default', icon: '🏆' };
-  };
-
-  const normalizedStatus = normalizeStatus(competition.status);
-  const statusConfig = getStatusConfig(normalizedStatus);
-  const typeConfig = getCompetitionType(competition.competition_type);
-
-  // Verificar permisos
-  const canEdit = () => {
-    if (!user) return false;
-    if (isAdmin) return true;
-    // Si el usuario es el creador de la competencia
-    if (competition.created_by === user.id) return true;
-    return false;
-  };
-
-  const canDelete = () => {
-    if (!user) return false;
-    if (isAdmin) return true;
-    // Solo admin puede borrar competencias
-    return false;
-  };
-
-  const calculateProgress = () => {
-    if (normalizedStatus === 'Finalizado') return 100;
-    if (normalizedStatus === 'Cancelado') return 0;
-    if (normalizedStatus === 'Programado') return 10;
-    if (normalizedStatus === 'En curso') return 50;
-    return 0;
-  };
-
-  const progress = calculateProgress();
-
-  const formatDate = (dateString) => {
-    if (!dateString) return 'Agotado';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric'
-    });
-  };
-
-  // Construir acciones basadas en permisos
-  const getActions = () => {
-    const actions = [];
-    
-    // Ver siempre visible para todos
-    actions.push(
-      <Tooltip title="Ver detalles" key="view">
-        <EyeOutlined 
-          onClick={(e) => {
-            e.stopPropagation();
-            navigate(`/competitions/${competition.id}`);
-          }}
-          style={{ color: '#1890ff' }}
-        />
-      </Tooltip>
-    );
-
-    // Editar solo si tiene permisos
-    if (canEdit()) {
-      actions.push(
-        <Tooltip title="Editar competencia" key="edit">
-          <EditOutlined 
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate(`/competitions/${competition.id}/edit`);
-            }}
-            style={{ color: '#52c41a' }}
-          />
-        </Tooltip>
-      );
-    } else if (showActions) {
-      // Mostrar bloqueado si no tiene permisos
-      actions.push(
-        <Tooltip title="No tienes permisos para editar" key="edit-locked">
-          <LockOutlined style={{ color: '#d9d9d9', cursor: 'not-allowed' }} />
-        </Tooltip>
-      );
-    }
-
-    // Eliminar solo admin
-    if (canDelete()) {
-      actions.push(
-        <Tooltip title="Eliminar competencia" key="delete">
-          <Popconfirm
-            title="¿Eliminar competencia?"
-            description="Esta acción no se puede deshacer. ¿Estás seguro?"
-            onConfirm={(e) => {
-              e?.stopPropagation();
-              onDelete && onDelete(competition.id);
-            }}
-            onCancel={(e) => e?.stopPropagation()}
-            okText="Sí, eliminar"
-            cancelText="Cancelar"
-            okType="danger"
-            placement="top"
-          >
-            <DeleteOutlined 
-              onClick={(e) => e.stopPropagation()}
-              style={{ color: '#ff4d4f' }}
-            />
-          </Popconfirm>
-        </Tooltip>
-      );
-    } else if (showActions) {
-      actions.push(
-        <Tooltip title="Solo administradores pueden eliminar" key="delete-locked">
-          <LockOutlined style={{ color: '#d9d9d9', cursor: 'not-allowed' }} />
-        </Tooltip>
-      );
-    }
-
-    return actions;
-  };
-
-  // Verificar si es competencia del usuario actual
-  const isUserCompetition = competition.created_by === user?.id;
+  const card = isDark
+    ? { bg: '#0f1824', border: '#1f2b3a', text: '#e6edf3', sub: '#94a3b8', action: '#1a2536' }
+    : { bg: '#ffffff', border: '#e5e7eb', text: '#111827', sub: '#6b7280', action: '#f8fafc' };
 
   return (
-    <Card
-      className="competition-card"
-      hoverable
-      actions={showActions ? getActions() : []}
+    <div
+      className="cc"
+      style={{
+        background: card.bg,
+        border: `1px solid ${card.border}`,
+        borderRadius: 14,
+        overflow: 'hidden',
+        cursor: 'pointer',
+        transition: 'box-shadow .2s, transform .2s',
+        boxShadow: isDark ? '0 4px 16px rgba(0,0,0,.3)' : '0 2px 10px rgba(17,24,39,.07)',
+        position: 'relative',
+      }}
       onClick={() => navigate(`/competitions/${competition.id}`)}
     >
-      {/* Indicador si es competencia del usuario */}
-      {isUserCompetition && (
-        <div style={{ position: 'absolute', top: 10, right: 10 }}>
-          <Tag color="gold" icon={<UserOutlined />} style={{ fontSize: '10px' }}>
-            Tu competencia
-          </Tag>
-        </div>
-      )}
+      {/* Barra de color superior */}
+      <div style={{ height: 4, background: sc.bar, width: '100%' }} />
 
-      {/* Indicador si es admin */}
-      {isAdmin && (
-        <div style={{ position: 'absolute', top: 10, left: 10 }}>
-          <Tag color="red" style={{ fontSize: '10px', padding: '2px 6px' }}>
-            ADMIN
-          </Tag>
-        </div>
-      )}
-
-      <div className="competition-card-header">
-        <Space align="start" style={{ width: '100%' }}>
-          <Badge 
-            count={competition.total_teams}
-            overflowCount={99}
-            style={{ 
-              backgroundColor: typeConfig.color,
-              color: '#fff'
-            }}
-          >
-            <Avatar 
-              size={48}
-              src={getLogoSrc(competition.logo_url)}
-              icon={!competition.logo_url ? <TrophyOutlined /> : undefined}
-              style={{ 
-                backgroundColor: hasLogo ? 'transparent' : statusConfig.color,
-                boxShadow: `0 0 0 2px ${statusConfig.color}20`,
-                border: isUserCompetition ? '2px solid #faad14' : 'none'
-              }}
-              className="competition-logo-avatar"
-            />
-          </Badge>
-          
-          <div className="competition-card-info" style={{ flex: 1 }}>
-            <h3 className="competition-card-title">
-              {competition.name}
-              {normalizedStatus === 'En curso' && (
-                <CrownOutlined style={{ color: '#faad14', marginLeft: 8 }} />
-              )}
-            </h3>
-            
-            <Space size={[4, 8]} wrap>
-              <Tag color={typeConfig.color}>
-                <span style={{ marginRight: 4 }}>{typeConfig.icon}</span>
-                {typeConfig.label}
-              </Tag>
-              
-              <Tag color={statusConfig.color}>
-                <span style={{ marginRight: 4 }}>{statusConfig.icon}</span>
-                {normalizedStatus}
-              </Tag>
-              
-              <Tag color="geekblue" icon={<TeamOutlined />}>
-                {competition.total_teams} equipos
-              </Tag>
-              
-              {competition.country && (
-                <Tag color="cyan">
-                  <img 
-                    src={`https://flagcdn.com/w20/${competition.country.toLowerCase()}.png`}
-                    alt={competition.country}
-                    style={{ width: 16, height: 12, marginRight: 4 }}
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                    }}
-                  />
-                  {competition.country}
-                </Tag>
-              )}
-            </Space>
-          </div>
-        </Space>
-      </div>
-
-      <div className="competition-card-body">
-        <div className="competition-card-dates">
-          <Space orientation="vertical" size={2} align="center">
-            <span style={{ fontSize: '12px', color: '#666' }}>
-              <CalendarOutlined /> Temporada
-            </span>
-            <strong>{competition.season || 'N/A'}</strong>
-          </Space>
-
-          <Space orientation="vertical" size={2} align="center">
-            <span style={{ fontSize: '12px', color: '#666' }}>
-              <CalendarOutlined /> Inicio
-            </span>
-            <span>{formatDate(competition.start_date)}</span>
-          </Space>
-
-          <Space orientation="vertical" size={2} align="center">
-            <span style={{ fontSize: '12px', color: '#666' }}>
-              <CalendarOutlined /> Fin
-            </span>
-            <span>{formatDate(competition.end_date) || 'Sin definir'}</span>
-          </Space>
-        </div>
-
-        {competition.description && (
-          <div className="competition-card-description">
-            <p style={{ margin: 0, fontSize: '14px' }}>{competition.description}</p>
-          </div>
-        )}
-
-        <div className="competition-card-progress">
-          <div style={{ marginBottom: 8 }}>
-            <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: '14px' }}>Progreso</span>
-              <span style={{ fontWeight: 'bold' }}>{progress}%</span>
-            </Space>
-          </div>
-          <Progress 
-            percent={progress} 
-            strokeColor={statusConfig.color}
-            showInfo={false}
-            size="small"
-          />
-          <Space style={{ width: '100%', justifyContent: 'space-between', marginTop: 4 }}>
-            <small style={{ color: '#666', fontSize: '11px' }}>
-              {normalizedStatus === 'Finalizado' ? 'Completado' : 
-               normalizedStatus === 'Cancelado' ? 'Cancelado' :
-               normalizedStatus === 'Programado' ? 'Por comenzar' :
-               'En progreso'}
-            </small>
-            <small style={{ fontSize: '11px' }}>
-              {competition.start_date ? formatDate(competition.start_date) : 'Agotado'}
-            </small>
-          </Space>
-        </div>
-
-        {/* Información adicional */}
-        <div className="competition-card-footer">
-          <Space size={16} wrap style={{ justifyContent: 'center' }}>
-            {competition.teams_to_qualify > 0 && (
-              <Tooltip title="Equipos que clasifican a playoffs">
-                <Space orientation="vertical" size={0} align="center">
-                  <Tag color="blue" style={{ margin: 0 }}>
-                    <ArrowUpOutlined /> {competition.teams_to_qualify}
-                  </Tag>
-                  <small style={{ fontSize: '10px' }}>Clasifican</small>
-                </Space>
-              </Tooltip>
-            )}
-            
-            {competition.promotion_spots > 0 && (
-              <Tooltip title="Ascensos">
-                <Space orientation="vertical" size={0} align="center">
-                  <Tag color="green" style={{ margin: 0 }}>
-                    <ArrowUpOutlined /> {competition.promotion_spots}
-                  </Tag>
-                  <small style={{ fontSize: '10px' }}>Ascensos</small>
-                </Space>
-              </Tooltip>
-            )}
-            
-            {competition.relegation_spots > 0 && (
-              <Tooltip title="Descensos">
-                <Space orientation="vertical" size={0} align="center">
-                  <Tag color="red" style={{ margin: 0 }}>
-                    <ArrowDownOutlined /> {competition.relegation_spots}
-                  </Tag>
-                  <small style={{ fontSize: '10px' }}>Descensos</small>
-                </Space>
-              </Tooltip>
-            )}
-            
-            {competition.international_spots > 0 && (
-              <Tooltip title="Cupos internacionales">
-                <Space orientation="vertical" size={0} align="center">
-                  <Tag color="gold" style={{ margin: 0 }}>
-                    🌍 {competition.international_spots}
-                  </Tag>
-                  <small style={{ fontSize: '10px' }}>Internacional</small>
-                </Space>
-              </Tooltip>
-            )}
-            
-            {competition.groups > 0 && (
-              <Tooltip title="Número de grupos">
-                <Space orientation="vertical" size={0} align="center">
-                  <Tag color="purple" style={{ margin: 0 }}>
-                    📊 {competition.groups}
-                  </Tag>
-                  <small style={{ fontSize: '10px' }}>Grupos</small>
-                </Space>
-              </Tooltip>
-            )}
-          </Space>
-        </div>
-
-        {/* Información del creador */}
-        {competition.created_by_name && (
-          <div style={{ 
-            marginTop: '12px', 
-            paddingTop: '8px', 
-            borderTop: '1px dashed #f0f0f0',
-            fontSize: '11px', 
-            color: '#999',
-            textAlign: 'center'
+      {/* Cuerpo */}
+      <div style={{ padding: '12px 14px 0' }}>
+        {/* Fila principal: logo + nombre + estado */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+          {/* Logo */}
+          <div style={{
+            width: 40, height: 40, borderRadius: 10, flexShrink: 0,
+            background: isDark ? '#0c141f' : '#f1f5f9',
+            border: `1px solid ${card.border}`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            overflow: 'hidden',
           }}>
-            <Space size={4}>
-              <UserOutlined />
-              <span>Creado por: {competition.created_by_name}</span>
-            </Space>
+            {logoSrc
+              ? <img src={logoSrc} alt="" style={{ width: 32, height: 32, objectFit: 'contain' }} />
+              : <TrophyOutlined style={{ fontSize: 18, color: isDark ? '#475569' : '#94a3b8' }} />}
+          </div>
+
+          {/* Nombre + meta */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 6, flexWrap: 'wrap' }}>
+              <span style={{
+                fontSize: 13, fontWeight: 700, color: card.text,
+                lineHeight: 1.3, flex: 1, minWidth: 0,
+              }}>
+                {competition.name}
+              </span>
+              {/* Pill de estado */}
+              <span style={{
+                flexShrink: 0,
+                padding: '2px 8px', borderRadius: 999, fontSize: 10, fontWeight: 600,
+                background: isDark ? sc.bg : sc.bg,
+                border: `1px solid ${sc.border}`,
+                color: isDark ? sc.darkText : sc.text,
+                lineHeight: '16px', whiteSpace: 'nowrap',
+              }}>
+                {sc.label}
+              </span>
+            </div>
+
+            {/* Sub-info en una línea */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 3, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 11, color: card.sub }}>
+                <TrophyOutlined style={{ marginRight: 3 }} />{typeLabel(competition.competition_type)}
+              </span>
+              <span style={{ fontSize: 11, color: card.sub }}>
+                <TeamOutlined style={{ marginRight: 3 }} />{competition.total_teams || 0} equipos
+              </span>
+              {competition.season && (
+                <span style={{ fontSize: 11, color: card.sub }}>
+                  <CalendarOutlined style={{ marginRight: 3 }} />{competition.season}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Fechas (solo si existen) */}
+        {(competition.start_date || competition.end_date) && (
+          <div style={{
+            display: 'flex', gap: 16, marginBottom: 10,
+            padding: '6px 10px', borderRadius: 8,
+            background: isDark ? 'rgba(15,24,36,.6)' : '#f8fafc',
+            border: `1px solid ${card.border}`,
+          }}>
+            {competition.start_date && (
+              <span style={{ fontSize: 10, color: card.sub }}>
+                Inicio: <strong style={{ color: card.text }}>{formatDate(competition.start_date)}</strong>
+              </span>
+            )}
+            {competition.end_date && (
+              <span style={{ fontSize: 10, color: card.sub }}>
+                Fin: <strong style={{ color: card.text }}>{formatDate(competition.end_date)}</strong>
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Badges admin / tu competencia */}
+        {(isAdmin || isUserComp) && (
+          <div style={{ display: 'flex', gap: 6, marginBottom: 8 }}>
+            {isAdmin && (
+              <span style={{ fontSize: 9, fontWeight: 700, padding: '1px 6px', borderRadius: 4, background: 'rgba(239,68,68,.15)', color: '#ef4444', border: '1px solid rgba(239,68,68,.3)' }}>
+                ADMIN
+              </span>
+            )}
+            {isUserComp && (
+              <span style={{ fontSize: 9, fontWeight: 700, padding: '1px 6px', borderRadius: 4, background: 'rgba(234,179,8,.15)', color: isDark ? '#fde68a' : '#b45309', border: '1px solid rgba(234,179,8,.3)' }}>
+                <UserOutlined style={{ marginRight: 3 }} />Tu competencia
+              </span>
+            )}
           </div>
         )}
       </div>
-    </Card>
+
+      {/* Barra de acciones */}
+      {showActions && (
+        <div style={{
+          display: 'flex', borderTop: `1px solid ${card.border}`,
+          background: card.action,
+        }}
+          onClick={e => e.stopPropagation()}
+        >
+          {/* Ver */}
+          <button
+            style={actionBtn(card)}
+            onClick={() => navigate(`/competitions/${competition.id}`)}
+          >
+            <EyeOutlined style={{ color: '#1677ff', fontSize: 14 }} />
+          </button>
+
+          {/* Editar */}
+          {canEdit ? (
+            <button
+              style={actionBtn(card)}
+              onClick={() => navigate(`/competitions/${competition.id}/edit`)}
+            >
+              <EditOutlined style={{ color: '#22c55e', fontSize: 14 }} />
+            </button>
+          ) : (
+            <Tooltip title="Sin permisos para editar">
+              <button style={{ ...actionBtn(card), opacity: .4, cursor: 'not-allowed' }}>
+                <LockOutlined style={{ fontSize: 14, color: card.sub }} />
+              </button>
+            </Tooltip>
+          )}
+
+          {/* Eliminar */}
+          {canDelete ? (
+            <Popconfirm
+              title="¿Eliminar competencia?"
+              description="Esta acción no se puede deshacer."
+              onConfirm={() => onDelete && onDelete(competition.id)}
+              okText="Eliminar"
+              cancelText="Cancelar"
+              okType="danger"
+              placement="top"
+            >
+              <button style={actionBtn(card)}>
+                <DeleteOutlined style={{ color: '#ef4444', fontSize: 14 }} />
+              </button>
+            </Popconfirm>
+          ) : (
+            <Tooltip title="Solo administradores pueden eliminar">
+              <button style={{ ...actionBtn(card), opacity: .4, cursor: 'not-allowed' }}>
+                <LockOutlined style={{ fontSize: 14, color: card.sub }} />
+              </button>
+            </Tooltip>
+          )}
+        </div>
+      )}
+    </div>
   );
 };
+
+const actionBtn = (card) => ({
+  flex: 1, border: 'none', background: 'transparent', cursor: 'pointer',
+  padding: '9px 0', display: 'flex', alignItems: 'center', justifyContent: 'center',
+  borderRight: `1px solid ${card.border}`,
+  transition: 'background .15s',
+});
 
 export default CompetitionCard;

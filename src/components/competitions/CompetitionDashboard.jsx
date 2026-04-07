@@ -1,8 +1,8 @@
 // frontend/src/components/competitions/CompetitionDashboard.jsx
 import React, { useState, useEffect } from 'react';
 import { 
-  Tabs, Card, Row, Col, Space, Button, 
-  Typography, Statistic, Tag, message, Switch, Grid 
+  Tabs, Card, Row, Col, Space, Button,
+  Typography, Statistic, Tag, message, Grid
 } from 'antd';
 import { 
   TrophyOutlined, TeamOutlined, CalendarOutlined, 
@@ -26,7 +26,7 @@ const { Title, Text } = Typography;
 const CompetitionDashboard = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { mode, setMode } = useTheme();
+  const { mode } = useTheme();
   const isDark = mode === 'dark';
   const screens = Grid.useBreakpoint();
   const isMobile = !screens.md;
@@ -300,15 +300,6 @@ const CompetitionDashboard = () => {
       <Card className="competition-tabs-card">
         {isMobile ? (
           <>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
-              <Space size="small" className="competition-dashboard__toggle">
-                <Text type="secondary">Vista oscura</Text>
-                <Switch
-                  checked={isDark}
-                  onChange={(checked) => setMode(checked ? 'dark' : 'light')}
-                />
-              </Space>
-            </div>
             <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 8, marginBottom: 12 }}>
               <Button size="small" type={activeTab === 'overview' ? 'primary' : 'default'} onClick={() => setActiveTab('overview')}>
                 Resumen
@@ -331,19 +322,10 @@ const CompetitionDashboard = () => {
             </div>
           </>
         ) : (
-          <Tabs 
-            activeKey={activeTab} 
+          <Tabs
+            activeKey={activeTab}
             onChange={setActiveTab}
             type="card"
-            tabBarExtraContent={(
-              <Space size="small" className="competition-dashboard__toggle">
-                <Text type="secondary">Vista oscura</Text>
-                <Switch
-                  checked={isDark}
-                  onChange={(checked) => setMode(checked ? 'dark' : 'light')}
-                />
-              </Space>
-            )}
             items={tabItems}
           />
         )}

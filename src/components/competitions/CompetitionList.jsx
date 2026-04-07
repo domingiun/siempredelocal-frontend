@@ -1,11 +1,11 @@
 // frontend/src/components/competitions/CompetitionsList.jsx
 import React, { useState, useEffect, useMemo } from 'react';
 import { usePermissions } from '../../hooks/usePermissions';
-import { 
-  Card, Table, Tag, Space, Button, Input, Select, 
+import {
+  Card, Table, Tag, Space, Button, Input, Select,
   DatePicker, Row, Col, Modal, message, Avatar,
   Statistic, Badge, Progress, Typography, Divider, Tooltip, Segmented,
-  Empty, Flex, Switch
+  Empty, Flex
 } from 'antd';
 import { 
   SearchOutlined, EyeOutlined, EditOutlined, 
@@ -36,7 +36,7 @@ const CompetitionsList = () => {
   const [selectedTeams, setSelectedTeams] = useState([]);
   const [viewMode, setViewMode] = useState('card'); // 'card' o 'table'
   const [statsLoading, setStatsLoading] = useState(false);
-  const { mode, setMode } = useTheme();
+  const { mode } = useTheme();
   const isDark = mode === 'dark';
   const navigate = useNavigate();
   const { user, isAdmin } = useAuth();
@@ -461,14 +461,6 @@ const CompetitionsList = () => {
             Gestiona y sigue todas las competencias deportivas
           </Text>
         </Space>
-        <Space size="small">
-          <Text type="secondary">Vista oscura</Text>
-          <Switch
-            checked={isDark}
-            onChange={(checked) => setMode(checked ? 'dark' : 'light')}
-          />
-        </Space>
-        
         {canCreateCompetition() && (
           <Button
             type="primary"
