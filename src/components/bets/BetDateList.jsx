@@ -1,12 +1,12 @@
 // frontend/src/components/bets/BetDateList.jsx
 import React, { useState, useEffect } from 'react';
-import { 
-  Card, Row, Col, Typography, Tag, Button, 
-  Space, Statistic, Badge, Alert, Spin, message, Modal, Avatar, Switch 
+import {
+  Card, Row, Col, Typography, Tag, Button,
+  Space, Alert, Spin, message, Modal, Avatar
 } from 'antd';
-import { 
-  CalendarOutlined, FireOutlined, TrophyOutlined, 
-  TeamOutlined, ClockCircleOutlined, DollarOutlined,
+import {
+  CalendarOutlined, FireOutlined, TrophyOutlined,
+  TeamOutlined, ClockCircleOutlined,
   EyeOutlined, PlayCircleOutlined, LockOutlined, HistoryOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
@@ -24,7 +24,7 @@ const BetDateList = () => {
   const { wallet, hasEnoughCredits } = useWallet();
   const [betDates, setBetDates] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { mode, setMode } = useTheme();
+  const { mode } = useTheme();
   const isDark = mode === 'dark';
   const [stats, setStats] = useState({
     total_bets: 0,
@@ -273,167 +273,100 @@ const BetDateList = () => {
     const isOpen = betDate.uiStatus === 'open';
     const timeRemaining = calculateTimeRemaining(betDate);
     const canBet = isOpen && hasEnoughCredits();
-    
+    const prize =
+      betDate.total_prize ||
+      ((betDate.prize_PTS || 0) + (betDate.accumulated_prize || 0)) ||
+      betDate.prize_cop ||
+      0;
+
     return (
       <Card
         className="betdate-card"
-        style={{ 
-          marginBottom: 16,
-          borderLeft: `4px solid ${isOpen ? '#52c41a' : '#d9d9d9'}`,
-          cursor: 'default'
+        style={{
+          marginBottom: 12,
+          borderLeft: `4px solid ${isOpen ? '#52c41a' : betDate.uiStatus === 'finished' ? '#1677ff' : '#d9d9d9'}`,
         }}
       >
-        <Row gutter={[16, 16]}>
-          <Col span={24}>
-            <Space orientation="vertical" size="small" style={{ width: '100%' }}>
-              <Row justify="space-between" align="middle">
-                <Col>
-                  <Title level={4} style={{ margin: 0 }}>
-                    <CalendarOutlined style={{ marginRight: 8 }} />
-                    {betDate.name || `Fecha #${betDate.id}`}
-                  </Title>
-                </Col>
-                <Col>
-                  <Tag color={getStatusColor(betDate.uiStatus || betDate.status)}
-                    style={isDark ? getBetDateStatusStyle(betDate.uiStatus || betDate.status) : undefined}>
-                    {getStatusText(betDate.uiStatus || betDate.status)}
-                  </Tag>
-                </Col>
-              </Row>
-              
-              <Text type="secondary">
-                {betDate.description || 'Pronostica 10 partidos y gana premios en Puntos'}
-              </Text>
-              
-              <Row gutter={[16, 8]}>
-                <Col span={8}>
-                  <Statistic
-                    title="Premio"
-                    value={
-                      (betDate.total_prize || 0) ||
-                      ((betDate.prize_PTS || 0) + (betDate.accumulated_prize || 0)) ||
-                      (betDate.prize_cop || 0)
-                    }
-                    prefix={<DollarOutlined />}
-                    suffix="PTS"
-                    styles={{ content: { 
-                      color: '#52c41a',
-                      fontSize: '18px',
-                      fontWeight: 'bold'
-                    } }}
-                  />
-                </Col>
-                <Col span={8}>
-                  <Statistic
-                    title="Pronósticos"
-                    value={betDate.bet_count || betDate.total_bets || 0}
-                    prefix={<TeamOutlined />}
-                    styles={{ content: { fontSize: '18px' } }}
-                  />
-                </Col>
-                <Col span={8}>
-                  <Statistic
-                    title="Tiempo"
-                    value={timeRemaining}
-                    prefix={<ClockCircleOutlined />}
-                    styles={{ content: {color: timeRemaining === 'Cerrado' ? '#ff4d4f' : '#1890ff', fontSize: '18px'} }}
-                  />
-                </Col>
-              </Row>
-              
-              <div style={{ 
-                background: isDark ? '#0b0f16' : '#f8fafc', 
-                padding: '8px 12px', 
-                borderRadius: 8,
-                border: isDark ? '1px solid #3a465c' : '1px solid #e2e8f0',
-                color: isDark ? '#ffffff' : 'inherit'
-              }} className="betdate-pill">
-                <Text type="secondary">
-                  <FireOutlined style={{ marginRight: 4 }} />
-                  {betDate.matches?.length || 0} partidos • 
-                  1 crédito • Mínimo 13 puntos para ganar
-                </Text>
-              </div>
-              
-              <Row justify="space-between" align="middle">
-                <Col>
-                  <Space>
-                    {betDate.accumulated_prize > 0 && (
-                      <Tag
-                        color="gold"
-                        style={
-                          isDark
-                            ? { background: 'rgba(234, 179, 8, 0.18)', borderColor: 'rgba(234, 179, 8, 0.35)', color: '#fde68a' }
-                            : undefined
-                        }
-                      >
-                        <TrophyOutlined /> Acumulado: ${betDate.accumulated_prize.toLocaleString()}
-                      </Tag>
-                    )}
-                  </Space>
-                </Col>
-                <Col>
-                  <Space>
-                    <Button
-                      icon={<EyeOutlined />}
-                      style={{
-                        backgroundColor: '#ffffff',
-                        borderColor: '#0958d9',
-                        color: '#0958d9',
-                        fontWeight: 600
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleViewDetails(betDate.id);
-                      }}
-                    >
-                      Ver
-                    </Button>
-                    
-                    {betDate.uiStatus === 'finished' && (
-                      <Button
-                        type="primary"
-                        icon={<TrophyOutlined />}
-                        style={{
-                          backgroundColor: '#0958d9',
-                          borderColor: '#0958d9',
-                          color: '#ffffff',
-                          fontWeight: 600
-                        }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleViewResults(betDate);
-                        }}
-                      >
-                        Resultados
-                      </Button>
-                    )}
-                    
-                    {isOpen && (
-                      <Button
-                        type="primary"
-                        icon={canBet ? <PlayCircleOutlined /> : <LockOutlined />}
-                        disabled={!canBet}
-                        style={{
-                          backgroundColor: '#0958d9',
-                          borderColor: '#0958d9',
-                          color: '#ffffff',
-                          fontWeight: 600
-                        }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handlePlaceBet(betDate.id);
-                        }}
-                      >
-                        {canBet ? 'Pronósticar' : 'Sin créditos'}
-                      </Button>
-                    )}
-                  </Space>
-                </Col>
-              </Row>
-            </Space>
-          </Col>
-        </Row>
+        {/* Encabezado: nombre + badge de estado */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10, gap: 8 }}>
+          <Text strong style={{ fontSize: 15, lineHeight: 1.3 }}>
+            <CalendarOutlined style={{ marginRight: 6, color: '#1677ff' }} />
+            {betDate.name || `Fecha #${betDate.id}`}
+          </Text>
+          <Tag
+            color={getStatusColor(betDate.uiStatus || betDate.status)}
+            style={isDark ? getBetDateStatusStyle(betDate.uiStatus || betDate.status) : undefined}
+          >
+            {getStatusText(betDate.uiStatus || betDate.status)}
+          </Tag>
+        </div>
+
+        {/* Chips de información: premio · pronósticos · tiempo */}
+        <div style={{ display: 'flex', gap: 16, marginBottom: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#52c41a', fontWeight: 700, fontSize: 14 }}>
+            <TrophyOutlined />
+            {prize.toLocaleString()} PTS
+          </span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 5, color: isDark ? '#94a3b8' : '#64748b', fontSize: 13 }}>
+            <TeamOutlined />
+            {betDate.bet_count || betDate.total_bets || 0} pronósticos
+          </span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 5, color: timeRemaining === 'Cerrado' ? '#ff4d4f' : '#1890ff', fontSize: 13 }}>
+            <ClockCircleOutlined />
+            {timeRemaining}
+          </span>
+        </div>
+
+        {/* Texto informativo */}
+        <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 12 }}>
+          <FireOutlined style={{ marginRight: 4 }} />
+          {betDate.matches?.length || 0} partidos · 1 crédito · Mínimo 13 pts para ganar
+        </Text>
+
+        {/* Tag de acumulado si existe */}
+        {betDate.accumulated_prize > 0 && (
+          <Tag
+            color="gold"
+            style={{
+              marginBottom: 10,
+              ...(isDark ? { background: 'rgba(234, 179, 8, 0.18)', borderColor: 'rgba(234, 179, 8, 0.35)', color: '#fde68a' } : {})
+            }}
+          >
+            <TrophyOutlined /> Acumulado: {betDate.accumulated_prize.toLocaleString()} PTS
+          </Tag>
+        )}
+
+        {/* Botones de acción */}
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <Button
+            icon={<EyeOutlined />}
+            style={{ backgroundColor: '#ffffff', borderColor: '#0958d9', color: '#0958d9', fontWeight: 600 }}
+            onClick={(e) => { e.stopPropagation(); handleViewDetails(betDate.id); }}
+          >
+            Ver
+          </Button>
+          {betDate.uiStatus === 'finished' && (
+            <Button
+              type="primary"
+              icon={<TrophyOutlined />}
+              style={{ backgroundColor: '#0958d9', borderColor: '#0958d9', color: '#ffffff', fontWeight: 600 }}
+              onClick={(e) => { e.stopPropagation(); handleViewResults(betDate); }}
+            >
+              Resultados
+            </Button>
+          )}
+          {isOpen && (
+            <Button
+              type="primary"
+              icon={canBet ? <PlayCircleOutlined /> : <LockOutlined />}
+              disabled={!canBet}
+              style={{ backgroundColor: '#0958d9', borderColor: '#0958d9', color: '#ffffff', fontWeight: 600 }}
+              onClick={(e) => { e.stopPropagation(); handlePlaceBet(betDate.id); }}
+            >
+              {canBet ? 'Pronósticar' : 'Sin créditos'}
+            </Button>
+          )}
+        </div>
       </Card>
     );
   };
@@ -695,82 +628,6 @@ const BetDateList = () => {
           }
         }
       `}</style>
-      {/* Encabezado con estadísticas — oculto en móvil (MobileBetDashboard lo reemplaza) */}
-      <Card className="betdate-header-card" style={{ marginBottom: 24 }}>
-        <Row gutter={[24, 24]}>
-          <Col span={24}>
-            <Row justify="space-between" align="middle" gutter={[12, 12]}>
-              <Col>
-                <Title level={2}>
-                  <FireOutlined style={{ marginRight: 8 }} />
-                  Fechas de Pronósticos
-                </Title>
-                <Text type="secondary">
-                  Pronostica 10 partidos, gana puntos y obtén premios en Puntos
-                </Text>
-              </Col>
-              <Col>
-                <Space size="small">
-                  <Text type="secondary">Vista oscura</Text>
-                  <Switch
-                    checked={isDark}
-                    onChange={(checked) => setMode(checked ? 'dark' : 'light')}
-                    className="toggle-dark"
-                    checkedChildren="ON"
-                    unCheckedChildren="OFF"
-                  />
-                </Space>
-              </Col>
-            </Row>
-          </Col>
-          
-          <Col xs={24} sm={12} md={6}>
-            <Statistic
-              title="Fechas Activas"
-              value={stats.active_dates}
-              prefix={<CalendarOutlined />}
-              styles={{
-                title: { color: isDark ? '#e6edf3' : undefined },
-                content: { color: '#1890ff' }
-              }}
-            />
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Statistic
-              title="Total Pronósticos"
-              value={stats.total_bets}
-              prefix={<TeamOutlined />}
-              styles={{
-                title: { color: isDark ? '#e6edf3' : undefined }
-              }}
-            />
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Statistic
-              title="Premio Total Acumulado "
-              value={stats.total_prize}
-              prefix={<FireOutlined/>}
-              suffix="PTS"
-              styles={{
-                title: { color: isDark ? '#e6edf3' : undefined },
-                content: { color: '#52c41a' }
-              }}
-            />
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Statistic
-              title="Tus Créditos"
-              value={wallet.credits}
-              prefix={<FireOutlined />}
-              styles={{
-                title: { color: isDark ? '#e6edf3' : undefined },
-                content: {color: wallet.credits > 0 ? '#52c41a' : '#ff4d4f',fontWeight: 'bold'}
-              }}
-            />
-          </Col>
-        </Row>
-      </Card>
-
       {/* Alerta si no hay créditos */}
       {wallet.credits === 0 && (
         <Alert

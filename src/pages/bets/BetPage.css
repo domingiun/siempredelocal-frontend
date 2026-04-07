@@ -163,6 +163,13 @@ body[data-theme="dark"] .bet-panel--list {
   .bet-hero--desktop {
     display: none;
   }
+  /* Sin borde ni sombra extra en móvil — las BetDateCards ya tienen su propio estilo */
+  .bet-panel {
+    border: none;
+    box-shadow: none;
+    background: transparent;
+    padding: 0;
+  }
 }
 
 @media (max-width: 480px) {
