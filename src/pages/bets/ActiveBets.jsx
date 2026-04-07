@@ -1,13 +1,12 @@
 // frontend/src/pages/bets/ActiveBets.jsx
 import React, { useMemo, useState, useEffect } from 'react';
-import { Typography, Spin, Alert, Collapse } from 'antd';
+import { Typography, Spin, Alert } from 'antd';
 import { FireOutlined, TrophyOutlined, CalendarOutlined, RightOutlined } from '@ant-design/icons';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import betService from '../../services/betService';
 import matchService from '../../services/matchService';
 import { calculatePredictionPoints } from '../../utils/betCalculations';
-import { formatDateTimeShort as formatDateTimeShortUTC, formatForInputUTC } from '../../utils/dateFormatter';
 
 const { Title, Text } = Typography;
 
@@ -53,18 +52,64 @@ const matchStatusStyle = (status, isDark) => {
 const Pill = ({ s }) => (
   <span style={{
     display: 'inline-block',
-    padding: '2px 10px',
+    padding: '1px 8px',
     borderRadius: 999,
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: 600,
     background: s.bg,
     border: `1px solid ${s.border}`,
     color: s.text,
-    lineHeight: '18px',
+    lineHeight: '17px',
   }}>
     {s.label}
   </span>
 );
+
+/* ─── Acordeón custom (sin Ant Design Collapse) ─── */
+const AccordionItem = ({ header, children, card }) => {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{
+      background: card.bg,
+      border: `1px solid ${card.border}`,
+      borderRadius: 12,
+      overflow: 'hidden',
+    }}>
+      <button
+        onClick={() => setOpen(o => !o)}
+        style={{
+          width: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          padding: '10px 14px',
+          background: card.bg,
+          border: 'none',
+          cursor: 'pointer',
+          textAlign: 'left',
+        }}
+      >
+        <RightOutlined style={{
+          fontSize: 10,
+          color: card.iconColor,
+          transform: open ? 'rotate(90deg)' : 'none',
+          transition: 'transform .2s',
+          flexShrink: 0,
+        }} />
+        <div style={{ flex: 1, minWidth: 0 }}>{header}</div>
+      </button>
+      {open && (
+        <div style={{
+          background: card.bg,
+          borderTop: `1px solid ${card.border}`,
+          padding: '8px 14px 12px',
+        }}>
+          {children}
+        </div>
+      )}
+    </div>
+  );
+};
 
 /* ─── componente principal ─── */
 const ActiveBets = () => {
@@ -170,8 +215,8 @@ const ActiveBets = () => {
 
   /* ── Render ── */
   const card = isDark
-    ? { bg: '#0f1824', border: '#1f2b3a', headerBg: '#0c141f' }
-    : { bg: '#ffffff', border: '#e5e7eb', headerBg: '#f8fafc' };
+    ? { bg: '#0f1824', border: '#1f2b3a', iconColor: '#64748b' }
+    : { bg: '#ffffff', border: '#e5e7eb', iconColor: '#94a3b8' };
 
   return (
     <div style={{
@@ -181,26 +226,6 @@ const ActiveBets = () => {
         ? 'linear-gradient(180deg,#0b0f16 0%,#0f1824 100%)'
         : undefined,
     }}>
-      {/* Forzar fondo oscuro en el Collapse de Ant Design */}
-      {isDark && (
-        <style>{`
-          .ab-collapse .ant-collapse-content {
-            background: #0f1824 !important;
-            border-top-color: #1f2b3a !important;
-          }
-          .ab-collapse .ant-collapse-content-box {
-            background: #0f1824 !important;
-            padding: 0 16px 12px !important;
-          }
-          .ab-collapse .ant-collapse-header {
-            background: #0f1824 !important;
-            border-radius: 12px !important;
-          }
-          .ab-collapse.ant-collapse-item-active > .ant-collapse-header {
-            border-radius: 12px 12px 0 0 !important;
-          }
-        `}</style>
-      )}
       {/* Encabezado */}
       <div style={{ marginBottom: 16 }}>
         <Title level={3} style={{ margin: 0, color: isDark ? '#e6edf3' : undefined }}>
@@ -218,106 +243,96 @@ const ActiveBets = () => {
           {groupedBets.map(group => {
             const statusStyle = betDateTagStyle(group.bet_date_status, isDark);
             return (
-              <Collapse
+              <AccordionItem
                 key={group.bet_date_id}
-                accordion={false}
-                className="ab-collapse"
-                style={{ background: card.bg, border: `1px solid ${card.border}`, borderRadius: 12 }}
-                expandIcon={({ isActive }) => (
-                  <RightOutlined style={{ fontSize: 11, color: isDark ? '#64748b' : '#94a3b8', transform: isActive ? 'rotate(90deg)' : 'none', transition: 'transform .2s' }} />
-                )}
-                items={[{
-                  key: String(group.bet_date_id),
-                  label: (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-                      <Text strong style={{ fontSize: 14, color: isDark ? '#e6edf3' : undefined }}>
-                        {group.bet_date_name}
-                      </Text>
-                      <Pill s={{ bg: isDark ? 'rgba(22,119,255,.15)' : '#e6f4ff', border: isDark ? 'rgba(22,119,255,.3)' : '#91caff', text: isDark ? '#60a5fa' : '#0958d9', label: `${group.totalBets} pronósticos` }} />
-                      {group.bet_date_status && <Pill s={statusStyle} />}
-                    </div>
-                  ),
-                  style: { background: card.bg, borderRadius: 12 },
-                  children: (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingTop: 4 }}>
-                      {group.items.map(bet => {
-                        const sorted = [...(bet.predictions || [])].sort((a, b) => {
-                          const at = a.match?.match_date ? new Date(a.match.match_date).getTime() : Infinity;
-                          const bt = b.match?.match_date ? new Date(b.match.match_date).getTime() : Infinity;
-                          return at - bt;
-                        });
-                        return (
-                          <div key={bet.id}>
-                            {/* Sub-encabezado del pronóstico */}
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8, padding: '4px 0', borderBottom: `1px solid ${card.border}` }}>
-                              <CalendarOutlined style={{ color: isDark ? '#64748b' : '#94a3b8', fontSize: 13 }} />
-                              <Text style={{ fontSize: 12, color: isDark ? '#94a3b8' : '#64748b' }}>
-                                {new Date(bet.submitted_at || bet.created_at).toLocaleDateString()}
-                              </Text>
-                              <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 5, fontWeight: 700, fontSize: 13, color: '#1677ff' }}>
-                                <TrophyOutlined />
-                                {bet.totalPoints || 0} pts
-                              </span>
-                            </div>
+                card={card}
+                header={
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                    <Text strong style={{ fontSize: 13, color: isDark ? '#e6edf3' : undefined }}>
+                      {group.bet_date_name}
+                    </Text>
+                    <Pill s={{ bg: isDark ? 'rgba(22,119,255,.15)' : '#e6f4ff', border: isDark ? 'rgba(22,119,255,.3)' : '#91caff', text: isDark ? '#60a5fa' : '#0958d9', label: `${group.totalBets} pronósticos` }} />
+                    {group.bet_date_status && <Pill s={statusStyle} />}
+                  </div>
+                }
+              >
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {group.items.map(bet => {
+                    const sorted = [...(bet.predictions || [])].sort((a, b) => {
+                      const at = a.match?.match_date ? new Date(a.match.match_date).getTime() : Infinity;
+                      const bt = b.match?.match_date ? new Date(b.match.match_date).getTime() : Infinity;
+                      return at - bt;
+                    });
+                    return (
+                      <div key={bet.id}>
+                        {/* Sub-encabezado del pronóstico */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, padding: '3px 0', borderBottom: `1px solid ${card.border}` }}>
+                          <CalendarOutlined style={{ color: isDark ? '#64748b' : '#94a3b8', fontSize: 11 }} />
+                          <Text style={{ fontSize: 11, color: isDark ? '#94a3b8' : '#64748b' }}>
+                            {new Date(bet.submitted_at || bet.created_at).toLocaleDateString()}
+                          </Text>
+                          <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4, fontWeight: 700, fontSize: 12, color: '#1677ff' }}>
+                            <TrophyOutlined />
+                            {bet.totalPoints || 0} pts
+                          </span>
+                        </div>
 
-                            {/* Lista de predicciones */}
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-                              {sorted.map((pred, idx) => {
-                                const match = pred.match;
-                                const ms = matchStatusStyle(match?.status, isDark);
-                                const isLast = idx === sorted.length - 1;
-                                const pointColor = pred.points === 3 ? '#52c41a' : pred.points === 1 ? '#1677ff' : isDark ? '#475569' : '#94a3b8';
-                                const homeName = match?.home_team?.name || '';
-                                const awayName = match?.away_team?.name || '';
-                                return (
-                                  <div
-                                    key={`${bet.id}-${pred.match_id}`}
-                                    style={{
-                                      padding: '8px 0',
-                                      borderBottom: isLast ? 'none' : `1px solid ${isDark ? 'rgba(31,43,58,.8)' : '#f1f5f9'}`,
-                                    }}
-                                  >
-                                    {/* Fila 1: logos + equipos completos */}
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 5 }}>
-                                      {match?.home_team?.logo_url
-                                        ? <img src={match.home_team.logo_url} alt="" style={{ width: 18, height: 18, borderRadius: '50%', flexShrink: 0 }} />
-                                        : null}
-                                      <Text style={{ fontSize: 12, color: isDark ? '#cbd5e1' : '#374151', flex: 1, lineHeight: 1.3 }}>
-                                        {match ? `${homeName} vs ${awayName}` : `Partido ${pred.match_id}`}
-                                      </Text>
-                                      {match?.away_team?.logo_url
-                                        ? <img src={match.away_team.logo_url} alt="" style={{ width: 18, height: 18, borderRadius: '50%', flexShrink: 0 }} />
-                                        : null}
-                                    </div>
+                        {/* Lista de predicciones */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+                          {sorted.map((pred, idx) => {
+                            const match = pred.match;
+                            const ms = matchStatusStyle(match?.status, isDark);
+                            const isLast = idx === sorted.length - 1;
+                            const pointColor = pred.points === 3 ? '#52c41a' : pred.points === 1 ? '#1677ff' : isDark ? '#475569' : '#94a3b8';
+                            const homeName = match?.home_team?.name || '';
+                            const awayName = match?.away_team?.name || '';
+                            return (
+                              <div
+                                key={`${bet.id}-${pred.match_id}`}
+                                style={{
+                                  padding: '6px 0',
+                                  borderBottom: isLast ? 'none' : `1px solid ${isDark ? 'rgba(31,43,58,.8)' : '#f1f5f9'}`,
+                                }}
+                              >
+                                {/* Fila 1: logos + equipos */}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 4 }}>
+                                  {match?.home_team?.logo_url
+                                    ? <img src={match.home_team.logo_url} alt="" style={{ width: 16, height: 16, borderRadius: '50%', flexShrink: 0 }} />
+                                    : null}
+                                  <Text style={{ fontSize: 11, color: isDark ? '#cbd5e1' : '#374151', flex: 1, lineHeight: 1.3 }}>
+                                    {match ? `${homeName} vs ${awayName}` : `Partido ${pred.match_id}`}
+                                  </Text>
+                                  {match?.away_team?.logo_url
+                                    ? <img src={match.away_team.logo_url} alt="" style={{ width: 16, height: 16, borderRadius: '50%', flexShrink: 0 }} />
+                                    : null}
+                                </div>
 
-                                    {/* Fila 2: pronóstico | resultado real | estado | puntos */}
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', paddingLeft: 24 }}>
-                                      <Text style={{ fontSize: 11, fontWeight: 700, color: isDark ? '#60a5fa' : '#0958d9' }}>
-                                        {pred.predicted_home_score}-{pred.predicted_away_score}
-                                      </Text>
-                                      {pred.hasResult && (
-                                        <Text style={{ fontSize: 11, color: isDark ? '#64748b' : '#9ca3af' }}>
-                                          ({match.home_score}-{match.away_score})
-                                        </Text>
-                                      )}
-                                      <Pill s={ms} />
-                                      {pred.isFinished && (
-                                        <span style={{ marginLeft: 'auto', fontSize: 12, fontWeight: 800, color: pointColor }}>
-                                          {pred.points}pt
-                                        </span>
-                                      )}
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ),
-                }]}
-              />
+                                {/* Fila 2: pronóstico | resultado | estado | puntos */}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', paddingLeft: 21 }}>
+                                  <Text style={{ fontSize: 11, fontWeight: 700, color: isDark ? '#60a5fa' : '#0958d9' }}>
+                                    {pred.predicted_home_score}-{pred.predicted_away_score}
+                                  </Text>
+                                  {pred.hasResult && (
+                                    <Text style={{ fontSize: 10, color: isDark ? '#64748b' : '#9ca3af' }}>
+                                      ({match.home_score}-{match.away_score})
+                                    </Text>
+                                  )}
+                                  <Pill s={ms} />
+                                  {pred.isFinished && (
+                                    <span style={{ marginLeft: 'auto', fontSize: 11, fontWeight: 800, color: pointColor }}>
+                                      {pred.points}pt
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </AccordionItem>
             );
           })}
         </div>
