@@ -7,7 +7,7 @@ import {
 import {
   TrophyOutlined, TeamOutlined, CalendarOutlined,
   EyeOutlined, FireOutlined, ThunderboltOutlined,
-  RocketOutlined, CrownOutlined, StarOutlined
+  RocketOutlined, CrownOutlined, StarOutlined, WalletOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import competitionService from '../services/competitionService';
@@ -797,6 +797,48 @@ const Dashboard = () => {
           />
         </Space>
       </div>
+
+      {/* ── Accesos rápidos ── */}
+      <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
+        <Col xs={12} sm={8} md={6}>
+          <Button
+            type="primary"
+            icon={<FireOutlined />}
+            size="large"
+            block
+            onClick={() => {
+              // Última fecha disponible (open primero, si no la más reciente)
+              const sorted = [...betdates].sort((a, b) =>
+                new Date(b.start_datetime || b.close_datetime || 0) -
+                new Date(a.start_datetime || a.close_datetime || 0)
+              );
+              const target = sorted.find(d => d.status === 'open') || sorted[0];
+              if (target) navigate(`/bets/${target.id}`);
+              else navigate('/bets');
+            }}
+            style={{ fontWeight: 700, backgroundColor: '#0958d9', borderColor: '#0958d9' }}
+          >
+            Hacer Pronósticos
+          </Button>
+        </Col>
+        <Col xs={12} sm={8} md={6}>
+          <Button
+            icon={<WalletOutlined />}
+            size="large"
+            block
+            onClick={() => navigate('/wallet')}
+            style={{
+              fontWeight: 700,
+              backgroundColor: isDark ? '#0f1824' : '#fff',
+              borderColor: '#52c41a',
+              color: '#52c41a'
+            }}
+          >
+            Recargar Créditos
+          </Button>
+        </Col>
+      </Row>
+
       <Row gutter={[16, 16]}>
 
         <Col xs={24} sm={6}>

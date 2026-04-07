@@ -270,8 +270,8 @@ const PlaceBetForm = () => {
           {/* Marcador */}
           <Col xs={6} md={6}>
             <Space orientation="vertical" align="center" style={{ width: '100%' }}>
-              <Row gutter={6} className="score-row">
-                <Col xs={12} md={10}>
+              <Row gutter={4} className="score-row" align="middle">
+                <Col xs={10} md={10}>
                   <InputNumber
                     min={0}
                     max={15}
@@ -280,10 +280,10 @@ const PlaceBetForm = () => {
                     controls={false}
                     inputMode="numeric"
                     pattern="[0-9]*"
-                    placeholder=""
+                    placeholder="0"
                     className="score-input"
-                    style={{ 
-                      width: '100%', 
+                    style={{
+                      width: '100%',
                       textAlign: 'center',
                       border: '2px solid #1677ff',
                       borderRadius: 8
@@ -291,10 +291,10 @@ const PlaceBetForm = () => {
                     size="large"
                   />
                 </Col>
-                <Col xs={0} md={4} className="score-separator" style={{ textAlign: 'center', lineHeight: '32px' }}>
-                  <Text strong>-</Text>
+                <Col xs={4} md={4} className="score-separator" style={{ textAlign: 'center', lineHeight: '38px' }}>
+                  <Text strong style={{ fontSize: 16 }}>-</Text>
                 </Col>
-                <Col xs={12} md={10}>
+                <Col xs={10} md={10}>
                   <InputNumber
                     min={0}
                     max={15}
@@ -303,10 +303,10 @@ const PlaceBetForm = () => {
                     controls={false}
                     inputMode="numeric"
                     pattern="[0-9]*"
-                    placeholder=""
+                    placeholder="0"
                     className="score-input"
-                    style={{ 
-                      width: '100%', 
+                    style={{
+                      width: '100%',
                       textAlign: 'center',
                       border: '2px solid #1677ff',
                       borderRadius: 8
@@ -382,10 +382,13 @@ const PlaceBetForm = () => {
 
   const isOpen = betDate.is_betting_open ?? betDate.status === 'open';
   const closedLabel = betDate.status === 'finished' ? 'finalizada' : 'cerrada';
+  const completedCount = Object.values(predictions).filter(
+    p => p.home_score != null && p.away_score != null
+  ).length;
 
 
   return (
-    <div className={isDark ? 'place-bet place-bet--dark' : 'place-bet'} style={{ padding: '14px', maxWidth: 1200, margin: '0 auto' }}>
+    <div className={isDark ? 'place-bet place-bet--dark' : 'place-bet'} style={{ padding: '14px', maxWidth: 1200, margin: '0 auto' }} role="main">
       <style>{`
         .place-bet {
           width: 100%;
@@ -681,6 +684,61 @@ const PlaceBetForm = () => {
           }
         }
 
+        /* ── BARRA STICKY MÓVIL ── */
+        .place-bet__mobile-bar {
+          display: none;
+        }
+        @media (max-width: 768px) {
+          /* Espacio para que la barra no tape el último elemento */
+          .place-bet {
+            padding-bottom: 80px !important;
+          }
+          .place-bet__mobile-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 200;
+            padding: 10px 16px;
+            padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+            background: #ffffff;
+            border-top: 1px solid #e8edf3;
+            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.10);
+          }
+          .place-bet--dark .place-bet__mobile-bar {
+            background: #0c141f;
+            border-top-color: #1f2b3a;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.40);
+          }
+          .place-bet__bar-progress {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+          }
+          .place-bet__bar-count {
+            font-size: 18px;
+            font-weight: 800;
+            color: #1677ff;
+          }
+          .place-bet__bar-label {
+            font-size: 11px;
+            color: #8c9ab0;
+          }
+          .place-bet--dark .place-bet__bar-label {
+            color: #6b7a8d;
+          }
+          /* Separador entre numero y "de 10" */
+          .place-bet__bar-count span {
+            font-size: 12px;
+            font-weight: 500;
+            color: #8c9ab0;
+            margin-left: 2px;
+          }
+        }
+
         @media (max-width: 576px) {
           .match-prediction-card .ant-card-head-title {
             font-size: 11px;
@@ -849,6 +907,37 @@ const PlaceBetForm = () => {
                 }}
               >
                 {hasEnoughCredits() ? 'Enviar Pronósticos' : 'Sin Creditos'}
+              </Button>
+            </div>
+
+            {/* ── BARRA STICKY MÓVIL — solo visible en ≤ 768px ── */}
+            <div className="place-bet__mobile-bar">
+              <div className="place-bet__bar-progress">
+                <span className="place-bet__bar-count">
+                  {completedCount}<span>/{matches.length}</span>
+                </span>
+                <span className="place-bet__bar-label">completados</span>
+              </div>
+              <Button
+                type="primary"
+                size="large"
+                icon={<CheckCircleOutlined />}
+                onClick={handleSubmit}
+                loading={submitting}
+                disabled={submitting || !hasEnoughCredits() || completedCount < matches.length}
+                style={{
+                  backgroundColor: completedCount === matches.length && hasEnoughCredits()
+                    ? '#0958d9' : undefined,
+                  fontWeight: 700,
+                  minWidth: 140,
+                }}
+              >
+                {!hasEnoughCredits()
+                  ? 'Sin Créditos'
+                  : completedCount < matches.length
+                    ? `Faltan ${matches.length - completedCount}`
+                    : 'Enviar ✓'
+                }
               </Button>
             </div>
           </>

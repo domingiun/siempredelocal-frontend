@@ -3,12 +3,16 @@ import React from 'react';
 import { Row, Col } from 'antd';
 import BetDateList from '../../components/bets/BetDateList';
 import WalletBalance from '../../components/wallet/WalletBalance';
+import MobileBetDashboard from '../../components/bets/MobileBetDashboard';
 import './BetPage.css';
 
 const BetPage = () => {
   return (
     <div className="bet-page">
-      <div className="bet-hero">
+      {/* Dashboard compacto solo en móvil: créditos + CTA fecha activa */}
+      <MobileBetDashboard />
+
+      <div className="bet-hero bet-hero--desktop">
         <div>
           <div className="bet-hero__eyebrow">pronósticos deportivos</div>
           <div className="bet-hero__title">Pronósticos de la semana</div>

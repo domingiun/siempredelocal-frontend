@@ -88,6 +88,35 @@ body[data-theme="dark"] .ant-select-selection-item {
   color: #e6edf3 !important;
 }
 
+/* Fix crítico: navegadores móviles (iOS/Android) fuerzan fondo blanco en selects.
+   Necesitamos alta especificidad para ganarle al reset del browser. */
+html body[data-theme="dark"] .ant-select .ant-select-selector {
+  background-color: #0c141f !important;
+  border-color: #1f2b3a !important;
+  color: #e6edf3 !important;
+}
+
+/* El input interno que el browser puede poner en blanco */
+body[data-theme="dark"] .ant-select-selection-search-input {
+  background-color: transparent !important;
+  color: #e6edf3 !important;
+  -webkit-text-fill-color: #e6edf3 !important;
+}
+
+/* Select abierto/focused en dark mode */
+body[data-theme="dark"] .ant-select-focused .ant-select-selector,
+body[data-theme="dark"] .ant-select-open .ant-select-selector {
+  background-color: #0c141f !important;
+  border-color: #1677ff !important;
+}
+
+/* InputNumber (score inputs) en dark mode mobile */
+body[data-theme="dark"] .ant-input-number-input {
+  background-color: transparent !important;
+  color: #e6edf3 !important;
+  -webkit-text-fill-color: #e6edf3 !important;
+}
+
 body[data-theme="dark"] .ant-picker-input > input {
   color: #e6edf3 !important;
 }

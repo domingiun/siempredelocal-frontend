@@ -155,9 +155,19 @@ body[data-theme="dark"] .bet-panel--list {
   }
 }
 
+/* Ocultar el hero decorativo en móvil — MobileBetDashboard lo reemplaza */
+@media (max-width: 768px) {
+  .bet-page {
+    padding: 12px 10px;
+  }
+  .bet-hero--desktop {
+    display: none;
+  }
+}
+
 @media (max-width: 480px) {
   .bet-page {
-    padding: 16px;
+    padding: 10px 8px;
   }
 
   .bet-hero {

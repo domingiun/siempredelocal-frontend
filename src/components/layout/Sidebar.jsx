@@ -375,6 +375,7 @@ const Sidebar = ({ collapsed, onCollapse, isMobile }) => {
   const handleMenuClick = ({ key }) => {
     if (key.startsWith('/')) {
       navigate(key);
+      if (isMobile) onCollapse(true);
     }
   };
 
@@ -383,6 +384,7 @@ const Sidebar = ({ collapsed, onCollapse, isMobile }) => {
       logout();
     } else if (key.startsWith('/')) {
       navigate(key);
+      if (isMobile) onCollapse(true);
     }
   };
 

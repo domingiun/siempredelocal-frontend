@@ -641,9 +641,18 @@ const BetDateList = () => {
         .betdate-list--dark .toggle-dark.ant-switch-checked .ant-switch-inner .ant-switch-inner-checked {
           color: #93c5fd;
         }
+        @media (max-width: 768px) {
+          .betdate-header-card {
+            display: none;
+          }
+          .betdate-list {
+            padding: 0 !important;
+          }
+        }
+
         @media (max-width: 480px) {
           .betdate-list {
-            padding: 16px !important;
+            padding: 0 !important;
           }
           .betdate-list h1,
           .betdate-list h2,
@@ -686,8 +695,8 @@ const BetDateList = () => {
           }
         }
       `}</style>
-      {/* Encabezado con estadísticas */}
-      <Card style={{ marginBottom: 24 }}>
+      {/* Encabezado con estadísticas — oculto en móvil (MobileBetDashboard lo reemplaza) */}
+      <Card className="betdate-header-card" style={{ marginBottom: 24 }}>
         <Row gutter={[24, 24]}>
           <Col span={24}>
             <Row justify="space-between" align="middle" gutter={[12, 12]}>
