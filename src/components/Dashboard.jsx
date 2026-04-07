@@ -842,7 +842,7 @@ const Dashboard = () => {
       <Row gutter={[16, 16]}>
 
         <Col xs={24} sm={6}>
-          <Card loading={loading} className="dash-stat">
+          <Card loading={loading} className="dash-stat" hoverable onClick={() => navigate('/competitions')} style={{ cursor: 'pointer' }}>
             <Statistic
               title="Competencias"
               value={stats.totalCompetitions}
@@ -861,7 +861,7 @@ const Dashboard = () => {
         </Col>
 
         <Col xs={24} sm={6}>
-          <Card loading={loading} className="dash-stat">
+          <Card loading={loading} className="dash-stat" hoverable onClick={() => navigate('/teams')} style={{ cursor: 'pointer' }}>
             <Statistic
               title="Equipos"
               value={stats.totalTeams}
@@ -871,7 +871,7 @@ const Dashboard = () => {
         </Col>
 
         <Col xs={24} sm={6}>
-          <Card loading={loading} className="dash-stat">
+          <Card loading={loading} className="dash-stat" hoverable onClick={() => navigate('/matches')} style={{ cursor: 'pointer' }}>
             <Statistic
               title="Partidos"
               value={stats.totalMatches}
