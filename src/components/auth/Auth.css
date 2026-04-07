@@ -1,0 +1,261 @@
+/* Auth.css — Login y Register con diseño editorial oscuro */
+
+/* ── Contenedor ── */
+.auth {
+  min-height: 100vh;
+  background: #060d18;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  position: relative;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Gradiente de fondo igual al homepage */
+.auth__bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(22,119,255,.28) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 40% at 90% 90%,  rgba(82,196,26,.08) 0%,  transparent 65%),
+    linear-gradient(180deg, #060d18 0%, #0b1422 60%, #060d18 100%);
+  z-index: 0;
+}
+
+/* ── Volver al inicio ── */
+.auth__home-link {
+  position: fixed;
+  top: 20px;
+  left: 24px;
+  z-index: 20;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255,255,255,.55);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  transition: color .15s;
+}
+.auth__home-link:hover {
+  color: #e6edf3;
+}
+
+/* ── Card ── */
+.auth__card {
+  position: relative;
+  z-index: 5;
+  width: 100%;
+  max-width: 440px;
+  background: rgba(11,20,34,.85);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 20px;
+  padding: 40px 36px 32px;
+  backdrop-filter: blur(16px);
+  box-shadow:
+    0 0 0 1px rgba(22,119,255,.08),
+    0 32px 64px rgba(0,0,0,.5);
+}
+
+.auth__card--wide {
+  max-width: 640px;
+}
+
+/* ── Logo ── */
+.auth__logo-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.auth__logo {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 20px rgba(22,119,255,.45));
+  animation: auth-float 4s ease-in-out infinite;
+}
+
+@keyframes auth-float {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+
+/* ── Header ── */
+.auth__header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.auth__title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #e6edf3;
+  margin: 0 0 6px;
+  letter-spacing: -.3px;
+}
+
+.auth__subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+}
+
+/* ── Alert ── */
+.auth__alert {
+  margin-bottom: 20px;
+  border-radius: 10px;
+}
+
+/* ── Form inputs — dark theme ── */
+.auth__form .ant-form-item-label > label {
+  color: #94a3b8 !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+}
+
+.auth__form .ant-input-affix-wrapper,
+.auth__form .ant-input-password {
+  background: rgba(255,255,255,.04) !important;
+  border-color: rgba(255,255,255,.1) !important;
+  border-radius: 10px !important;
+  color: #e6edf3 !important;
+}
+
+.auth__form .ant-input-affix-wrapper:hover,
+.auth__form .ant-input-password:hover {
+  border-color: rgba(22,119,255,.5) !important;
+}
+
+.auth__form .ant-input-affix-wrapper-focused,
+.auth__form .ant-input-password-focused {
+  border-color: #1677ff !important;
+  box-shadow: 0 0 0 2px rgba(22,119,255,.15) !important;
+}
+
+.auth__form .ant-input {
+  background: transparent !important;
+  color: #e6edf3 !important;
+  -webkit-text-fill-color: #e6edf3 !important;
+}
+
+.auth__form .ant-input::placeholder {
+  color: rgba(148,163,184,.45) !important;
+  -webkit-text-fill-color: rgba(148,163,184,.45) !important;
+}
+
+.auth__form .ant-input-prefix .anticon,
+.auth__form .ant-input-suffix .anticon {
+  color: rgba(148,163,184,.5) !important;
+}
+
+/* Autofill dark */
+.auth__form .ant-input:-webkit-autofill,
+.auth__form .ant-input:-webkit-autofill:hover,
+.auth__form .ant-input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 100px #0c1625 inset !important;
+  -webkit-text-fill-color: #e6edf3 !important;
+}
+
+/* ── Olvidaste contraseña ── */
+.auth__forgot {
+  text-align: right;
+  margin-top: -8px;
+  margin-bottom: 16px;
+}
+.auth__forgot a {
+  font-size: 12px;
+  color: #1677ff;
+  font-weight: 600;
+  text-decoration: none;
+}
+.auth__forgot a:hover {
+  color: #4096ff;
+}
+
+/* ── Botones ── */
+.auth__btn-primary.ant-btn {
+  height: 48px !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  border-radius: 10px !important;
+  background: linear-gradient(135deg, #1677ff 0%, #0958d9 100%) !important;
+  border: none !important;
+  box-shadow: 0 8px 24px rgba(22,119,255,.35) !important;
+  letter-spacing: .01em;
+}
+.auth__btn-primary.ant-btn:hover {
+  background: linear-gradient(135deg, #4096ff 0%, #1677ff 100%) !important;
+  box-shadow: 0 8px 28px rgba(22,119,255,.5) !important;
+}
+
+.auth__btn-secondary.ant-btn {
+  height: 44px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  border-radius: 10px !important;
+  background: rgba(255,255,255,.05) !important;
+  border-color: rgba(255,255,255,.15) !important;
+  color: #e6edf3 !important;
+}
+.auth__btn-secondary.ant-btn:hover {
+  background: rgba(255,255,255,.1) !important;
+  border-color: rgba(255,255,255,.3) !important;
+  color: #ffffff !important;
+}
+
+/* ── Divisor ── */
+.auth__divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0 12px;
+  color: #334155;
+  font-size: 12px;
+}
+.auth__divider::before,
+.auth__divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255,255,255,.07);
+}
+.auth__divider span {
+  color: #475569;
+  white-space: nowrap;
+}
+
+/* ── Legal ── */
+.auth__legal {
+  text-align: center;
+  margin: 20px 0 0;
+  font-size: 11px;
+  color: #334155;
+}
+.auth__legal a {
+  color: #475569;
+  text-decoration: none;
+}
+.auth__legal a:hover {
+  color: #94a3b8;
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .auth__card {
+    padding: 32px 20px 24px;
+    border-radius: 16px;
+  }
+  .auth__card--wide {
+    max-width: 100%;
+  }
+  .auth__logo {
+    width: 80px;
+    height: 80px;
+  }
+  .auth__title {
+    font-size: 19px;
+  }
+}

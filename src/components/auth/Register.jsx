@@ -1,220 +1,194 @@
-// frontend/src/components/Register.jsx
+// frontend/src/components/auth/Register.jsx
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { Form, Input, Button, Alert, Row, Col } from 'antd';
+import {
+  UserOutlined, LockOutlined, MailOutlined,
+  PhoneOutlined, UserAddOutlined, LoginOutlined, HomeOutlined
+} from '@ant-design/icons';
 import logo from '../../assets/logo.png';
+import './Auth.css';
 
 const Register = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    username: '',
-    full_name: '',
-    phone: '',
-    password: '',
-    confirmPassword: ''
-  });
-  const [error, setError] = useState('');
+  const [form]    = Form.useForm();
+  const [loading, setLoading] = useState(false);
+  const [error, setError]     = useState('');
   const { register } = useAuth();
-  const navigate = useNavigate();
+  const navigate     = useNavigate();
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const onFinish = async (values) => {
     setError('');
-    
-    if (formData.password !== formData.confirmPassword) {
-      setError('Las contraseñas no coinciden');
-      return;
-    }
-    
-    const userData = {
-      email: formData.email,
-      username: formData.username,
-      full_name: formData.full_name,
-      phone: formData.phone,
-      password: formData.password
-    };
-    
-    const result = await register(userData);
-    
+    setLoading(true);
+
+    const result = await register({
+      email:     values.email,
+      username:  values.username,
+      full_name: values.full_name || '',
+      phone:     values.phone,
+      password:  values.password,
+    });
+
+    setLoading(false);
+
     if (result.success) {
       navigate('/dashboard');
     } else {
-      setError(result.error || 'Error en el registro');
+      let msg = result.error;
+      if (msg && typeof msg === 'object') {
+        msg = Array.isArray(msg)
+          ? msg.map(e => e.msg || e.detail).join(', ')
+          : msg.detail || msg.msg || JSON.stringify(msg);
+      }
+      setError(msg || 'Error en el registro. Intenta de nuevo.');
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      <img
-        src={logo}
-        alt="Watermark top left"
-        style={{
-          position: 'absolute',
-          width: '56vw',
-          maxWidth: 820,
-          minWidth: 360,
-          opacity: 0.07,
-          left: '-10vw',
-          top: '-12vh',
-          pointerEvents: 'none',
-          userSelect: 'none',
-          filter: 'grayscale(100%)',
-        }}
-      />
-      <img
-        src={logo}
-        alt="Watermark bottom right"
-        style={{
-          position: 'absolute',
-          width: '62vw',
-          maxWidth: 900,
-          minWidth: 420,
-          opacity: 0.08,
-          right: '-8vw',
-          bottom: '-10vh',
-          pointerEvents: 'none',
-          userSelect: 'none',
-          filter: 'grayscale(100%)',
-        }}
-      />
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <div className="flex justify-center mb-4">
-            <img
-              src={logo}
-              alt="Siempre de Local"
-              style={{ width: 184, height: 184, objectFit: 'contain' }}
-            />
-          </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Registrarse
-          </h2>
+    <div className="auth auth--register">
+      <div className="auth__bg" />
+
+      <Link to="/" className="auth__home-link">
+        <HomeOutlined /> Inicio
+      </Link>
+
+      <div className="auth__card auth__card--wide">
+        {/* Logo */}
+        <div className="auth__logo-wrap">
+          <img src={logo} alt="Siempre de Local" className="auth__logo" />
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit} autoComplete="off">
-          {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-              {error}
-            </div>
-          )}
-          <div className="rounded-md shadow-sm space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Correo electrónico
-              </label>
-              <input
-                id="email"
+
+        <div className="auth__header">
+          <h1 className="auth__title">Crea tu cuenta</h1>
+          <p className="auth__subtitle">Únete y empieza a pronosticar</p>
+        </div>
+
+        {error && (
+          <Alert
+            description={error}
+            type="error"
+            showIcon
+            closable
+            onClose={() => setError('')}
+            className="auth__alert"
+          />
+        )}
+
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={onFinish}
+          size="large"
+          requiredMark={false}
+          className="auth__form"
+          autoComplete="off"
+        >
+          <Row gutter={16}>
+            <Col xs={24} sm={12}>
+              <Form.Item
                 name="email"
-                type="email"
-                required
-                autoComplete="email"
-                className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="correo@ejemplo.com"
-                value={formData.email}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
-                Nombre de usuario
-              </label>
-              <input
-                id="username"
+                label="Correo electrónico"
+                rules={[
+                  { required: true, message: 'Ingresa tu correo' },
+                  { type: 'email', message: 'Correo inválido' },
+                ]}
+              >
+                <Input prefix={<MailOutlined />} placeholder="correo@ejemplo.com" autoComplete="email" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item
                 name="username"
-                type="text"
-                required
-                autoComplete="new-username"
-                className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Ingresa tu username"
-                value={formData.username}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label htmlFor="full_name" className="block text-sm font-medium text-gray-700 mb-1">
-                Nombre completo
-              </label>
-              <input
-                id="full_name"
-                name="full_name"
-                type="text"
-                className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Opcional"
-                value={formData.full_name}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                Celular
-              </label>
-              <input
-                id="phone"
+                label="Nombre de usuario"
+                rules={[
+                  { required: true, message: 'Ingresa un usuario' },
+                  { min: 3, message: 'Mínimo 3 caracteres' },
+                ]}
+              >
+                <Input prefix={<UserOutlined />} placeholder="tu_usuario" autoComplete="off" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col xs={24} sm={12}>
+              <Form.Item name="full_name" label="Nombre completo">
+                <Input prefix={<UserOutlined />} placeholder="Opcional" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item
                 name="phone"
-                type="tel"
-                required
-                className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="ej: +57 300 123 4567"
-                value={formData.phone}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Contraseña
-              </label>
-              <input
-                id="password"
+                label="Celular"
+                rules={[{ required: true, message: 'Ingresa tu celular' }]}
+              >
+                <Input prefix={<PhoneOutlined />} placeholder="+57 300 123 4567" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={16}>
+            <Col xs={24} sm={12}>
+              <Form.Item
                 name="password"
-                type="password"
-                required
-                autoComplete="new-password"
-                className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Mínimo 6 caracteres"
-                value={formData.password}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                Confirmar contraseña
-              </label>
-              <input
-                id="confirmPassword"
+                label="Contraseña"
+                rules={[
+                  { required: true, message: 'Ingresa una contraseña' },
+                  { min: 6, message: 'Mínimo 6 caracteres' },
+                ]}
+              >
+                <Input.Password prefix={<LockOutlined />} placeholder="Mínimo 6 caracteres" autoComplete="new-password" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item
                 name="confirmPassword"
-                type="password"
-                required
-                autoComplete="new-password"
-                className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Repite tu contraseña"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
+                label="Confirmar contraseña"
+                dependencies={['password']}
+                rules={[
+                  { required: true, message: 'Confirma tu contraseña' },
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (!value || getFieldValue('password') === value) return Promise.resolve();
+                      return Promise.reject('Las contraseñas no coinciden');
+                    },
+                  }),
+                ]}
+              >
+                <Input.Password prefix={<LockOutlined />} placeholder="Repite tu contraseña" autoComplete="new-password" />
+              </Form.Item>
+            </Col>
+          </Row>
 
-          <div>
-
-            <button
-              type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          <Form.Item style={{ marginTop: 8 }}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={loading}
+              icon={<UserAddOutlined />}
+              block
+              className="auth__btn-primary"
             >
-              Registrarse
-            </button>
-          </div>
-          
-          <div className="text-center">
-            <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
-              ¿Ya tienes cuenta? Inicia sesión
-            </Link>
-          </div>
-        </form>
+              {loading ? 'Creando cuenta...' : 'Crear cuenta'}
+            </Button>
+          </Form.Item>
+        </Form>
+
+        <div className="auth__divider">
+          <span>¿Ya tienes cuenta?</span>
+        </div>
+
+        <Link to="/login" style={{ display: 'block' }}>
+          <Button icon={<LoginOutlined />} block className="auth__btn-secondary">
+            Iniciar sesión
+          </Button>
+        </Link>
+
+        <p className="auth__legal">
+          © {new Date().getFullYear()} Chain Reaction Projects S.A.S.
+          {' · '}
+          <Link to="/help/security">Privacidad</Link>
+        </p>
       </div>
     </div>
   );

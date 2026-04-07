@@ -80,6 +80,10 @@ import AttendanceReportPage from './pages/reports/AttendanceReportPage';
 import BetAdminPage from './pages/admin/bets/BetAdminPage';
 import CreateBetDatePage from './pages/admin/bets/CreateBetDatePage';
 
+// Artículos
+import ArticlePage from './pages/articles/ArticlePage';
+import AdminArticlesPage from './pages/admin/articles/AdminArticlesPage';
+
 // Componentes comunes
 import PrivateRoute from './components/common/PrivateRoute';
 import AdminRoute from './components/common/AdminRoute';
@@ -101,6 +105,7 @@ function App() {
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/help/security" element={<SecurityPolicyPage />} />
+                <Route path="/articles/:id" element={<ArticlePage />} />
                 
                 {/* Rutas protegidas */}
                 <Route element={<PrivateRoute />}>
@@ -177,6 +182,8 @@ function App() {
                     <Route path="/admin/bets" element={<BetAdminPage />} />
                     <Route path="/admin/create-betdate" element={<CreateBetDatePage />} />
                     <Route path="/admin/bets/:id" element={<BetAdminPage />} />
+                    {/* Artículos del homepage */}
+                    <Route path="/admin/articles" element={<AdminArticlesPage />} />
                     {/* Usuarios y sistema */}
                     <Route path="/admin/users" element={<AdminUsersPage />} />
                     <Route path="/admin/system" element={<AdminSystemPage />} />

@@ -87,49 +87,13 @@ const Sidebar = ({ collapsed, onCollapse, isMobile }) => {
   // Elementos del menú principal 
   const getMainMenuItems = () => {
     const baseItems = [
+      // 1. Dashboard
       {
         key: '/dashboard',
         icon: <DashboardOutlined />,
         label: 'Dashboard',
       },
-      // ===========================================
-      // MENÚ DE COMPETENCIAS (EXISTENTE)
-      // ===========================================
-      {
-        key: 'competitions-submenu',
-        icon: <TrophyOutlined />,
-        label: 'Competencias',
-        children: [
-          {
-            key: '/competitions',
-            icon: <AppstoreOutlined />,
-            label: 'Todas las Competencias',
-          },
-          ...(user?.role === 'admin' ? [
-            {
-              key: '/competitions/new',
-              icon: <PlusOutlined />,
-              label: 'Nueva Competencia',
-            },
-          ] : []),
-          // Gestión de Jornadas - solo admin
-          ...(user?.role === 'admin' ? [
-            {
-              key: '/rounds/management',
-              icon: <ScheduleOutlined />,
-              label: 'Gestión de Jornadas',
-            },
-            {
-              key: '/rounds/new',
-              icon: <FlagOutlined />,
-              label: 'Nueva Jornada',
-            },
-          ] : []),
-        ],
-      },
-      // ===========================================
-      // MENÚ DE APUESTAS
-      // ===========================================
+      // 2. Pronósticos
       {
         key: 'bets-submenu',
         icon: <FireOutlined />,
@@ -140,10 +104,10 @@ const Sidebar = ({ collapsed, onCollapse, isMobile }) => {
             icon: <FireOutlined />,
             label: 'Hacer Pronósticos',
             badge: wallet?.credits > 0 ? (
-              <Badge 
-                count={wallet.credits} 
-                size="small" 
-                style={{ 
+              <Badge
+                count={wallet.credits}
+                size="small"
+                style={{
                   backgroundColor: wallet.credits > 0 ? '#52c41a' : '#ff4d4f',
                   marginLeft: 8
                 }}
@@ -165,10 +129,10 @@ const Sidebar = ({ collapsed, onCollapse, isMobile }) => {
             icon: <WalletOutlined />,
             label: 'Mi Cajón',
             badge: wallet?.balance_PTS > 0 ? (
-              <Badge 
-                count={`$${(wallet.balance_PTS / 1000).toFixed(0)}k`} 
-                size="small" 
-                style={{ 
+              <Badge
+                count={`$${(wallet.balance_PTS / 1000).toFixed(0)}k`}
+                size="small"
+                style={{
                   backgroundColor: '#1890ff',
                   marginLeft: 8
                 }}
@@ -182,6 +146,7 @@ const Sidebar = ({ collapsed, onCollapse, isMobile }) => {
           },
         ],
       },
+      // 3. Partidos
       {
         key: 'matches-submenu',
         icon: <CalendarOutlined />,
@@ -202,7 +167,6 @@ const Sidebar = ({ collapsed, onCollapse, isMobile }) => {
             icon: <FireOutlined />,
             label: 'Partidos de Hoy',
           },
-          // Solo para admin
           ...(user?.role === 'admin' ? [
             {
               key: '/matches/new',
@@ -217,6 +181,37 @@ const Sidebar = ({ collapsed, onCollapse, isMobile }) => {
           ] : []),
         ],
       },
+      // 4. Competencias
+      {
+        key: 'competitions-submenu',
+        icon: <TrophyOutlined />,
+        label: 'Competencias',
+        children: [
+          {
+            key: '/competitions',
+            icon: <AppstoreOutlined />,
+            label: 'Todas las Competencias',
+          },
+          ...(user?.role === 'admin' ? [
+            {
+              key: '/competitions/new',
+              icon: <PlusOutlined />,
+              label: 'Nueva Competencia',
+            },
+            {
+              key: '/rounds/management',
+              icon: <ScheduleOutlined />,
+              label: 'Gestión de Jornadas',
+            },
+            {
+              key: '/rounds/new',
+              icon: <FlagOutlined />,
+              label: 'Nueva Jornada',
+            },
+          ] : []),
+        ],
+      },
+      // 5. Equipos
       {
         key: 'teams-submenu',
         icon: <TeamOutlined />,
@@ -236,6 +231,7 @@ const Sidebar = ({ collapsed, onCollapse, isMobile }) => {
           ] : []),
         ],
       },
+      // Reportes — solo admin
       ...(user?.role === 'admin' ? [
         {
           key: 'reports-submenu',
@@ -262,7 +258,7 @@ const Sidebar = ({ collapsed, onCollapse, isMobile }) => {
       ] : []),
     ];
 
-    // Solo agregar menú de admin si el usuario es admin
+    // Administración — solo admin
     if (user?.role === 'admin') {
       baseItems.push({
         key: 'admin-submenu',
@@ -288,6 +284,11 @@ const Sidebar = ({ collapsed, onCollapse, isMobile }) => {
             key: '/admin/create-betdate',
             icon: <PlusCircleOutlined />,
             label: 'Nueva Fecha',
+          },
+          {
+            key: '/admin/articles',
+            icon: <FileTextOutlined />,
+            label: 'Artículos',
           },
         ],
       });
