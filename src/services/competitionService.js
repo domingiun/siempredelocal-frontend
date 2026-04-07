@@ -46,7 +46,10 @@ class CompetitionService {
     const normalized = String(backendStatus).trim().toLowerCase();
     const statusMap = {
       'draft': 'Programado',
-      'borrador': 'En curso',
+      'borrador': 'Programado',
+      'scheduled': 'Programado',
+      'programado': 'Programado',
+      'ongoing': 'En curso',
       'active': 'En curso',
       'en curso': 'En curso',
       'en_curso': 'En curso',
@@ -54,8 +57,6 @@ class CompetitionService {
       'finalizado': 'Finalizado',
       'cancelled': 'Cancelado',
       'cancelado': 'Cancelado',
-      'scheduled': 'Programado',
-      'programado': 'Programado'
     };
     
     return statusMap[normalized] || backendStatus;
