@@ -1,14 +1,14 @@
 // frontend/src/components/bets/PlaceBetForm.jsx
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
-import { 
-  Card, Row, Col, Typography, Button, 
-  InputNumber, Space, Alert,
+import {
+  Card, Row, Col, Typography, Button,
+  InputNumber, Alert,
   message, Spin, Divider, Tag,
-  Statistic, Modal, Switch
+  Modal
 } from 'antd';
-import { 
+import {
   FireOutlined, TeamOutlined, CheckCircleOutlined,
-  DollarOutlined, ClockCircleOutlined
+  ClockCircleOutlined, TrophyOutlined
 } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useWallet } from '../../context/WalletContext';
@@ -33,7 +33,7 @@ const PlaceBetForm = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [validationResult, setValidationResult] = useState(null);
-  const { mode, setMode } = useTheme();
+  const { mode } = useTheme();
   const isDark = mode === 'dark';
   const lastScrollYRef = useRef(0);
 
@@ -228,124 +228,88 @@ const PlaceBetForm = () => {
 
   const MatchPredictionCard = ({ match, index }) => {
     const prediction = predictions[match.match_id] || {};
-    
+    const filled = prediction.home_score != null && prediction.away_score != null;
+
     return (
-      <Card 
-        size="small"
+      <Card
         className="match-prediction-card"
-        style={{ marginBottom: 6 }}
-        title={
-          <Space className="match-head">
-            <Tag color="blue">Partido {index + 1}</Tag>
-            <Text className="match-competition">{match.competition_name}</Text>
-            <div className="match-head-divider" />
-          </Space>
-        }
-        extra={
-          <Text type="secondary" className="match-datetime">
-            {match.match_date ? formatDateTimeShortUTC(formatForInputUTC(match.match_date)) : 'Fecha por definir'}
-          </Text>
-        }
+        style={{
+          marginBottom: 8,
+          borderLeft: `3px solid ${filled ? '#52c41a' : '#1677ff'}`,
+        }}
+        styles={{ body: { padding: '10px 12px' } }}
       >
-        <Row gutter={[16, 16]} align="middle" className="match-row">
-          {/* Equipo Local */}
-          <Col xs={9} md={9}>
-            <Space orientation="vertical" align="center" style={{ width: '100%' }}>
-              {match.home_team_logo ? (
-                <img 
-                  src={match.home_team_logo} 
-                  alt={match.home_team_name}
-                  className="team-logo"
-                  style={{ width: 40, height: 40, borderRadius: '50%' }}
-                />
-              ) : (
-                <TeamOutlined style={{ fontSize: 24 }} />
-              )}
-              <Text strong className="team-name" style={{ textAlign: 'center' }}>
-                {match.home_team_name}
-              </Text>
-            </Space>
-          </Col>
-          
-          {/* Marcador */}
-          <Col xs={6} md={6}>
-            <Space orientation="vertical" align="center" style={{ width: '100%' }}>
-              <Row gutter={4} className="score-row" align="middle">
-                <Col xs={10} md={10}>
-                  <InputNumber
-                    min={0}
-                    max={15}
-                    value={prediction.home_score ?? null}
-                    onChange={(value) => handlePredictionChange(match.match_id, 'home_score', value)}
-                    controls={false}
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    placeholder="0"
-                    className="score-input"
-                    style={{
-                      width: '100%',
-                      textAlign: 'center',
-                      border: '2px solid #1677ff',
-                      borderRadius: 8
-                    }}
-                    size="large"
-                  />
-                </Col>
-                <Col xs={4} md={4} className="score-separator" style={{ textAlign: 'center', lineHeight: '38px' }}>
-                  <Text strong style={{ fontSize: 16 }}>-</Text>
-                </Col>
-                <Col xs={10} md={10}>
-                  <InputNumber
-                    min={0}
-                    max={15}
-                    value={prediction.away_score ?? null}
-                    onChange={(value) => handlePredictionChange(match.match_id, 'away_score', value)}
-                    controls={false}
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    placeholder="0"
-                    className="score-input"
-                    style={{
-                      width: '100%',
-                      textAlign: 'center',
-                      border: '2px solid #1677ff',
-                      borderRadius: 8
-                    }}
-                    size="large"
-                  />
-                </Col>
-              </Row>
-              
-              
-            </Space>
-          </Col>
-          
-          {/* Equipo Visitante */}
-          <Col xs={9} md={9}>
-            <Space orientation="vertical" align="center" style={{ width: '100%' }}>
-              {match.away_team_logo ? (
-                <img 
-                  src={match.away_team_logo} 
-                  alt={match.away_team_name}
-                  className="team-logo"
-                  style={{ width: 40, height: 40, borderRadius: '50%' }}
-                />
-              ) : (
-                <TeamOutlined style={{ fontSize: 24 }} />
-              )}
-              <Text strong className="team-name" style={{ textAlign: 'center' }}>
-                {match.away_team_name}
-              </Text>
-            </Space>
-          </Col>
-        </Row>
-        
+        {/* Meta: número + competencia + fecha */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 10, flexWrap: 'wrap' }}>
+          <Tag color="blue" style={{ margin: 0, fontSize: 11 }}>{index + 1}</Tag>
+          {match.competition_name && (
+            <Text type="secondary" style={{ fontSize: 11 }}>{match.competition_name}</Text>
+          )}
+          <Text type="secondary" style={{ fontSize: 11, marginLeft: 'auto' }}>
+            {match.match_date ? formatDateTimeShortUTC(formatForInputUTC(match.match_date)) : '—'}
+          </Text>
+        </div>
+
+        {/* Fila principal: local — inputs — visitante */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {/* Equipo local */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, minWidth: 0 }}>
+            {match.home_team_logo ? (
+              <img src={match.home_team_logo} alt={match.home_team_name} style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }} />
+            ) : (
+              <TeamOutlined style={{ fontSize: 22 }} />
+            )}
+            <Text strong style={{ fontSize: 11, textAlign: 'center', lineHeight: 1.2, wordBreak: 'break-word' }}>
+              {match.home_team_name}
+            </Text>
+          </div>
+
+          {/* Inputs de marcador */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+            <InputNumber
+              min={0} max={15}
+              value={prediction.home_score ?? null}
+              onChange={(value) => handlePredictionChange(match.match_id, 'home_score', value)}
+              controls={false}
+              inputMode="numeric"
+              pattern="[0-9]*"
+              placeholder="0"
+              className="score-input"
+              style={{ width: 52, textAlign: 'center', border: '2px solid #1677ff', borderRadius: 8 }}
+              size="large"
+            />
+            <Text strong style={{ fontSize: 15 }}>-</Text>
+            <InputNumber
+              min={0} max={15}
+              value={prediction.away_score ?? null}
+              onChange={(value) => handlePredictionChange(match.match_id, 'away_score', value)}
+              controls={false}
+              inputMode="numeric"
+              pattern="[0-9]*"
+              placeholder="0"
+              className="score-input"
+              style={{ width: 52, textAlign: 'center', border: '2px solid #1677ff', borderRadius: 8 }}
+              size="large"
+            />
+          </div>
+
+          {/* Equipo visitante */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, minWidth: 0 }}>
+            {match.away_team_logo ? (
+              <img src={match.away_team_logo} alt={match.away_team_name} style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }} />
+            ) : (
+              <TeamOutlined style={{ fontSize: 22 }} />
+            )}
+            <Text strong style={{ fontSize: 11, textAlign: 'center', lineHeight: 1.2, wordBreak: 'break-word' }}>
+              {match.away_team_name}
+            </Text>
+          </div>
+        </div>
+
         {/* Estadio */}
         {match.stadium && (
-          <div style={{ textAlign: 'center', marginTop: 8 }}>
-            <Text type="secondary" className="match-stadium" style={{ fontSize: '12px' }}>
-              {match.stadium}
-            </Text>
+          <div style={{ textAlign: 'center', marginTop: 6 }}>
+            <Text type="secondary" style={{ fontSize: 10 }}>{match.stadium}</Text>
           </div>
         )}
       </Card>
@@ -394,66 +358,12 @@ const PlaceBetForm = () => {
           width: 100%;
         }
         .match-prediction-card {
-          border-radius: 14px;
-        }
-        .match-prediction-card .ant-card-head {
-          border-bottom: 1px solid #1f2a36;
-        }
-        .match-prediction-card .ant-card-head-title {
-          font-size: 13px;
-        }
-        .match-prediction-card .ant-card-extra {
-          font-size: 12px;
-        }
-        .match-prediction-card .match-head {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          flex-wrap: wrap;
-        }
-        .match-prediction-card .ant-card-head-title {
-          display: block;
-          width: 100%;
-          white-space: normal;
-        }
-        .match-prediction-card .match-competition {
-          font-size: 13px;
-        }
-        .match-prediction-card .match-head-divider {
-          height: 1px;
-          background: #1f2a36;
-          width: 100%;
-          opacity: 0.7;
-          margin-top: 2px;
-          display: none;
-        }
-        .match-prediction-card .ant-card-head-title .ant-tag {
-          font-size: 11px;
-          height: 20px;
-          line-height: 18px;
-          padding: 0 6px;
+          border-radius: 12px;
         }
         .match-prediction-card .team-name {
-          font-size: 13px;
+          font-size: 12px;
           line-height: 1.2;
           word-break: break-word;
-        }
-        .match-prediction-card .team-logo {
-          width: 40px !important;
-          height: 40px !important;
-        }
-        .match-prediction-card .ant-card-extra {
-          white-space: nowrap;
-        }
-        .score-row {
-          width: 100%;
-        }
-        .match-datetime {
-          font-size: 12px;
-          white-space: nowrap;
-        }
-        .match-stadium {
-          font-size: 12px;
         }
         .place-bet--dark {
           background: radial-gradient(1200px 600px at 10% 0%, #1a2a36 0%, #0c1116 45%, #0b0f14 100%);
@@ -578,109 +488,14 @@ const PlaceBetForm = () => {
             margin: 0 !important;
             border-radius: 0 !important;
           }
-          .match-prediction-card {
-            border-radius: 12px;
-          }
-          .match-prediction-card .ant-card-head {
-            padding: 8px 12px;
-          }
-          .match-prediction-card .ant-card-body {
-            padding: 10px 12px;
-          }
-          .match-prediction-card .ant-card-head-title {
-            font-size: 12px;
-          }
-          .match-prediction-card .ant-card-extra {
-            font-size: 11px;
-          }
-          .match-prediction-card .match-competition {
-            font-size: 11px;
-          }
-          .match-prediction-card .match-head {
-            align-items: flex-start;
-            gap: 4px;
-          }
-          .match-prediction-card .match-head-divider {
-            display: block;
-          }
-          .match-prediction-card .ant-card-head {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            align-items: flex-start;
-          }
-          .match-prediction-card .ant-card-head-title {
-            width: 100%;
-          }
-          .match-prediction-card .ant-card-extra {
-            width: 100%;
-            white-space: normal;
-          }
-          .match-datetime {
-            font-size: 11px;
-          }
-          .match-stadium {
-            font-size: 11px;
-          }
-          .match-prediction-card .ant-card-head-title .ant-tag {
-            font-size: 10px;
-            height: 18px;
-            line-height: 16px;
-            padding: 0 5px;
-          }
-          .match-row {
-            margin-left: 0 !important;
-            margin-right: 0 !important;
-            row-gap: 8px;
-          }
-          .match-row > .ant-col {
-            padding-left: 4px !important;
-            padding-right: 4px !important;
-          }
-          .match-prediction-card .team-name {
-            font-size: 11px;
-          }
-          .match-prediction-card .team-logo {
-            width: 28px !important;
-            height: 28px !important;
-          }
-          .score-separator {
-            display: none;
-          }
-          .place-bet .ant-card {
-            border-radius: 12px;
-          }
-          .place-bet h3 {
-            font-size: 18px !important;
-          }
-          .place-bet h4 {
-            font-size: 16px !important;
-          }
-          .place-bet .ant-typography,
-          .place-bet .ant-typography-secondary,
-          .place-bet .ant-statistic-title {
-            font-size: 13px;
-          }
-          .place-bet .ant-statistic-content {
-            font-size: 20px;
-          }
           .score-input .ant-input-number-input {
             height: 34px;
             font-size: 14px;
             line-height: 34px;
           }
-          .score-row {
-            justify-content: center;
-            column-gap: 6px;
-          }
-          .score-row .ant-col {
-            padding-left: 3px !important;
-            padding-right: 3px !important;
-          }
           .score-input {
-            width: 60px !important;
-            min-width: 60px !important;
-            z-index: 1;
+            width: 54px !important;
+            min-width: 54px !important;
           }
         }
 
@@ -740,113 +555,58 @@ const PlaceBetForm = () => {
         }
 
         @media (max-width: 576px) {
-          .match-prediction-card .ant-card-head-title {
-            font-size: 11px;
-          }
-          .match-prediction-card .ant-card-extra {
-            font-size: 10px;
-          }
           .score-input .ant-input-number-input {
             font-size: 13px;
           }
           .match-prediction-card .team-name {
             font-size: 10px;
           }
-          .match-prediction-card .team-logo {
-            width: 26px !important;
-            height: 26px !important;
-          }
-          .match-prediction-card .match-competition {
-            font-size: 10px;
-          }
-          .match-prediction-card .ant-typography-secondary {
-            font-size: 11px;
-          }
-          .match-prediction-card .ant-card-body {
-            padding: 8px 10px;
-          }
           .score-input {
-            width: 58px !important;
-            min-width: 58px !important;
-            z-index: 1;
-          }
-          .match-datetime,
-          .match-stadium {
-            font-size: 10px;
+            width: 50px !important;
+            min-width: 50px !important;
           }
         }
       `}</style>
-      <Card style={{ marginBottom: 12 }}>
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
-          <Space size="small">
-            <Text type="secondary">Vista oscura</Text>
-            <Switch checked={isDark} onChange={(checked) => setMode(checked ? 'dark' : 'light')} />
-          </Space>
+      {/* ── Encabezado compacto ── */}
+      <div style={{ marginBottom: 12, padding: '10px 4px' }}>
+        <Text strong style={{ fontSize: 16, display: 'block', marginBottom: 6 }}>
+          <FireOutlined style={{ marginRight: 6, color: '#1677ff' }} />
+          {betDate.name || `Fecha #${betDate.id}`}
+        </Text>
+        <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', alignItems: 'center' }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#52c41a', fontWeight: 700, fontSize: 13 }}>
+            <TrophyOutlined />
+            {(
+              (betDate.total_prize || 0) ||
+              ((betDate.prize_PTS || 0) + (betDate.accumulated_prize || 0)) ||
+              (betDate.prize_cop || 0)
+            ).toLocaleString()} PTS
+          </span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#1890ff', fontSize: 13 }}>
+            <ClockCircleOutlined />
+            {calculateTimeRemaining(betDate)}
+          </span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: wallet.credits > 0 ? '#52c41a' : '#ff4d4f', fontWeight: 700, fontSize: 13 }}>
+            <FireOutlined />
+            {wallet.credits} cr
+          </span>
         </div>
-        {!isOpen && (
-          <Alert
-            message={<Text style={{ color: isDark ? '#e6edf3' : undefined }}><strong> ESTA FECHA YA ESTA CERRADA</strong></Text>}
-            description={
-              <div>
-                <Text strong style={{ color: isDark ? '#e6edf3' : undefined }}>
-                  En esta oportunidad no pudistes estar con tus pronósticos ya la fecha esta {closedLabel}.
-                </Text>
-                <Text type="secondary" style={{ display: 'block', color: isDark ? '#cbd5e1' : undefined }}>
-                  Ya no puedes apostar. Las fechas se cierran 1 hora antes del primer partido programado. 
-                </Text>
-                <Text><strong>Pronto se abriran otras fechas disponibles para pronosticar.</strong></Text>
-              </div>
-            }
-            type="warning"
-            showIcon
-            banner
-            style={{ marginBottom: 16, borderRadius: 8 }}
-          />
-        )}
+      </div>
 
-        <Space orientation="vertical" size="large" style={{ width: '100%' }}>
-          <div>
-            <Title level={3} style={{ marginBottom: 4 }}>
-              <FireOutlined style={{ marginRight: 8 }} />
-              {betDate.name || `Fecha #${betDate.id}`}
-            </Title>
-            <Text type="secondary">{betDate.description}</Text>
-          </div>
-
-          <Row gutter={[16, 16]}>
-            <Col xs={24} md={8}>
-              <Statistic
-                title="Premio acumulado en esta Fecha"
-                value={
-                  (betDate.total_prize || 0) ||
-                  ((betDate.prize_PTS || 0) + (betDate.accumulated_prize || 0)) ||
-                  (betDate.prize_cop || 0)
-                }
-                prefix={<DollarOutlined />}
-                suffix="PTS"
-                styles={{ content: { color: '#52c41a' }}}
-              />
-            </Col>
-            <Col xs={24} md={8}>
-              <Statistic
-                title="Tiempo Restante"
-                value={calculateTimeRemaining(betDate)}
-                prefix={<ClockCircleOutlined />}
-              />
-            </Col>
-            <Col xs={24} md={8}>
-              <Statistic
-                title="Tus Creditos"
-                value={wallet.credits}
-                prefix={<FireOutlined />}
-                styles={{ content: { color: wallet.credits > 0 ? '#52c41a' : '#ff4d4f' }}}
-              />
-            </Col>
-          </Row>
-
-          
-        </Space>
-      </Card>
+      {!isOpen && (
+        <Alert
+          message={<strong>Esta fecha ya está cerrada</strong>}
+          description={
+            <span>
+              Ya no puedes apostar. La fecha está {closedLabel}.{' '}
+              <strong>Pronto se abrirán otras fechas disponibles.</strong>
+            </span>
+          }
+          type="warning"
+          showIcon
+          style={{ marginBottom: 12, borderRadius: 8 }}
+        />
+      )}
 
       <Card>
         {isOpen ? (
