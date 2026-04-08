@@ -1,29 +1,117 @@
 // frontend/src/pages/admin/articles/AdminArticlesPage.jsx
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Table, Button, Modal, Form, Input, Switch, Upload,
-  message, Popconfirm, Space, Tag, Image, Typography, Avatar, Divider
+  message, Popconfirm, Space, Tag, Image, Typography,
+  Avatar, Divider, Tooltip, Collapse
 } from 'antd';
 import {
-  PlusOutlined, EditOutlined, DeleteOutlined,
-  UploadOutlined, EyeOutlined, FileTextOutlined, UserOutlined
+  PlusOutlined, EditOutlined, DeleteOutlined, UploadOutlined,
+  EyeOutlined, FileTextOutlined, UserOutlined, BoldOutlined,
+  ItalicOutlined, LineOutlined, PictureOutlined, FontSizeOutlined,
+  QuestionCircleOutlined
 } from '@ant-design/icons';
 import api from '../../../services/api';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
+const { Panel } = Collapse;
 
+// ─── Syntax cheatsheet items ───────────────────────────────────────────────
+const SYNTAX_GUIDE = [
+  { mark: '## Subtítulo',            desc: 'Encabezado grande de sección' },
+  { mark: '### Subtítulo menor',     desc: 'Encabezado pequeño' },
+  { mark: '>> frase destacada <<',   desc: 'Pull quote en color azul (frase resaltada)' },
+  { mark: '[IMG-LEFT: url | pie]',   desc: 'Imagen flotante a la izquierda con texto rodeándola' },
+  { mark: '[IMG-RIGHT: url | pie]',  desc: 'Imagen flotante a la derecha con texto rodeándola' },
+  { mark: '[IMG-CENTER: url | pie]', desc: 'Imagen centrada ancho completo' },
+  { mark: '---',                     desc: 'Línea separadora decorativa' },
+  { mark: '**texto**',               desc: 'Negrita' },
+  { mark: '*texto*',                 desc: 'Cursiva' },
+];
+
+// ─── Inline parser (same as ArticlePage) — for preview ────────────────────
+const parseInline = (text) => {
+  const regex = /(\*\*(.+?)\*\*|\*(.+?)\*)/g;
+  const parts = []; let last = 0; let m;
+  while ((m = regex.exec(text)) !== null) {
+    if (m.index > last) parts.push(text.slice(last, m.index));
+    if (m[0].startsWith('**')) parts.push(<strong key={m.index}>{m[2]}</strong>);
+    else parts.push(<em key={m.index}>{m[3]}</em>);
+    last = regex.lastIndex;
+  }
+  if (last < text.length) parts.push(text.slice(last));
+  return parts.length > 1 ? parts : text;
+};
+
+const parseBlocks = (raw = '') => raw.split('\n').map((line) => {
+  const t = line.trim();
+  const quoteM = t.match(/^>>\s*(.+?)\s*<<$/);
+  if (quoteM) return { type: 'quote', text: quoteM[1] };
+  const imgM = t.match(/^\[IMG-(LEFT|RIGHT|CENTER):\s*(.+?)(?:\s*\|\s*(.+?))?\]$/i);
+  if (imgM) return { type: 'img', align: imgM[1].toLowerCase(), src: imgM[2].trim(), caption: imgM[3]?.trim() || '' };
+  if (t.startsWith('## ')) return { type: 'h2', text: t.slice(3) };
+  if (t.startsWith('### ')) return { type: 'h3', text: t.slice(4) };
+  if (t === '---') return { type: 'hr' };
+  if (t === '') return { type: 'br' };
+  return { type: 'p', text: line };
+});
+
+// ─── Mini preview ──────────────────────────────────────────────────────────
+const Preview = ({ content }) => {
+  const blocks = parseBlocks(content);
+  return (
+    <div style={{ fontFamily: 'Georgia, serif', color: '#c8d5e8', lineHeight: 1.8, overflow: 'hidden' }}>
+      {blocks.map((b, i) => {
+        switch (b.type) {
+          case 'quote':
+            return (
+              <blockquote key={i} style={{ borderLeft: '4px solid #1677ff', background: 'rgba(22,119,255,.07)', margin: '20px -4px', padding: '16px 20px', borderRadius: '0 8px 8px 0' }}>
+                <span style={{ fontSize: 36, lineHeight: .7, color: '#1677ff', float: 'left', marginRight: 8 }}>&ldquo;</span>
+                <span style={{ fontSize: 17, fontWeight: 700, fontStyle: 'italic', color: '#60a5fa' }}>{b.text}</span>
+                <span style={{ fontSize: 36, lineHeight: 0, color: '#1677ff', float: 'right', marginBottom: -8 }}>&rdquo;</span>
+              </blockquote>
+            );
+          case 'img':
+            return (
+              <figure key={i} style={{
+                float: b.align === 'left' ? 'left' : b.align === 'right' ? 'right' : 'none',
+                width: b.align === 'center' ? '100%' : '40%',
+                margin: b.align === 'left' ? '4px 20px 12px 0' : b.align === 'right' ? '4px 0 12px 20px' : '20px 0',
+                clear: b.align === 'center' ? 'both' : b.align,
+              }}>
+                <img src={b.src} alt={b.caption} style={{ width: '100%', borderRadius: 6, objectFit: 'cover' }} />
+                {b.caption && <figcaption style={{ fontSize: 11, color: '#64748b', textAlign: 'center', marginTop: 4, fontStyle: 'italic' }}>{b.caption}</figcaption>}
+              </figure>
+            );
+          case 'h2': return <h2 key={i} style={{ fontSize: 22, fontWeight: 800, color: '#f1f5f9', margin: '28px 0 10px', borderBottom: '2px solid rgba(22,119,255,.3)', paddingBottom: 6 }}>{b.text}</h2>;
+          case 'h3': return <h3 key={i} style={{ fontSize: 18, fontWeight: 700, color: '#e2e8f0', margin: '20px 0 8px' }}>{b.text}</h3>;
+          case 'hr': return <hr key={i} style={{ border: 'none', borderTop: '1px solid rgba(22,119,255,.3)', margin: '24px 0' }} />;
+          case 'br': return <div key={i} style={{ height: 8 }} />;
+          default:   return <p key={i} style={{ fontSize: 15, margin: '0 0 14px' }}>{parseInline(b.text)}</p>;
+        }
+      })}
+    </div>
+  );
+};
+
+// ─── Main component ────────────────────────────────────────────────────────
 const AdminArticlesPage = () => {
-  const [articles, setArticles]     = useState([]);
-  const [loading, setLoading]       = useState(false);
-  const [modalOpen, setModalOpen]   = useState(false);
-  const [editing, setEditing]       = useState(null);
-  const [saving, setSaving]         = useState(false);
-  const [imageFile, setImageFile]           = useState(null);
-  const [imagePreview, setImagePreview]     = useState(null);
-  const [authorFile, setAuthorFile]         = useState(null);
-  const [authorPreview, setAuthorPreview]   = useState(null);
+  const [articles, setArticles]   = useState([]);
+  const [loading, setLoading]     = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editing, setEditing]     = useState(null);
+  const [saving, setSaving]       = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewContent, setPreviewContent] = useState('');
+
+  const [imageFile, setImageFile]         = useState(null);
+  const [imagePreview, setImagePreview]   = useState(null);
+  const [authorFile, setAuthorFile]       = useState(null);
+  const [authorPreview, setAuthorPreview] = useState(null);
+
   const [form] = Form.useForm();
+  const taRef  = useRef(null);  // ref to antd TextArea
 
   const load = async () => {
     setLoading(true);
@@ -43,13 +131,15 @@ const AdminArticlesPage = () => {
     setEditing(null);
     setImageFile(null); setImagePreview(null);
     setAuthorFile(null); setAuthorPreview(null);
+    setShowPreview(false); setPreviewContent('');
     setModalOpen(true);
   };
 
   const openEdit = (record) => {
     setEditing(record);
-    setImageFile(null);   setImagePreview(record.image_url || null);
-    setAuthorFile(null);  setAuthorPreview(record.author_photo_url || null);
+    setImageFile(null);  setImagePreview(record.image_url || null);
+    setAuthorFile(null); setAuthorPreview(record.author_photo_url || null);
+    setShowPreview(false); setPreviewContent(record.content || '');
     setModalOpen(true);
   };
 
@@ -57,38 +147,24 @@ const AdminArticlesPage = () => {
     try {
       const values = await form.validateFields();
       setSaving(true);
-
       const fd = new FormData();
-      fd.append('title',     values.title);
-      fd.append('content',   values.content);
-      fd.append('published', values.published ? 'true' : 'false');
+      fd.append('title',       values.title);
+      fd.append('content',     values.content);
+      fd.append('published',   values.published ? 'true' : 'false');
       fd.append('author_name', values.author_name || '');
       fd.append('author_bio',  values.author_bio  || '');
       if (imageFile)  fd.append('image',        imageFile);
       if (authorFile) fd.append('author_photo', authorFile);
 
-      // Con FormData axios genera Content-Type+boundary automáticamente.
-      // Hay que eliminar el Content-Type del header default (application/json)
-      // para que no interfiera con el multipart.
-      // fetch nativo: maneja FormData+boundary correctamente sin config extra
       const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-      const url  = editing
-        ? `${BASE}/articles/${editing.id}`
-        : `${BASE}/articles/`;
-
-      const res = await fetch(url, {
-        method: editing ? 'PUT' : 'POST',
-        credentials: 'include',   // envía la cookie httpOnly
-        body: fd,                 // browser auto-setea multipart+boundary
-      });
+      const url  = editing ? `${BASE}/articles/${editing.id}` : `${BASE}/articles/`;
+      const res  = await fetch(url, { method: editing ? 'PUT' : 'POST', credentials: 'include', body: fd });
 
       if (!res.ok) {
         const detail = await res.json().catch(() => ({}));
         throw new Error(detail?.detail || `Error ${res.status}`);
       }
-
       message.success(editing ? 'Artículo actualizado' : 'Artículo creado');
-
       setModalOpen(false);
       load();
     } catch (err) {
@@ -113,16 +189,57 @@ const AdminArticlesPage = () => {
   const makeBeforeUpload = (setFile, setPreview) => (file) => {
     if (!file.type.startsWith('image/')) { message.error('Solo imágenes'); return Upload.LIST_IGNORE; }
     if (file.size > 10 * 1024 * 1024)   { message.error('Máximo 10 MB');  return Upload.LIST_IGNORE; }
-    setFile(file);
-    setPreview(URL.createObjectURL(file));
+    setFile(file); setPreview(URL.createObjectURL(file));
     return false;
   };
 
+  // ── Toolbar: insert syntax at cursor ──────────────────────────────────
+  const getTA = () => taRef.current?.resizableTextArea?.textArea;
+
+  const insertAtCursor = (before, after = '', placeholder = '') => {
+    const ta = getTA();
+    if (!ta) return;
+    const start = ta.selectionStart;
+    const end   = ta.selectionEnd;
+    const cur   = form.getFieldValue('content') || '';
+    const sel   = cur.substring(start, end) || placeholder;
+    const next  = cur.substring(0, start) + before + sel + after + cur.substring(end);
+    form.setFieldValue('content', next);
+    setPreviewContent(next);
+    setTimeout(() => {
+      ta.focus();
+      ta.setSelectionRange(start + before.length, start + before.length + sel.length);
+    }, 0);
+  };
+
+  const insertLine = (line) => {
+    const ta = getTA();
+    if (!ta) return;
+    const cur  = form.getFieldValue('content') || '';
+    const pos  = ta.selectionStart;
+    // Find start of current line
+    const lineStart = cur.lastIndexOf('\n', pos - 1) + 1;
+    const next = cur.substring(0, lineStart) + line + '\n' + cur.substring(lineStart);
+    form.setFieldValue('content', next);
+    setPreviewContent(next);
+    setTimeout(() => { ta.focus(); ta.setSelectionRange(lineStart + line.length + 1, lineStart + line.length + 1); }, 0);
+  };
+
+  const TOOLBAR = [
+    { icon: '## H2', tip: 'Subtítulo grande', action: () => insertLine('## Subtítulo de sección') },
+    { icon: '### H3', tip: 'Subtítulo pequeño', action: () => insertLine('### Subtítulo menor') },
+    { icon: '❝ Frase', tip: 'Pull quote (frase destacada)', action: () => insertAtCursor('>> ', ' <<', 'Escribe aquí la frase destacada') },
+    { icon: '━━', tip: 'Separador horizontal', action: () => insertLine('---') },
+    { icon: 'N', tip: 'Negrita (**texto**)', action: () => insertAtCursor('**', '**', 'texto en negrita'), bold: true },
+    { icon: 'I', tip: 'Cursiva (*texto*)', action: () => insertAtCursor('*', '*', 'texto en cursiva'), italic: true },
+    { icon: '← Img', tip: 'Imagen flotante izquierda', action: () => insertLine('[IMG-LEFT: https://url-de-imagen.com/foto.jpg | Descripción de la imagen]') },
+    { icon: '→ Img', tip: 'Imagen flotante derecha',   action: () => insertLine('[IMG-RIGHT: https://url-de-imagen.com/foto.jpg | Descripción de la imagen]') },
+    { icon: '↕ Img', tip: 'Imagen centrada ancho completo', action: () => insertLine('[IMG-CENTER: https://url-de-imagen.com/foto.jpg | Descripción de la imagen]') },
+  ];
+
   const columns = [
     {
-      title: 'Imagen',
-      dataIndex: 'image_url',
-      width: 80,
+      title: 'Imagen', dataIndex: 'image_url', width: 80,
       render: (url) => url
         ? <Image src={url} width={60} height={40} style={{ objectFit: 'cover', borderRadius: 4 }} />
         : <div style={{ width: 60, height: 40, background: '#1c2b3a', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -130,34 +247,24 @@ const AdminArticlesPage = () => {
           </div>,
     },
     {
-      title: 'Título',
-      dataIndex: 'title',
+      title: 'Título', dataIndex: 'title',
       render: (t, r) => (
         <div>
           <Text strong style={{ color: '#e6edf3', display: 'block' }}>{t}</Text>
-          {r.author_name && (
-            <Text style={{ fontSize: 12, color: '#64748b' }}>
-              <UserOutlined style={{ marginRight: 4 }} />{r.author_name}
-            </Text>
-          )}
+          {r.author_name && <Text style={{ fontSize: 12, color: '#64748b' }}><UserOutlined style={{ marginRight: 4 }} />{r.author_name}</Text>}
         </div>
       ),
     },
     {
-      title: 'Estado',
-      dataIndex: 'published',
-      width: 110,
+      title: 'Estado', dataIndex: 'published', width: 110,
       render: (v) => v ? <Tag color="green">Publicado</Tag> : <Tag color="default">Borrador</Tag>,
     },
     {
-      title: 'Fecha',
-      dataIndex: 'created_at',
-      width: 120,
+      title: 'Fecha', dataIndex: 'created_at', width: 120,
       render: (d) => new Date(d).toLocaleDateString('es-CO'),
     },
     {
-      title: 'Acciones',
-      width: 140,
+      title: 'Acciones', width: 140,
       render: (_, record) => (
         <Space>
           <Button size="small" icon={<EyeOutlined />} onClick={() => window.open(`/articles/${record.id}`, '_blank')} />
@@ -192,13 +299,7 @@ const AdminArticlesPage = () => {
         afterOpenChange={(open) => {
           if (open) {
             if (editing) {
-              form.setFieldsValue({
-                title:       editing.title,
-                content:     editing.content,
-                published:   editing.published,
-                author_name: editing.author_name || '',
-                author_bio:  editing.author_bio  || '',
-              });
+              form.setFieldsValue({ title: editing.title, content: editing.content, published: editing.published, author_name: editing.author_name || '', author_bio: editing.author_bio || '' });
             } else {
               form.resetFields();
               form.setFieldsValue({ published: true });
@@ -208,13 +309,13 @@ const AdminArticlesPage = () => {
         okText={editing ? 'Guardar cambios' : 'Crear'}
         cancelText="Cancelar"
         confirmLoading={saving}
-        width={680}
+        width={820}
         destroyOnHidden
       >
         <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
 
-          {/* ── Imagen del artículo ── */}
-          <Form.Item label="Imagen principal del artículo">
+          {/* Imagen del artículo */}
+          <Form.Item label="Imagen principal (hero del artículo)">
             <Upload accept="image/*" beforeUpload={makeBeforeUpload(setImageFile, setImagePreview)} showUploadList={false} maxCount={1}>
               <Button icon={<UploadOutlined />}>{imageFile ? 'Cambiar imagen' : 'Subir imagen'}</Button>
             </Upload>
@@ -223,19 +324,116 @@ const AdminArticlesPage = () => {
             )}
           </Form.Item>
 
-          {/* ── Título ── */}
+          {/* Título */}
           <Form.Item name="title" label="Título" rules={[{ required: true, message: 'Ingresa un título' }]}>
             <Input placeholder="Título del artículo" />
           </Form.Item>
 
-          {/* ── Contenido ── */}
+          {/* Toolbar de formato */}
+          <div style={{ marginBottom: 6 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginBottom: 6, flexWrap: 'wrap' }}>
+              <Text style={{ fontSize: 12, color: '#64748b', marginRight: 4 }}>Insertar:</Text>
+              {TOOLBAR.map((btn, idx) => (
+                <Tooltip key={idx} title={btn.tip}>
+                  <button
+                    type="button"
+                    onClick={btn.action}
+                    style={{
+                      padding: '3px 10px',
+                      fontSize: 12,
+                      fontWeight: btn.bold ? 700 : 400,
+                      fontStyle: btn.italic ? 'italic' : 'normal',
+                      background: '#1c2b3a',
+                      border: '1px solid #2b3a4f',
+                      borderRadius: 4,
+                      color: '#c8d5e8',
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                      lineHeight: '1.6',
+                    }}
+                  >
+                    {btn.icon}
+                  </button>
+                </Tooltip>
+              ))}
+              <Tooltip title="Ver / ocultar vista previa">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPreviewContent(form.getFieldValue('content') || '');
+                    setShowPreview(p => !p);
+                  }}
+                  style={{
+                    padding: '3px 10px',
+                    fontSize: 12,
+                    background: showPreview ? '#1677ff' : '#1c2b3a',
+                    border: `1px solid ${showPreview ? '#1677ff' : '#2b3a4f'}`,
+                    borderRadius: 4,
+                    color: '#fff',
+                    cursor: 'pointer',
+                    lineHeight: '1.6',
+                    marginLeft: 8,
+                  }}
+                >
+                  {showPreview ? '✕ Previa' : '👁 Previa'}
+                </button>
+              </Tooltip>
+            </div>
+          </div>
+
+          {/* Contenido */}
           <Form.Item name="content" label="Contenido del artículo" rules={[{ required: true, message: 'Escribe el contenido' }]}>
-            <TextArea rows={7} placeholder="Escribe el contenido completo..." showCount maxLength={10000} />
+            <TextArea
+              ref={taRef}
+              rows={showPreview ? 10 : 14}
+              placeholder="Escribe el contenido completo..."
+              showCount
+              maxLength={20000}
+              onChange={(e) => setPreviewContent(e.target.value)}
+              style={{ fontFamily: 'monospace', fontSize: 13 }}
+            />
           </Form.Item>
+
+          {/* Vista previa */}
+          {showPreview && (
+            <div style={{
+              background: '#0c141f',
+              border: '1px solid #1f2b3a',
+              borderRadius: 8,
+              padding: '20px 24px',
+              marginBottom: 20,
+              maxHeight: 420,
+              overflowY: 'auto',
+            }}>
+              <Text style={{ fontSize: 11, color: '#475569', display: 'block', marginBottom: 12, fontFamily: 'sans-serif' }}>
+                VISTA PREVIA DEL CONTENIDO
+              </Text>
+              <Preview content={previewContent} />
+            </div>
+          )}
+
+          {/* Guía de sintaxis */}
+          <Collapse ghost size="small" style={{ marginBottom: 12 }}>
+            <Panel
+              header={<Text style={{ fontSize: 12, color: '#64748b' }}><QuestionCircleOutlined style={{ marginRight: 6 }} />Guía de formato del contenido</Text>}
+              key="guide"
+            >
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {SYNTAX_GUIDE.map((g, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 12, alignItems: 'flex-start' }}>
+                    <code style={{ background: '#0c141f', border: '1px solid #1f2b3a', borderRadius: 4, padding: '1px 8px', fontSize: 12, color: '#60a5fa', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                      {g.mark}
+                    </code>
+                    <Text style={{ fontSize: 12, color: '#64748b' }}>{g.desc}</Text>
+                  </div>
+                ))}
+              </div>
+            </Panel>
+          </Collapse>
 
           <Divider>Información del Autor</Divider>
 
-          {/* ── Foto del autor ── */}
+          {/* Foto del autor */}
           <Form.Item label="Foto del autor">
             <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
               {authorPreview
@@ -248,22 +446,14 @@ const AdminArticlesPage = () => {
             </div>
           </Form.Item>
 
-          {/* ── Nombre del autor ── */}
           <Form.Item name="author_name" label="Nombre del autor">
             <Input placeholder="Ej: Johan García Blandón" />
           </Form.Item>
 
-          {/* ── Reseña ── */}
           <Form.Item name="author_bio" label="Reseña del autor (máx. 2 líneas)">
-            <TextArea
-              rows={2}
-              placeholder="Ej: 20 años de experiencia en fútbol europeo y análisis táctico."
-              maxLength={300}
-              showCount
-            />
+            <TextArea rows={2} placeholder="Ej: 20 años de experiencia en fútbol europeo y análisis táctico." maxLength={300} showCount />
           </Form.Item>
 
-          {/* ── Publicado ── */}
           <Form.Item name="published" label="Estado" valuePropName="checked">
             <Switch checkedChildren="Publicado" unCheckedChildren="Borrador" />
           </Form.Item>
