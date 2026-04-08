@@ -1,338 +1,219 @@
 // frontend/src/components/competitions/CompetitionDashboard.jsx
 import React, { useState, useEffect } from 'react';
-import { 
-  Tabs, Card, Row, Col, Space, Button,
-  Typography, Statistic, Tag, message, Grid
-} from 'antd';
-import { 
-  TrophyOutlined, TeamOutlined, CalendarOutlined, 
-  TableOutlined, EyeOutlined, SettingOutlined,
-  FireOutlined, CrownOutlined 
+import { Spin, Button, message } from 'antd';
+import {
+  TrophyOutlined, TeamOutlined, CalendarOutlined,
+  TableOutlined, EyeOutlined, FireOutlined,
+  EnvironmentOutlined, RightOutlined
 } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
 import competitionService from '../../services/competitionService';
 import { useTheme } from '../../context/ThemeContext';
 import './CompetitionDashboard.css';
 
-// Importa los componentes
-import CompetitionTeams from "./CompetitionTeams";
-import CompetitionMatches from "./CompetitionMatches";
-import CompetitionRounds from "./CompetitionRounds";
-import CompetitionStandings from "./CompetitionStandings";
-import CompetitionStats from "./CompetitionStats";
+import CompetitionTeams from './CompetitionTeams';
+import CompetitionMatches from './CompetitionMatches';
+import CompetitionRounds from './CompetitionRounds';
+import CompetitionStandings from './CompetitionStandings';
+import CompetitionStats from './CompetitionStats';
 
-const { Title, Text } = Typography;
+/* ─── helpers ─── */
+const STATUS = {
+  ongoing:   { bar: '#22c55e', bg: 'rgba(34,197,94,.15)',  border: 'rgba(34,197,94,.35)',  text: '#86efac', label: 'En curso'    },
+  active:    { bar: '#22c55e', bg: 'rgba(34,197,94,.15)',  border: 'rgba(34,197,94,.35)',  text: '#86efac', label: 'En curso'    },
+  scheduled: { bar: '#3b82f6', bg: 'rgba(59,130,246,.15)', border: 'rgba(59,130,246,.3)',  text: '#93c5fd', label: 'Programado'  },
+  draft:     { bar: '#f59e0b', bg: 'rgba(245,158,11,.15)', border: 'rgba(245,158,11,.3)',  text: '#fde68a', label: 'Borrador'    },
+  completed: { bar: '#64748b', bg: 'rgba(100,116,139,.15)',border: 'rgba(100,116,139,.3)', text: '#94a3b8', label: 'Finalizado'  },
+  cancelled: { bar: '#ef4444', bg: 'rgba(239,68,68,.15)',  border: 'rgba(239,68,68,.3)',   text: '#fca5a5', label: 'Cancelado'   },
+};
+const getStatus = (s) => STATUS[String(s||'').toLowerCase()] || { bar:'#64748b', bg:'rgba(100,116,139,.1)', border:'rgba(100,116,139,.3)', text:'#94a3b8', label: s||'—' };
 
+const TYPE_LABEL = { league:'Liga', cup:'Copa', league_cup:'Liga + Copa', groups_playoff:'Grupos + Playoff' };
+
+const Pill = ({ children, color = '#1677ff' }) => (
+  <span style={{
+    display: 'inline-flex', alignItems: 'center', gap: 4,
+    padding: '3px 10px', borderRadius: 999, fontSize: 11, fontWeight: 600,
+    background: `${color}22`, border: `1px solid ${color}55`, color,
+    whiteSpace: 'nowrap',
+  }}>{children}</span>
+);
+
+const TABS = [
+  { key: 'overview',   label: 'Resumen',            icon: <EyeOutlined />       },
+  { key: 'teams',      label: 'Equipos',             icon: <TeamOutlined />      },
+  { key: 'matches',    label: 'Partidos',            icon: <CalendarOutlined />  },
+  { key: 'standings',  label: 'Tabla',               icon: <TableOutlined />     },
+  { key: 'rounds',     label: 'Jornadas',            icon: <CalendarOutlined />  },
+];
+
+/* ─── componente principal ─── */
 const CompetitionDashboard = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { mode } = useTheme();
   const isDark = mode === 'dark';
-  const screens = Grid.useBreakpoint();
-  const isMobile = !screens.md;
+
   const [competition, setCompetition] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
-  const [stats, setStats] = useState({
-    total_matches: 0,
-    matches_played: 0,
-    goals_scored: 0,
-    avg_goals_per_match: 0,
-    total_rounds: 0,
-    completed_rounds: 0
-  });
+  const [stats, setStats] = useState({});
 
-  useEffect(() => {
-    if (id) {
-      fetchCompetitionData();
-    }
-  }, [id]);
+  useEffect(() => { if (id) fetchData(); }, [id]);
 
-  const fetchCompetitionData = async () => {
+  const fetchData = async () => {
     setLoading(true);
     try {
-      // Obtener datos de la competencia
-      const compResponse = await competitionService.getCompetition(id);
-      setCompetition(compResponse.data);
-
-      // Obtener estadísticas
+      const compRes = await competitionService.getCompetition(id);
+      setCompetition(compRes.data);
       try {
-        const statsResponse = await competitionService.getStats(id);
-        setStats(statsResponse.data || {});
-      } catch (statsError) {
-        console.warn('No se pudieron cargar estadísticas:', statsError);
-        // Usar estadísticas por defecto
-      }
-
-    } catch (error) {
-      console.error('Error al cargar la competencia:', error);
+        const statsRes = await competitionService.getStats(id);
+        setStats(statsRes.data || {});
+      } catch { /* stats opcionales */ }
+    } catch {
       message.error('Error al cargar la competencia');
     } finally {
       setLoading(false);
     }
   };
 
-  const getStatusColor = (status) => {
-    if (!status) return 'default';
-    
-    const statusUpper = String(status).toUpperCase();
-    switch (statusUpper) {
-      case 'ONGOING': return 'green';
-      case 'SCHEDULED': return 'blue';
-      case 'COMPLETED': return 'gray';
-      case 'CANCELLED': return 'red';
-      case 'DRAFT': return 'orange';
-      default: return 'default';
-    }
+  /* ── paleta ── */
+  const card = isDark
+    ? { bg: '#0c141f', border: '#1f2b3a', sub: '#64748b', text: '#e6edf3', muted: '#94a3b8' }
+    : { bg: '#ffffff', border: '#e5e7eb', sub: '#6b7280', text: '#111827', muted: '#9ca3af' };
+
+  if (loading) return (
+    <div style={{ display: 'flex', justifyContent: 'center', padding: 60 }}>
+      <Spin size="large" />
+    </div>
+  );
+
+  if (!competition) return (
+    <div style={{ padding: 24 }}>
+      <p>Competencia no encontrada.</p>
+      <Button type="primary" onClick={() => navigate('/competitions')}>Volver</Button>
+    </div>
+  );
+
+  const sc = getStatus(competition.status);
+  const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+  const logoSrc = competition.logo_url
+    ? (competition.logo_url.startsWith('http') ? competition.logo_url : `${apiBase}${competition.logo_url}`)
+    : null;
+
+  const tabContent = {
+    overview:  <CompetitionStats competition={competition} stats={stats} />,
+    teams:     <CompetitionTeams competitionId={id} teams={competition?.teams || []} />,
+    matches:   <CompetitionMatches competitionId={id} competitionName={competition?.name} />,
+    standings: <CompetitionStandings competitionId={id} competitionType={competition?.competition_type} />,
+    rounds:    <CompetitionRounds competitionId={id} />,
   };
-
-  const getStatusText = (status) => {
-    if (!status) return 'Desconocido';
-    
-    const statusUpper = String(status).toUpperCase();
-    switch (statusUpper) {
-      case 'ONGOING': return 'En Curso';
-      case 'SCHEDULED': return 'Programado';
-      case 'COMPLETED': return 'Finalizado';
-      case 'CANCELLED': return 'Cancelado';
-      case 'DRAFT': return 'Borrador';
-      default: return status;
-    }
-  };
-
-  const getCompetitionType = (type) => {
-    if (!type) return 'Desconocido';
-    
-    const types = {
-      'league': 'Liga',
-      'cup': 'PTSa',
-      'league_cup': 'Liga + PTSa',
-      'groups_playoff': 'Grupos + Playoff',
-    };
-    return types[type] || type;
-  };
-
-  // Configuración de tabs con la nueva API
-  const tabItems = [
-    {
-      key: 'overview',
-      label: (
-        <span>
-          <EyeOutlined />
-          Resumen
-        </span>
-      ),
-      children: (
-        <div className="competition-tab-content">
-          <CompetitionStats competition={competition} stats={stats} />
-        </div>
-      )
-    },
-    {
-      key: 'teams',
-      label: (
-        <span>
-          <TeamOutlined />
-          Equipos ({competition?.teams?.length || 0})
-        </span>
-      ),
-      children: (
-        <div className="competition-tab-content">
-          <CompetitionTeams competitionId={id} teams={competition?.teams || []} />
-        </div>
-      )
-    },
-    {
-      key: 'matches',
-      label: (
-        <span>
-          <CalendarOutlined />
-          Partidos
-        </span>
-      ),
-      children: (
-        <div className="competition-tab-content">
-          <CompetitionMatches competitionId={id} competitionName={competition?.name} />
-        </div>
-      )
-    },
-    {
-      key: 'standings',
-      label: (
-        <span>
-          <TableOutlined />
-          Tabla de Posiciones
-        </span>
-      ),
-      children: (
-        <div className="competition-tab-content">
-          <CompetitionStandings competitionId={id} competitionType={competition?.competition_type} />
-        </div>
-      )
-    },
-    {
-      key: 'rounds',
-      label: (
-        <span>
-          <CalendarOutlined />
-          Jornadas
-        </span>
-      ),
-      children: (
-        <div className="competition-tab-content">
-          <CompetitionRounds competitionId={id} />
-        </div>
-      )
-    },
-  ];
-
-  if (loading) {
-    return (
-      <div style={{ padding: '24px', textAlign: 'center' }}>
-        <Card>
-          <Title level={4}>Cargando competencia...</Title>
-          <Text type="secondary">Por favor espera...</Text>
-        </Card>
-      </div>
-    );
-  }
-
-  if (!competition) {
-    return (
-      <div style={{ padding: '24px' }}>
-        <Card>
-          <Title level={3}>Competencia no encontrada</Title>
-          <Text>La competencia que buscas no existe o fue eliminada.</Text>
-          <br />
-          <Button 
-            type="primary" 
-            onClick={() => navigate('/competitions')}
-            style={{ marginTop: '16px' }}
-          >
-            Volver a competencias
-          </Button>
-        </Card>
-      </div>
-    );
-  }
 
   return (
-    <div className={isDark ? 'competition-dashboard competition-dashboard--dark' : 'competition-dashboard'} style={{ padding: '24px' }}>
-      {/* Header de la competencia */}
-      <Card 
-        className="competition-hero-card"
-        style={{ 
-          marginBottom: '24px',
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          color: 'white'
-        }}
-        bodyStyle={{ padding: isMobile ? 16 : 24 }}
-      >
-        <Row gutter={[24, 24]} align="middle">
-          <Col xs={24} md={16}>
-            <Space orientation="vertical" size="small">
-              <Space>
-                <TrophyOutlined style={{ fontSize: isMobile ? 22 : 32 }} />
-                <Title level={isMobile ? 4 : 2} style={{ color: 'white', margin: 0 }}>
-                  {competition.name}
-                </Title>
-              </Space>
-              {isMobile ? (
-                <div style={{ display: 'grid', gap: 6 }}>
-                  <div>
-                    <Tag color={getStatusColor(competition.status)}>
-                      {getStatusText(competition.status)}
-                    </Tag>
-                  </div>
-                  <Text style={{ color: 'rgba(255, 255, 255, 0.85)' }}>
-                    Tipo: {getCompetitionType(competition.competition_type)}
-                  </Text>
-                  <Text style={{ color: 'rgba(255, 255, 255, 0.85)' }}>
-                    Temporada: {competition.season}
-                  </Text>
-                  <Text style={{ color: 'rgba(255, 255, 255, 0.85)' }}>
-                    Equipos: {competition.total_teams}
-                  </Text>
-                </div>
-              ) : (
-                <Space size="middle">
-                  <Tag color={getStatusColor(competition.status)}>
-                    {getStatusText(competition.status)}
-                  </Tag>
-                  <Tag color="blue">{getCompetitionType(competition.competition_type)}</Tag>
-                  <Tag color="geekblue">{competition.season}</Tag>
-                  <Space>
-                    <TeamOutlined />
-                    <Text style={{ color: 'white' }}>{competition.total_teams} equipos</Text>
-                  </Space>
-                </Space>
-              )}
-              <Text style={{ color: 'rgba(255, 255, 255, 0.85)' }}>
-                {competition.description || 'Sin descripción'}
-              </Text>
-            </Space>
-          </Col>
-          {!isMobile && (
-            <Col xs={24} md={8}>
-              <Row gutter={[8, 8]}>
-                <Col span={12}>
-                  <Statistic
-                    title="Partidos Jugados"
-                    value={stats.matches_played || 0}
-                    styles={{ content: { color: 'white' } }}
-                    prefix={<FireOutlined />}
-                  />
-                </Col>
-                <Col span={12}>
-                  <Statistic
-                    title="Goles Totales"
-                    value={stats.goals_scored || 0}
-                    styles={{ content: { color: 'white' } }}
-                  />
-                </Col>
-              </Row>
-            </Col>
-          )}
-        </Row>
-      </Card>
+    <div className="cdash" style={{ '--cdash-bg': card.bg, '--cdash-border': card.border }}>
 
-      {/* Navegación principal con nueva API de Tabs */}
-      <Card className="competition-tabs-card">
-        {isMobile ? (
-          <>
-            <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 8, marginBottom: 12 }}>
-              <Button size="small" type={activeTab === 'overview' ? 'primary' : 'default'} onClick={() => setActiveTab('overview')}>
-                Resumen
-              </Button>
-              <Button size="small" type={activeTab === 'teams' ? 'primary' : 'default'} onClick={() => setActiveTab('teams')}>
-                Equipos
-              </Button>
-              <Button size="small" type={activeTab === 'matches' ? 'primary' : 'default'} onClick={() => setActiveTab('matches')}>
-                Partidos
-              </Button>
-              <Button size="small" type={activeTab === 'standings' ? 'primary' : 'default'} onClick={() => setActiveTab('standings')}>
-                Tabla
-              </Button>
-              <Button size="small" type={activeTab === 'rounds' ? 'primary' : 'default'} onClick={() => setActiveTab('rounds')}>
-                Jornadas
-              </Button>
+      {/* ── Hero header ── */}
+      <div className="cdash__hero" style={{
+        background: card.bg,
+        borderBottom: `1px solid ${card.border}`,
+      }}>
+        {/* Barra de color de estado */}
+        <div style={{ height: 4, background: sc.bar, width: '100%' }} />
+
+        <div className="cdash__hero-body">
+          {/* Logo + nombre + meta */}
+          <div className="cdash__hero-main">
+            {/* Logo */}
+            <div className="cdash__logo" style={{
+              background: isDark ? '#0f1824' : '#f1f5f9',
+              border: `1px solid ${card.border}`,
+            }}>
+              {logoSrc
+                ? <img src={logoSrc} alt="" style={{ width: 48, height: 48, objectFit: 'contain' }} />
+                : <TrophyOutlined style={{ fontSize: 28, color: card.muted }} />}
             </div>
-            <div className="competition-tab-content">
-              {tabItems.find((item) => item.key === activeTab)?.children}
+
+            {/* Info */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div className="cdash__name-row">
+                <h1 className="cdash__name" style={{ color: card.text }}>{competition.name}</h1>
+                <span style={{
+                  flexShrink: 0,
+                  padding: '3px 10px', borderRadius: 999, fontSize: 11, fontWeight: 700,
+                  background: sc.bg, border: `1px solid ${sc.border}`, color: sc.text,
+                }}>{sc.label}</span>
+              </div>
+
+              {/* Chips meta */}
+              <div className="cdash__chips">
+                {competition.competition_type && (
+                  <Pill color="#1677ff"><TrophyOutlined />{TYPE_LABEL[competition.competition_type] || competition.competition_type}</Pill>
+                )}
+                {competition.season && (
+                  <Pill color="#8b5cf6"><CalendarOutlined />{competition.season}</Pill>
+                )}
+                {competition.total_teams > 0 && (
+                  <Pill color="#0ea5e9"><TeamOutlined />{competition.total_teams} equipos</Pill>
+                )}
+                {competition.country && (
+                  <Pill color="#10b981"><EnvironmentOutlined />{competition.country}</Pill>
+                )}
+              </div>
+
+              {competition.description && (
+                <p className="cdash__desc" style={{ color: card.muted }}>{competition.description}</p>
+              )}
             </div>
-          </>
-        ) : (
-          <Tabs
-            activeKey={activeTab}
-            onChange={setActiveTab}
-            type="card"
-            items={tabItems}
-          />
-        )}
-      </Card>
+          </div>
+
+          {/* Stats rápidas */}
+          {(stats.matches_played > 0 || stats.goals_scored > 0) && (
+            <div className="cdash__quick-stats" style={{ borderLeft: `1px solid ${card.border}` }}>
+              <div className="cdash__stat">
+                <span className="cdash__stat-val" style={{ color: card.text }}>{stats.matches_played || 0}</span>
+                <span className="cdash__stat-lbl" style={{ color: card.muted }}>Partidos</span>
+              </div>
+              <div className="cdash__stat" style={{ borderLeft: `1px solid ${card.border}` }}>
+                <span className="cdash__stat-val" style={{ color: card.text }}>{stats.goals_scored || 0}</span>
+                <span className="cdash__stat-lbl" style={{ color: card.muted }}>Goles</span>
+              </div>
+              {stats.completed_rounds > 0 && (
+                <div className="cdash__stat" style={{ borderLeft: `1px solid ${card.border}` }}>
+                  <span className="cdash__stat-val" style={{ color: card.text }}>{stats.completed_rounds}/{stats.total_rounds || '?'}</span>
+                  <span className="cdash__stat-lbl" style={{ color: card.muted }}>Jornadas</span>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ── Barra de pestañas ── */}
+      <div className="cdash__tab-bar" style={{
+        background: isDark ? 'rgba(11,15,22,.9)' : 'rgba(255,255,255,.9)',
+        borderBottom: `1px solid ${card.border}`,
+      }}>
+        {TABS.map(tab => (
+          <button
+            key={tab.key}
+            className={`cdash__tab${activeTab === tab.key ? ' cdash__tab--active' : ''}`}
+            onClick={() => setActiveTab(tab.key)}
+            style={activeTab === tab.key
+              ? { background: '#1677ff', color: '#fff' }
+              : { color: card.muted }}
+          >
+            {tab.icon}
+            <span>{tab.label}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* ── Contenido ── */}
+      <div className="cdash__content">
+        {tabContent[activeTab]}
+      </div>
     </div>
   );
 };
 
 export default CompetitionDashboard;
-

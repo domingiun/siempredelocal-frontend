@@ -1,252 +1,226 @@
-.competition-dashboard {
+/* CompetitionDashboard — diseño moderno sin Card morado */
+
+.cdash {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* ── Hero ── */
+.cdash__hero {
   width: 100%;
 }
 
-.competition-tab-content {
-  width: 100%;
+.cdash__hero-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 16px 20px;
+  flex-wrap: wrap;
 }
 
-.competition-dashboard__toggle {
+.cdash__hero-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Logo */
+.cdash__logo {
+  width: 68px;
+  height: 68px;
+  border-radius: 14px;
+  flex-shrink: 0;
+  display: flex;
   align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
-/* Dark mode styles scoped to competitions dashboard */
-body[data-theme="dark"] .competition-dashboard .competition-tabs-card {
-  background: #0f1724;
-  border-color: #1f2b3a;
+/* Nombre */
+.cdash__name-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
 }
 
-body[data-theme="dark"] .competition-dashboard .competition-tab-card,
-body[data-theme="dark"] .competition-dashboard .competition-tab-card .ant-card {
-  background: #0f1724;
-  border-color: #1f2b3a;
-  color: #e6edf3;
+.cdash__name {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.2;
+  flex: 1;
+  min-width: 0;
 }
 
-body[data-theme="dark"] .competition-dashboard .ant-card {
-  background: #0f1724;
-  border-color: #1f2b3a;
-  color: #e6edf3;
+/* Chips */
+.cdash__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 6px;
 }
 
-body[data-theme="dark"] .competition-dashboard .competition-hero-card {
-  border-color: transparent;
+/* Descripción */
+.cdash__desc {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
 }
 
-body[data-theme="dark"] .competition-dashboard .ant-card-head {
-  background: #111b2a;
-  border-bottom-color: #1f2b3a;
+/* Stats rápidas */
+.cdash__quick-stats {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  flex-shrink: 0;
+  padding-left: 20px;
+  margin-left: 4px;
 }
 
-body[data-theme="dark"] .competition-dashboard .ant-card-head-title,
-body[data-theme="dark"] .competition-dashboard .ant-card-extra,
-body[data-theme="dark"] .competition-dashboard .ant-typography {
-  color: #e6edf3;
+.cdash__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 20px;
+  gap: 2px;
 }
 
-body[data-theme="dark"] .competition-dashboard .ant-typography-secondary {
-  color: #9fb0c2;
+.cdash__stat-val {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
 }
 
-body[data-theme="dark"] .competition-dashboard .ant-statistic-title {
-  color: #9fb0c2;
+.cdash__stat-lbl {
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
-body[data-theme="dark"] .competition-dashboard .ant-statistic-content,
-body[data-theme="dark"] .competition-dashboard .ant-statistic-content-value,
-body[data-theme="dark"] .competition-dashboard .ant-statistic-content-prefix,
-body[data-theme="dark"] .competition-dashboard .ant-statistic-content-suffix {
-  color: #e6edf3;
+/* ── Barra de pestañas ── */
+.cdash__tab-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  overflow-x: auto;
+  scrollbar-width: none;
 }
 
-body[data-theme="dark"] .competition-dashboard .ant-divider {
-  border-color: #1f2b3a;
+.cdash__tab-bar::-webkit-scrollbar {
+  display: none;
 }
 
-body[data-theme="dark"] .competition-dashboard .ant-table {
-  background: #0f1724;
-  color: #e6edf3;
+.cdash__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+  -webkit-tap-highlight-color: transparent;
 }
 
-body[data-theme="dark"] .competition-dashboard .ant-table-container {
-  background: #0f1724;
-  border-color: #1f2b3a;
+.cdash__tab:hover:not(.cdash__tab--active) {
+  background: rgba(22, 119, 255, 0.1);
+  color: #1677ff !important;
 }
 
-body[data-theme="dark"] .competition-dashboard .ant-table-thead > tr > th {
-  background: #111b2a;
-  color: #e6edf3;
-  border-bottom-color: #1f2b3a;
+.cdash__tab--active {
+  color: #fff !important;
 }
 
-body[data-theme="dark"] .competition-dashboard .ant-table-tbody > tr > td {
-  background: #0f1724;
-  color: #e6edf3;
-  border-bottom-color: #1f2b3a;
+/* ── Contenido ── */
+.cdash__content {
+  padding: 0;
+  width: 100%;
 }
 
-body[data-theme="dark"] .competition-dashboard .ant-table-tbody > tr.ant-table-row:hover > td {
-  background: #132133;
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .cdash__hero-body {
+    padding: 12px 14px;
+    gap: 12px;
+  }
+
+  .cdash__logo {
+    width: 52px;
+    height: 52px;
+    border-radius: 10px;
+  }
+
+  .cdash__logo img {
+    width: 38px !important;
+    height: 38px !important;
+  }
+
+  .cdash__name {
+    font-size: 15px;
+  }
+
+  .cdash__quick-stats {
+    width: 100%;
+    border-left: none !important;
+    border-top: 1px solid var(--cdash-border);
+    padding-left: 0;
+    padding-top: 10px;
+    margin-left: 0;
+    justify-content: space-around;
+  }
+
+  .cdash__stat {
+    padding: 4px 12px;
+  }
+
+  .cdash__stat-val {
+    font-size: 18px;
+  }
+
+  .cdash__tab-bar {
+    padding: 7px 10px;
+    gap: 3px;
+  }
+
+  .cdash__tab {
+    padding: 5px 12px;
+    font-size: 11px;
+  }
 }
 
-body[data-theme="dark"] .competition-dashboard .ant-progress-text {
-  color: #e6edf3 !important;
-}
+@media (max-width: 480px) {
+  .cdash__hero-main {
+    gap: 10px;
+  }
 
-body[data-theme="dark"] .competition-dashboard .ant-progress-text span,
-body[data-theme="dark"] .competition-dashboard .ant-progress-text tspan {
-  color: #e6edf3 !important;
-  fill: #e6edf3 !important;
-}
+  .cdash__logo {
+    width: 44px;
+    height: 44px;
+  }
 
-body[data-theme="dark"] .competition-dashboard .ant-progress .ant-progress-text,
-body[data-theme="dark"] .competition-dashboard .ant-progress .ant-progress-text * {
-  color: #e6edf3 !important;
-  fill: #e6edf3 !important;
-}
+  .cdash__logo img {
+    width: 32px !important;
+    height: 32px !important;
+  }
 
-body[data-theme="dark"] .competition-dashboard .competition-progress-text {
-  color: #e6edf3 !important;
-}
-
-body[data-theme="dark"] .competition-dashboard .ant-pagination-item,
-body[data-theme="dark"] .competition-dashboard .ant-pagination-prev,
-body[data-theme="dark"] .competition-dashboard .ant-pagination-next {
-  background: #0f1724;
-  border-color: #1f2b3a;
-}
-
-body[data-theme="dark"] .competition-dashboard .ant-pagination-item a,
-body[data-theme="dark"] .competition-dashboard .ant-pagination-prev a,
-body[data-theme="dark"] .competition-dashboard .ant-pagination-next a {
-  color: #e6edf3;
-}
-
-body[data-theme="dark"] .competition-dashboard .ant-pagination-total-text {
-  color: #cbd5e1;
-}
-
-body[data-theme="dark"] .competition-dashboard .ant-alert {
-  background: #111b2a;
-  border-color: #1f2b3a;
-  color: #e6edf3;
-}
-
-body[data-theme="dark"] .competition-dashboard .ant-btn-default {
-  background: #111b2a;
-  border-color: #1f2b3a;
-  color: #e6edf3;
-}
-
-body[data-theme="dark"] .competition-dashboard .ant-btn-default:disabled,
-body[data-theme="dark"] .competition-dashboard .ant-btn-default.ant-btn-disabled {
-  color: #6b7c93;
-  background: #0f1724;
-  border-color: #1f2b3a;
-}
-
-body[data-theme="dark"] .competition-dashboard .ant-btn-text,
-body[data-theme="dark"] .competition-dashboard .ant-btn-link {
-  color: #cbd5e1;
-}
-
-body[data-theme="dark"] .competition-dashboard .ant-btn-text:hover,
-body[data-theme="dark"] .competition-dashboard .ant-btn-link:hover {
-  color: #ffffff;
-}
-
-body[data-theme="dark"] .competition-dashboard .ant-btn-text .anticon,
-body[data-theme="dark"] .competition-dashboard .ant-btn-link .anticon {
-  color: inherit;
-}
-
-body[data-theme="dark"] .competition-dashboard .ant-tabs-card > .ant-tabs-nav .ant-tabs-tab {
-  background: #0f1724;
-  border-color: #1f2b3a;
-  color: #9fb0c2;
-}
-
-body[data-theme="dark"] .competition-dashboard .ant-tabs-card > .ant-tabs-nav .ant-tabs-tab-active {
-  background: #111b2a;
-  color: #e6edf3;
-  border-color: #1f2b3a;
-}
-
-body[data-theme="dark"] .competition-dashboard .ant-tabs-card > .ant-tabs-nav .ant-tabs-tab-active .ant-tabs-tab-btn {
-  color: #e6edf3;
-}
-
-
-body[data-theme="dark"] .competition-dashboard .ant-tag {
-  background: #111b2a;
-  border-color: #1f2b3a;
-  color: #e6edf3;
-}
-
-body[data-theme="dark"] .competition-dashboard .ant-tag-green {
-  background: rgba(34, 197, 94, 0.15) !important;
-  border-color: rgba(34, 197, 94, 0.35) !important;
-  color: #86efac !important;
-}
-
-body[data-theme="dark"] .competition-dashboard .ant-tag-blue {
-  background: rgba(59, 130, 246, 0.18) !important;
-  border-color: rgba(59, 130, 246, 0.35) !important;
-  color: #93c5fd !important;
-}
-
-body[data-theme="dark"] .competition-dashboard .ant-tag-orange {
-  background: rgba(249, 115, 22, 0.18);
-  border-color: rgba(249, 115, 22, 0.35);
-  color: #fdba74;
-}
-
-body[data-theme="dark"] .competition-dashboard .ant-tag-red {
-  background: rgba(239, 68, 68, 0.18);
-  border-color: rgba(239, 68, 68, 0.35);
-  color: #fca5a5;
-}
-
-body[data-theme="dark"] .competition-dashboard .ant-select-selector,
-body[data-theme="dark"] .competition-dashboard .ant-select-single .ant-select-selector {
-  background: #0f1724 !important;
-  border-color: #1f2b3a !important;
-  color: #e6edf3 !important;
-}
-
-body[data-theme="dark"] .competition-dashboard .ant-select-arrow,
-body[data-theme="dark"] .competition-dashboard .ant-select-selection-placeholder,
-body[data-theme="dark"] .competition-dashboard .ant-select-selection-item {
-  color: #9fb0c2 !important;
-}
-
-body[data-theme="dark"] .competition-dashboard .ant-select-selector,
-body[data-theme="dark"] .competition-dashboard .ant-select-single:not(.ant-select-customize-input) .ant-select-selector {
-  background: #0f1724 !important;
-  border-color: #1f2b3a !important;
-  color: #e6edf3 !important;
-}
-
-body[data-theme="dark"] .competition-dashboard .competition-round-select .ant-select-selector {
-  background: #0f1724 !important;
-  border-color: #1f2b3a !important;
-  color: #e6edf3 !important;
-}
-
-body[data-theme="dark"] .competition-dashboard .ant-select-dropdown {
-  background: #0f1724;
-  border: 1px solid #1f2b3a;
-}
-
-body[data-theme="dark"] .competition-dashboard .ant-select-item,
-body[data-theme="dark"] .competition-dashboard .ant-select-item-option-content {
-  color: #e6edf3;
-}
-
-body[data-theme="dark"] .competition-dashboard .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
-  background: #132133;
-}
-
-body[data-theme="dark"] .competition-dashboard .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
-  background: #1a2a40;
+  .cdash__name {
+    font-size: 14px;
+  }
 }
