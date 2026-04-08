@@ -1,10 +1,10 @@
 // frontend/src/App.jsx
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { ConfigProvider } from 'antd';
+import { ConfigProvider, theme as antdTheme } from 'antd';
 import esES from 'antd/locale/es_ES';
 import './antd-theme.css';
-import { ThemeProvider } from './context/ThemeContext';
+import { ThemeProvider, useTheme } from './context/ThemeContext';
 
 // Layout
 import MainLayout from './components/layout/MainLayout';
@@ -88,10 +88,28 @@ import AdminArticlesPage from './pages/admin/articles/AdminArticlesPage';
 import PrivateRoute from './components/common/PrivateRoute';
 import AdminRoute from './components/common/AdminRoute';
 
+const ThemedConfigProvider = ({ children }) => {
+  const { mode } = useTheme();
+  return (
+    <ConfigProvider
+      locale={esES}
+      theme={{
+        algorithm: mode === 'dark' ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
+        token: {
+          colorPrimary: '#1677ff',
+          borderRadius: 8,
+        },
+      }}
+    >
+      {children}
+    </ConfigProvider>
+  );
+};
+
 function App() {
   return (
     <ThemeProvider>
-      <ConfigProvider locale={esES}>
+      <ThemedConfigProvider>
         <Router>
           <AuthProvider>
             <WalletProvider> {/* ¡NUEVO! Envolver todo con WalletProvider */}
@@ -206,7 +224,7 @@ function App() {
             </WalletProvider>
           </AuthProvider>
         </Router>
-      </ConfigProvider>
+      </ThemedConfigProvider>
     </ThemeProvider>
   );
 }
