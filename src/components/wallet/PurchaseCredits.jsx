@@ -518,7 +518,7 @@ const PurchaseCredits = () => {
               icon={<ArrowRightOutlined />} 
               onClick={() => navigate('/wallet')}
             >
-              Volver a Mi Cajón
+              Volver a Mi Cuenta
             </Button>
           </Col>
         </Row>

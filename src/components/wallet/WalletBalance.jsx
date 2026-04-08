@@ -552,7 +552,7 @@ const WalletBalance = ({ compact = false, showActions = true }) => {
             <Col>
               <WalletOutlined style={{ fontSize: '18px' }} />
               <Text strong style={{ color: 'white', marginLeft: 8 }}>
-                Mi Cajón
+                Mi Cuenta
               </Text>
             </Col>
             <Col>
@@ -619,7 +619,7 @@ const WalletBalance = ({ compact = false, showActions = true }) => {
           <Col>
             <Title level={2}>
               <WalletOutlined style={{ marginRight: 8 }} />
-              Mi Cajón
+              Mi Cuenta
             </Title>
             <Text type="secondary">
               Gestiona tus créditos, Puntos y transacciones

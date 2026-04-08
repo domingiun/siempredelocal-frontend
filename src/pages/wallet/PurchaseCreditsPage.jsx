@@ -88,7 +88,7 @@ const PurchaseCreditsPage = () => {
         className="btn-outline-primary"
         style={{ marginBottom: 16 }}
       >
-        Volver a Mi Cajón
+        Volver a Mi Cuenta
       </Button>
 
       <Card className="purchase-credits-card">

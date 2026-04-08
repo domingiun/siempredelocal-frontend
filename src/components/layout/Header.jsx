@@ -43,7 +43,7 @@ const AppHeader = ({ collapsed, setCollapsed }) => {
     {
       key: 'wallet',
       icon: <WalletOutlined />,
-      label: 'Mi Cajón',
+      label: 'Mi Cuenta',
       onClick: () => navigate('/wallet'),
     },
     {

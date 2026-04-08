@@ -127,7 +127,7 @@ const Sidebar = ({ collapsed, onCollapse, isMobile }) => {
           {
             key: '/wallet',
             icon: <WalletOutlined />,
-            label: 'Mi Cajón',
+            label: 'Mi Cuenta',
             badge: wallet?.balance_PTS > 0 ? (
               <Badge
                 count={`$${(wallet.balance_PTS / 1000).toFixed(0)}k`}
@@ -546,8 +546,8 @@ const Sidebar = ({ collapsed, onCollapse, isMobile }) => {
               />
             </Tooltip>
             
-            {/* Mi Cajón */}
-            <Tooltip title="Mi Cajón" placement="right">
+            {/* Mi Cuenta */}
+            <Tooltip title="Mi Cuenta" placement="right">
               <Button
                 type="dashed"
                 icon={<WalletOutlined />}

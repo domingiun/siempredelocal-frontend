@@ -67,7 +67,7 @@ import BetDateDetail from './pages/bets/BetDateDetail';
 import ActiveBets from './pages/bets/ActiveBets';
 import BetRankingPage from './pages/bets/BetRankingPage';
 
-// Páginas de Mi Cajón
+// Páginas de Mi Cuenta
 import WalletPage from './pages/wallet/WalletPage';
 import PurchaseCreditPage from './pages/wallet/PurchaseCreditsPage';
 import TransactionHistoryPage from './pages/wallet/TransactionHistoryPage';
@@ -162,7 +162,7 @@ function App() {
                     <Route path="/bets/:id/place" element={<BetDateDetail />} />
                     <Route path="/active-bets" element={<ActiveBets />} />
                     
-                    {/* Mi Cajón */}
+                    {/* Mi Cuenta */}
                     <Route path="/wallet" element={<WalletPage />} />
                     <Route path="/purchase" element={<PurchaseCreditPage />} />
                     <Route path="/transactions" element={<TransactionHistoryPage />} />
