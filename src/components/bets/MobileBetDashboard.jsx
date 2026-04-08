@@ -77,7 +77,7 @@ const MobileBetDashboard = () => {
                 (activeBetDate.prize_PTS || 0) + (activeBetDate.accumulated_prize || 0) ||
                 activeBetDate.prize_cop ||
                 0
-              ).toLocaleString()} PTS
+              ).toLocaleString()}
             </span>
             <span className="mbd__bet-name">
               {activeBetDate.name || `Fecha #${activeBetDate.id}`}

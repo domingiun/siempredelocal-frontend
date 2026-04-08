@@ -95,13 +95,13 @@ const AttendanceReportPage = () => {
     { title: 'Creditos usados', dataIndex: 'credits_used', key: 'credits_used' },
     { title: 'Creditos disponibles', dataIndex: 'credits_available', key: 'credits_available' },
     {
-      title: 'Invertido (PTS)',
+      title: 'Invertido',
       dataIndex: 'total_invested_cop',
       key: 'total_invested_cop',
       render: (value) => `$${Number(value || 0).toLocaleString('es-CO')}`
     },
     {
-      title: 'Premios recibidos (PTS)',
+      title: 'Premios recibidos',
       dataIndex: 'total_prizes_cop',
       key: 'total_prizes_cop',
       render: (value) => `$${Number(value || 0).toLocaleString('es-CO')}`

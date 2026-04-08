@@ -305,7 +305,7 @@ const BetDateList = () => {
         <div style={{ display: 'flex', gap: 16, marginBottom: 10, flexWrap: 'wrap', alignItems: 'center' }}>
           <span style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#52c41a', fontWeight: 700, fontSize: 14 }}>
             <TrophyOutlined />
-            {prize.toLocaleString()} PTS
+            ${prize.toLocaleString()}
           </span>
           <span style={{ display: 'flex', alignItems: 'center', gap: 5, color: isDark ? '#94a3b8' : '#64748b', fontSize: 13 }}>
             <TeamOutlined />
@@ -332,7 +332,7 @@ const BetDateList = () => {
               ...(isDark ? { background: 'rgba(234, 179, 8, 0.18)', borderColor: 'rgba(234, 179, 8, 0.35)', color: '#fde68a' } : {})
             }}
           >
-            <TrophyOutlined /> Acumulado: {betDate.accumulated_prize.toLocaleString()} PTS
+            <TrophyOutlined /> Acumulado: ${betDate.accumulated_prize.toLocaleString()}
           </Tag>
         )}
 

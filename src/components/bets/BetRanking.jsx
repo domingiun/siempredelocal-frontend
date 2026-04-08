@@ -348,7 +348,7 @@ const BetRanking = ({ betDateId }) => {
         if (record.position === 1 && record.points >= 13) {
           return (
             <Text strong style={{ color: '#52c41a' }}>
-              {Number(prizePaidTotal || 0).toLocaleString()} PTS
+              ${Number(prizePaidTotal || 0).toLocaleString()}
             </Text>
           );
         }

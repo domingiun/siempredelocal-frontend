@@ -171,7 +171,7 @@ const PurchaseCredits = () => {
             <div>
               <p>
                 Hemos recibido tu solicitud por <strong>{selectedPlan.credits} credito(s)</strong> por{' '}
-                <strong>{selectedPlan.final_price.toLocaleString()} PTS</strong>.
+                <strong>${selectedPlan.final_price.toLocaleString()}</strong>.
               </p>
               <p style={{ textAlign: 'justify' }}>
                 Realiza tu transferencia a <strong>Nequi</strong> y envia el comprobante de recarga al{' '}
@@ -187,7 +187,7 @@ const PurchaseCredits = () => {
                     </Row>
                     <Row justify="space-between">
                       <Text>Transferencia a Nequi por un total de:</Text>
-                      <Text strong>{selectedPlan.final_price.toLocaleString()} PTS</Text>
+                      <Text strong>${selectedPlan.final_price.toLocaleString()}</Text>
                     </Row>
                     <Row justify="space-between">
                       <Text>Estado:</Text>
@@ -279,16 +279,16 @@ const PurchaseCredits = () => {
             <Title level={2} style={{ margin: '16px 0 8px 0' }}>
               ${plan.final_price?.toLocaleString() || plan.price_PTS?.toLocaleString() || '0'}
             </Title>
-            <Text type="secondary">PTS</Text>
+            <Text type="secondary">pesos</Text>
           </div>
           
           {/* Ahorro */}
           {savings > 0 && (
             <Alert
-              title={`Ahorras $${savings.toLocaleString()} PTS`}
+              title={`Ahorras $${savings.toLocaleString()}`}
               description={
                 <Text type="secondary" style={{ fontSize: '12px' }}>
-                  {(5000).toLocaleString()} PTS por crédito individual
+                  $5,000 por crédito individual
                 </Text>
               }
               type="success"
@@ -371,7 +371,7 @@ const PurchaseCredits = () => {
               </td>
               {plans.map(plan => (
                 <td key={plan.id} style={{ padding: '12px', textAlign: 'center', borderBottom: '1px solid #f0f0f0' }}>
-                  <Text strong>${plan.final_price?.toLocaleString() || plan.price_PTS?.toLocaleString() || '0'} PTS</Text>
+                  <Text strong>${plan.final_price?.toLocaleString() || plan.price_PTS?.toLocaleString() || '0'}</Text>
                 </td>
               ))}
             </tr>
@@ -381,7 +381,7 @@ const PurchaseCredits = () => {
               </td>
               {plans.map(plan => (
                 <td key={plan.id} style={{ padding: '12px', textAlign: 'center', borderBottom: '1px solid #f0f0f0' }}>
-                  <Text>${Math.round(plan.price_per_credit).toLocaleString()} PTS</Text>
+                  <Text>${Math.round(plan.price_per_credit).toLocaleString()}</Text>
                 </td>
               ))}
             </tr>
@@ -407,7 +407,7 @@ const PurchaseCredits = () => {
                 <td key={plan.id} style={{ padding: '12px', textAlign: 'center', borderBottom: '1px solid #f0f0f0' }}>
                   {calculateSavings(plan) > 0 ? (
                     <Text strong style={{ color: '#52c41a' }}>
-                      ${calculateSavings(plan).toLocaleString()} PTS
+                      ${calculateSavings(plan).toLocaleString()}
                     </Text>
                   ) : (
                     <Text type="secondary">-</Text>
@@ -545,10 +545,10 @@ const PurchaseCredits = () => {
           
           <Col xs={24} sm={8}>
             <Statistic
-              title="Total en PTS"
+              title="Valor por crédito"
               value={5000}
-              prefix={<FireOutlined />}
-              suffix="PTS"
+              prefix="$"
+              suffix=""
             />
           </Col>
           
@@ -606,7 +606,7 @@ const PurchaseCredits = () => {
                   <Col span={12}>
                     <Text strong>Precio:</Text>
                     <div style={{ fontSize: '24px', fontWeight: 'bold' }}>
-                      {selectedPlan.final_price?.toLocaleString() || selectedPlan.price_PTS?.toLocaleString() || '0'} PTS
+                      ${selectedPlan.final_price?.toLocaleString() || selectedPlan.price_PTS?.toLocaleString() || '0'}
                     </div>
                   </Col>
                   
@@ -617,7 +617,7 @@ const PurchaseCredits = () => {
                           <Space>
                             <GiftOutlined />
                             <Text>
-                              ¡Ahorras ${calculateSavings(selectedPlan).toLocaleString()} PTS!
+                              ¡Ahorras ${calculateSavings(selectedPlan).toLocaleString()}!
                             </Text>
                           </Space>
                         }
@@ -671,7 +671,7 @@ const PurchaseCredits = () => {
 
         <Panel header="¿Cómo funcionan los créditos?" key="2">
           <Space orientation="vertical" size="small">
-            <Text>• <strong>1 crédito = 5,000 PTS</strong></Text>
+            <Text>• <strong>1 crédito = $5,000</strong></Text>
             <Text>• <strong>1 apuesta = 1 crédito</strong></Text>
             <Text>• <strong>No puedes convertir tus créditos a Puntos</strong></Text>
             <Text>• <strong>Los créditos no expiran</strong></Text>

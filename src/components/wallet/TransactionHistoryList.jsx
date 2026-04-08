@@ -105,7 +105,7 @@ const TransactionHistoryList = () => {
           <ArrowDownOutlined style={{ color: '#ff4d4f' }} />
         )}
         <Text strong type={isPositive ? 'success' : 'danger'}>
-          {isPositive ? '+' : ''}${Math.abs(amount).toLocaleString()} PTS
+          {isPositive ? '+' : ''}${Math.abs(amount).toLocaleString()}
         </Text>
       </Space>
     );
@@ -151,7 +151,7 @@ const TransactionHistoryList = () => {
       render: (desc) => desc || '-',
     },
     {
-      title: 'Monto (PTS)',
+      title: 'Monto',
       key: 'amount',
       render: (_, record) => getAmountDisplay(record),
       width: 120,

@@ -177,7 +177,7 @@ const CreateBetDateAdmin = () => {
             <p><strong>ID:</strong> {response.data.id}</p>
             <p><strong>Fecha de inicio:</strong> {new Date(response.data.start_datetime).toLocaleString()}</p>
             <p><strong>Fecha de cierre:</strong> {new Date(response.data.close_datetime).toLocaleString()}</p>
-            <p><strong>Premio inicial:</strong> ${response.data.prize_PTS.toLocaleString()} PTS</p>
+            <p><strong>Premio inicial:</strong> ${response.data.prize_PTS.toLocaleString()}</p>
           </div>
         ),
       });
@@ -431,7 +431,7 @@ const CreateBetDateAdmin = () => {
                 </Col>
                 <Col span={12}>
                   <Form.Item
-                    label="Premio Inicial (PTS)"
+                    label="Premio Inicial"
                     name="prize_PTS"
                   >
                     <Space.Compact style={{ width: '100%' }}>
@@ -451,7 +451,7 @@ const CreateBetDateAdmin = () => {
                           borderRadius: '0 6px 6px 0'
                         }}
                       >
-                        PTS
+                        $
                       </span>
                     </Space.Compact>
                   </Form.Item>

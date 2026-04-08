@@ -188,7 +188,7 @@ const PlaceBetForm = () => {
             <ul>
               <li>Se descontará <strong>1 crédito</strong> de tu saldo</li>
               <li>No podrás modificar la predicción después</li>
-              <li>El premio potencial es: <strong>${((betDate.total_prize || 0) || ((betDate.prize_PTS || 0) + (betDate.accumulated_prize || 0)) || (betDate.prize_cop || 0)).toLocaleString()} PTS</strong></li>
+              <li>El premio potencial es: <strong>${((betDate.total_prize || 0) || ((betDate.prize_PTS || 0) + (betDate.accumulated_prize || 0)) || (betDate.prize_cop || 0)).toLocaleString()}</strong></li>
             </ul>
           </div>
         ),

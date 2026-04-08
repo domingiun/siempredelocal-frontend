@@ -45,7 +45,7 @@ const PurchaseCreditsPage = () => {
           content: (
             <div>
               <p>Has Solicitado la recarga de <strong>{plan.credits} créditos</strong>.</p>
-              <p>Total recarga: <strong>{plan.final_price.toLocaleString()} PTS</strong></p>
+              <p>Total recarga: <strong>${plan.final_price.toLocaleString()}</strong></p>
               <p>Los créditos estaran disponibles en tu cajón al momento de ser verificados por el administrator.</p>
               <p>La trasnsaccion se vera registrada en tu historial de transacciones como <strong>"Pendiente"</strong> hasta ser autorizada</p>
               <p>Si tienes alguna duda, contacta con soporte.</p>
@@ -143,20 +143,20 @@ const PurchaseCreditsPage = () => {
                     <Text type="secondary" style={{ fontSize: 14 }}>créditos</Text>
                   </div>
                   <Text type="secondary" style={{ fontSize: 12 }}>
-                    {plan.final_price.toLocaleString()} PTS
+                    ${plan.final_price.toLocaleString()}
                   </Text>
                 </div>
 
                 <div style={{ flex: 1 }}>
                   <Row justify="space-between" style={{ marginBottom: 8 }}>
                     <Col><Text type="secondary">Recarga normal:</Text></Col>
-                    <Col><Text>{(plan.credits * 5000).toLocaleString()} PTS</Text></Col>
+                    <Col><Text>${(plan.credits * 5000).toLocaleString()}</Text></Col>
                   </Row>
                   
                   <Row justify="space-between" style={{ marginBottom: 8 }}>
                     <Col><Text strong>Recarga final:</Text></Col>
                     <Col><Text strong style={{ fontSize: '18px', color: '#52c41a' }}>
-                      {plan.final_price.toLocaleString()} PTS
+                      ${plan.final_price.toLocaleString()}
                     </Text></Col>
                   </Row>
                   
@@ -165,7 +165,7 @@ const PurchaseCreditsPage = () => {
                       <Col><Text type="success">Beneficio:</Text></Col>
                       <Col>
                         <Text type="success">
-                          {plan.discount_percent}% ({((plan.credits * 5000) - plan.final_price).toLocaleString()} PTS)
+                          {plan.discount_percent}% (${((plan.credits * 5000) - plan.final_price).toLocaleString()})
                         </Text>
                       </Col>
                     </Row>
@@ -175,7 +175,7 @@ const PurchaseCreditsPage = () => {
                     <Col><Text type="secondary">Puntos por crédito:</Text></Col>
                     <Col>
                       <Text strong>
-                        {(plan.final_price / plan.credits).toLocaleString(undefined, { minimumFractionDigits: 0 })} PTS
+                        ${(plan.final_price / plan.credits).toLocaleString(undefined, { minimumFractionDigits: 0 })}
                       </Text>
                     </Col>
                   </Row>

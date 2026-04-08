@@ -177,13 +177,13 @@ export const validatePredictions = (predictions) => {
 
 // Formatear premio
 export const formatPrize = (amount) => {
-  if (!amount) return '0 PTS';
-  
+  if (!amount) return '0';
+
   const formatted = new Intl.NumberFormat('es-CO', {
     minimumFractionDigits: 0
   }).format(amount);
-  
-  return `${formatted} PTS`;
+
+  return `${formatted}`;
 };
 
 // Calcular puntos por prediccion

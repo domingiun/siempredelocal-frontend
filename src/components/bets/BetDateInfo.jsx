@@ -351,7 +351,7 @@ const BetDateInfo = ({ betDateId }) => {
                 (betDate.prize_cop || 0)
               }
               prefix={<DollarOutlined />}
-              suffix="PTS"
+              prefix="$"
               styles={{ content: { color: '#52c41a' } }}
             />
           </Card>
@@ -395,7 +395,7 @@ const BetDateInfo = ({ betDateId }) => {
           description={
             <Space orientation="vertical" size="small">
               <Text>
-                Premio anterior no reclamado: <Text strong>${betDate.accumulated_prize.toLocaleString()} PTS</Text>
+                Premio anterior no reclamado: <Text strong>${betDate.accumulated_prize.toLocaleString()}</Text>
               </Text>
               <Text type="secondary" style={{ fontSize: '12px' }}>
                 Se suma al premio actual si no hay ganador
@@ -467,7 +467,7 @@ const BetDateInfo = ({ betDateId }) => {
           • <strong>3 puntos</strong> por marcador exacto
           • <strong>1 punto</strong> por ganador correcto
           • <strong>Mínimo 13 puntos</strong> para ganar</Text>
-          <Text>• <strong>Premio:</strong> ${((betDate.total_prize || 0) || ((betDate.prize_PTS || 0) + (betDate.accumulated_prize || 0)) || (betDate.prize_cop || 0)).toLocaleString()} PTS</Text>
+          <Text>• <strong>Premio:</strong> ${((betDate.total_prize || 0) || ((betDate.prize_PTS || 0) + (betDate.accumulated_prize || 0)) || (betDate.prize_cop || 0)).toLocaleString()}</Text>
         </Space>
       </Card>
 

@@ -228,7 +228,7 @@ const BetAdminPage = () => {
       render: (value) => <Tag color="blue">+{value}</Tag>
     },
     {
-      title: 'Valor (PTS)',
+      title: 'Valor',
       dataIndex: 'amount_PTS',
       key: 'amount_PTS',
       render: (value) => `$${Number(value || 0).toLocaleString()}`
@@ -320,7 +320,7 @@ const BetAdminPage = () => {
       )
     },
     {
-      title: 'Puntos (PTS)',
+      title: 'Puntos',
       dataIndex: 'amount_cop',
       key: 'amount_cop',
       render: (value) => `$${Math.abs(Number(value || 0)).toLocaleString()}`

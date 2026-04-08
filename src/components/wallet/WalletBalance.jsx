@@ -164,7 +164,7 @@ const WalletBalance = ({ compact = false, showActions = true }) => {
       if (result.success) {
         notification.success({
           title: '¡Conversión exitosa!',
-          description: `Convertiste ${conversionAmount} créditos a $${result.data.amount_PTS.toLocaleString()} PTS`
+          description: `Convertiste ${conversionAmount} créditos a $${result.data.amount_PTS.toLocaleString()}`
         });
         
         // Resetear cantidad
@@ -198,11 +198,11 @@ const WalletBalance = ({ compact = false, showActions = true }) => {
     try {
       if (redeemType === 'credits') {
         if (pointsToConvert < 5000) {
-          notification.warning({ message: 'Minimo 5,000 PTS para convertir a creditos' });
+          notification.warning({ message: 'Mínimo 5,000 puntos para convertir a créditos' });
           return;
         }
         if (pointsToConvert % 5000 !== 0) {
-          notification.warning({ message: 'Los puntos deben ser multiplo de 5,000 PTS' });
+          notification.warning({ message: 'Los puntos deben ser múltiplo de 5,000' });
           return;
         }
         if (pointsToConvert > balancePts) {
@@ -216,11 +216,11 @@ const WalletBalance = ({ compact = false, showActions = true }) => {
         }
       } else {
         if (withdrawAmount < 20000) {
-          notification.warning({ message: 'El retiro minimo es 20,000 PTS' });
+          notification.warning({ message: 'El retiro mínimo es 20,000 puntos' });
           return;
         }
         if (withdrawAmount > 1000000) {
-          notification.warning({ message: 'El retiro maximo es 1,000,000 PTS' });
+          notification.warning({ message: 'El retiro máximo es 1,000,000 puntos' });
           return;
         }
         if (withdrawAmount > balancePts) {
@@ -276,7 +276,7 @@ const WalletBalance = ({ compact = false, showActions = true }) => {
               <Text>Valor créditos:</Text>
             </Col>
             <Col>
-              <Text strong>{totalPTS.toLocaleString()} PTS</Text>
+              <Text strong>${totalPTS.toLocaleString()}</Text>
             </Col>
           </Row>
           
@@ -285,7 +285,7 @@ const WalletBalance = ({ compact = false, showActions = true }) => {
               <Text>Comisión (5%):</Text>
             </Col>
             <Col>
-              <Text type="danger">-{commissionAmount.toLocaleString()} PTS</Text>
+              <Text type="danger">-${commissionAmount.toLocaleString()}</Text>
             </Col>
           </Row>
           
@@ -295,7 +295,7 @@ const WalletBalance = ({ compact = false, showActions = true }) => {
             </Col>
             <Col>
               <Text strong style={{ color: '#52c41a', fontSize: '16px' }}>
-                {netAmount.toLocaleString()} PTS
+                ${netAmount.toLocaleString()}
               </Text>
             </Col>
           </Row>
@@ -368,7 +368,7 @@ const WalletBalance = ({ compact = false, showActions = true }) => {
             <Text type="secondary">1 crédito =</Text>
           </Col>
           <Col>
-            <Text strong>5,000 PTS</Text>
+            <Text strong>$5,000</Text>
           </Col>
         </Row>
         
@@ -457,7 +457,7 @@ const WalletBalance = ({ compact = false, showActions = true }) => {
           </Col>
           <Col>
             <Text strong style={{ color: '#52c41a' }}>
-              {stats.total_won.toLocaleString()} PTS
+              ${stats.total_won.toLocaleString()}
             </Text>
           </Col>
         </Row>
@@ -669,12 +669,12 @@ const WalletBalance = ({ compact = false, showActions = true }) => {
                   <Row justify="space-between">
                     <Col>
                       <Text style={{ color: 'rgba(255, 255, 255, 0.85)' }}>
-                        Valor en PTS:
+                        Valor:
                       </Text>
                     </Col>
                     <Col>
                       <Text strong style={{ color: 'white' }}>
-                        ${(wallet.credits * 5000).toLocaleString()} PTS
+                        ${(wallet.credits * 5000).toLocaleString()}
                       </Text>
                     </Col>
                   </Row>
@@ -724,9 +724,9 @@ const WalletBalance = ({ compact = false, showActions = true }) => {
                   value={wallet.balance_PTS}
                   styles={{ content: {color: 'white', fontSize: '36px', fontWeight: 'bold'} }}                  
                   prefix="$"
-                  suffix="PTS"
+                  suffix=""
                 />
-                
+
                 <Space orientation="vertical" size="small" style={{ marginTop: 16, width: '100%' }}>
                   <Row justify="space-between">
                     <Col>
@@ -736,7 +736,7 @@ const WalletBalance = ({ compact = false, showActions = true }) => {
                     </Col>
                     <Col>
                       <Text strong style={{ color: 'white' }}>
-                        ${wallet.total_earned?.toLocaleString() || '0'} PTS
+                        ${wallet.total_earned?.toLocaleString() || '0'}
                       </Text>
                     </Col>
                   </Row>
@@ -850,14 +850,14 @@ const WalletBalance = ({ compact = false, showActions = true }) => {
 
           {redeemType === 'credits' ? (
             <Space orientation="vertical" size="small" style={{ width: '100%' }}>
-              <Text type="secondary">Minimo 5,000 PTS. Debe ser multiplo de 5,000.</Text>
+              <Text type="secondary">Mínimo 5,000 puntos. Debe ser múltiplo de 5,000.</Text>
               <InputNumber
                 min={5000}
                 step={5000}
                 value={pointsToConvert}
                 onChange={(value) => setPointsToConvert(Number(value || 0))}
                 style={{ width: '100%' }}
-                addonAfter="PTS"
+                prefix="$"
               />
               <Text>
                 Creditos a recibir: <strong>{Math.floor((pointsToConvert || 0) / 5000)}</strong>
@@ -865,7 +865,7 @@ const WalletBalance = ({ compact = false, showActions = true }) => {
             </Space>
           ) : (
             <Space orientation="vertical" size="small" style={{ width: '100%' }}>
-              <Text type="secondary">Minimo 20,000 PTS. Maximo 1,000,000 PTS.</Text>
+              <Text type="secondary">Mínimo $20,000. Máximo $1,000,000.</Text>
               <InputNumber
                 min={20000}
                 max={1000000}
@@ -873,7 +873,7 @@ const WalletBalance = ({ compact = false, showActions = true }) => {
                 value={withdrawAmount}
                 onChange={(value) => setWithdrawAmount(Number(value || 0))}
                 style={{ width: '100%' }}
-                addonAfter="PTS"
+                prefix="$"
               />
             </Space>
           )}

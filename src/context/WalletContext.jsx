@@ -214,7 +214,7 @@ export const WalletProvider = ({ children }) => {
         
         setTransactions(prev => [newTransaction, ...prev]);
         
-        message.success(`Conversión exitosa! +$${response.data.amount_received.toLocaleString()} PTS`);
+        message.success(`Conversión exitosa! +$${response.data.amount_received.toLocaleString()}`);
         return { success: true, data: response.data };
       }
     } catch (error) {
@@ -311,7 +311,7 @@ export const WalletProvider = ({ children }) => {
     
     setTransactions(prev => [newTransaction, ...prev]);
     
-    message.success(`¡Felicidades! Ganaste $${amount.toLocaleString()} PTS`);
+    message.success(`¡Felicidades! Ganaste $${amount.toLocaleString()}`);
   };
 
   const hasEnoughCredits = (required = 1) => {
