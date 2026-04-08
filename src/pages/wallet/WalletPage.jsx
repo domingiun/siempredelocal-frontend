@@ -5,8 +5,8 @@ import {
   WalletOutlined, HistoryOutlined,
   CreditCardOutlined, SettingOutlined
 } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import WalletBalance from '../../components/wallet/WalletBalance';
-import PurchaseCredits from '../../components/wallet/PurchaseCredits';
 import TransactionHistoryList from '../../components/wallet/TransactionHistoryList';
 import { useTheme } from '../../context/ThemeContext';
 import './WalletPage.css';
@@ -23,6 +23,7 @@ const TABS = [
 const WalletPage = () => {
   const [activeTab, setActiveTab] = useState('resumen');
   const { mode } = useTheme();
+  const navigate = useNavigate();
   const isDark = mode === 'dark';
 
   const colors = {
@@ -46,13 +47,7 @@ const WalletPage = () => {
         </Col>
       </Row>
     ),
-    recargar: (
-      <Row gutter={[24, 24]}>
-        <Col span={24}>
-          <PurchaseCredits />
-        </Col>
-      </Row>
-    ),
+    recargar: null, // navega a /purchase
     historial: (
       <Row gutter={[24, 24]}>
         <Col span={24}>
@@ -114,7 +109,10 @@ const WalletPage = () => {
             return (
               <button
                 key={tab.key}
-                onClick={() => setActiveTab(tab.key)}
+                onClick={() => {
+                if (tab.key === 'recargar') { navigate('/purchase'); return; }
+                setActiveTab(tab.key);
+              }}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
