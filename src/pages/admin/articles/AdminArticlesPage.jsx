@@ -1,15 +1,15 @@
 // frontend/src/pages/admin/articles/AdminArticlesPage.jsx
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import {
   Table, Button, Modal, Form, Input, Switch, Upload,
   message, Popconfirm, Space, Tag, Image, Typography,
-  Avatar, Divider, Tooltip, Collapse
+  Avatar, Divider, Tooltip, Collapse, Select, Spin, Radio
 } from 'antd';
 import {
   PlusOutlined, EditOutlined, DeleteOutlined, UploadOutlined,
-  EyeOutlined, FileTextOutlined, UserOutlined, BoldOutlined,
-  ItalicOutlined, LineOutlined, PictureOutlined, FontSizeOutlined,
-  QuestionCircleOutlined
+  EyeOutlined, FileTextOutlined, UserOutlined, QuestionCircleOutlined,
+  PictureOutlined, ReloadOutlined, AlignLeftOutlined, AlignCenterOutlined,
+  AlignRightOutlined
 } from '@ant-design/icons';
 import api from '../../../services/api';
 
@@ -22,8 +22,8 @@ const SYNTAX_GUIDE = [
   { mark: '## Subtítulo',            desc: 'Encabezado grande de sección' },
   { mark: '### Subtítulo menor',     desc: 'Encabezado pequeño' },
   { mark: '>> frase destacada <<',   desc: 'Pull quote en color azul (frase resaltada)' },
-  { mark: '[IMG-LEFT: url | pie]',   desc: 'Imagen flotante a la izquierda con texto rodeándola' },
-  { mark: '[IMG-RIGHT: url | pie]',  desc: 'Imagen flotante a la derecha con texto rodeándola' },
+  { mark: '[IMG-LEFT: url | pie]',   desc: 'Imagen flotante izquierda (usa el botón "Imágenes" para seleccionar del banco)' },
+  { mark: '[IMG-RIGHT: url | pie]',  desc: 'Imagen flotante derecha' },
   { mark: '[IMG-CENTER: url | pie]', desc: 'Imagen centrada ancho completo' },
   { mark: '---',                     desc: 'Línea separadora decorativa' },
   { mark: '**texto**',               desc: 'Negrita' },
@@ -95,6 +95,143 @@ const Preview = ({ content }) => {
   );
 };
 
+// ─── Folder labels ─────────────────────────────────────────────────────────
+const FOLDER_LABELS = {
+  'article-images':    'Imágenes de artículos',
+  'logos':             'Logos de equipos',
+  'competition-logos': 'Logos de competencias',
+  'author-photos':     'Fotos de autores',
+  'avatars':           'Avatares',
+};
+
+// ─── Image Picker Modal ─────────────────────────────────────────────────────
+const ImagePicker = ({ open, onClose, onInsert }) => {
+  const [images, setImages]       = useState([]);
+  const [loading, setLoading]     = useState(false);
+  const [folder, setFolder]       = useState('all');
+  const [selected, setSelected]   = useState(null);
+  const [align, setAlign]         = useState('center');
+  const [caption, setCaption]     = useState('');
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await api.get('/articles/admin/images');
+      setImages(res.data || []);
+    } catch {
+      message.error('No se pudo cargar el banco de imágenes');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { if (open) { load(); setSelected(null); setCaption(''); setAlign('center'); } }, [open]);
+
+  const folders = ['all', ...new Set((images || []).map(i => i.folder))];
+  const filtered = folder === 'all' ? images : images.filter(i => i.folder === folder);
+
+  const handleInsert = () => {
+    if (!selected) { message.warning('Selecciona una imagen'); return; }
+    onInsert({ url: selected.url, align, caption });
+    onClose();
+  };
+
+  return (
+    <Modal
+      title={<span><PictureOutlined style={{ marginRight: 8, color: '#1677ff' }} />Banco de imágenes</span>}
+      open={open}
+      onCancel={onClose}
+      onOk={handleInsert}
+      okText="Insertar imagen"
+      cancelText="Cancelar"
+      width={860}
+      styles={{ body: { padding: '12px 0' } }}
+    >
+      {/* Filtro de carpeta + reload */}
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center', padding: '0 16px 12px' }}>
+        <Select
+          value={folder}
+          onChange={setFolder}
+          style={{ flex: 1 }}
+          options={folders.map(f => ({ value: f, label: f === 'all' ? 'Todas las carpetas' : (FOLDER_LABELS[f] || f) }))}
+        />
+        <Button icon={<ReloadOutlined />} onClick={load} loading={loading} />
+      </div>
+
+      {/* Grid de imágenes */}
+      {loading ? (
+        <div style={{ textAlign: 'center', padding: 40 }}><Spin /></div>
+      ) : filtered.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: 40, color: '#64748b' }}>No hay imágenes en esta carpeta</div>
+      ) : (
+        <div style={{ maxHeight: 360, overflowY: 'auto', padding: '0 16px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: 8 }}>
+          {filtered.map((img, i) => {
+            const isSel = selected?.url === img.url;
+            return (
+              <div
+                key={i}
+                onClick={() => setSelected(img)}
+                style={{
+                  cursor: 'pointer',
+                  border: `2px solid ${isSel ? '#1677ff' : 'transparent'}`,
+                  borderRadius: 8,
+                  overflow: 'hidden',
+                  position: 'relative',
+                  background: '#0c141f',
+                  transition: 'border-color .15s',
+                }}
+              >
+                <img
+                  src={img.url}
+                  alt={img.name}
+                  style={{ width: '100%', height: 90, objectFit: 'cover', display: 'block' }}
+                  loading="lazy"
+                />
+                {isSel && (
+                  <div style={{ position: 'absolute', top: 4, right: 4, background: '#1677ff', borderRadius: '50%', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, color: '#fff', fontWeight: 700 }}>
+                    ✓
+                  </div>
+                )}
+                <div style={{ fontSize: 10, color: '#64748b', padding: '4px 6px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {img.name}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Opciones de inserción */}
+      {selected && (
+        <div style={{ padding: '16px 16px 0', borderTop: '1px solid #1f2b3a', marginTop: 12 }}>
+          <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <Text style={{ fontSize: 13, color: '#94a3b8', whiteSpace: 'nowrap' }}>Posición:</Text>
+              <Radio.Group value={align} onChange={e => setAlign(e.target.value)} size="small">
+                <Radio.Button value="left"><AlignLeftOutlined /> Izquierda</Radio.Button>
+                <Radio.Button value="center"><AlignCenterOutlined /> Centro</Radio.Button>
+                <Radio.Button value="right"><AlignRightOutlined /> Derecha</Radio.Button>
+              </Radio.Group>
+            </div>
+            <div style={{ flex: 1, minWidth: 200, display: 'flex', gap: 8, alignItems: 'center' }}>
+              <Text style={{ fontSize: 13, color: '#94a3b8', whiteSpace: 'nowrap' }}>Pie de foto:</Text>
+              <Input
+                size="small"
+                placeholder="Descripción opcional..."
+                value={caption}
+                onChange={e => setCaption(e.target.value)}
+              />
+            </div>
+          </div>
+          <div style={{ marginTop: 10, padding: '8px 10px', background: '#0c141f', borderRadius: 6, fontSize: 12, color: '#64748b', fontFamily: 'monospace', wordBreak: 'break-all' }}>
+            [IMG-{align.toUpperCase()}: {selected.url}{caption ? ` | ${caption}` : ''}]
+          </div>
+        </div>
+      )}
+    </Modal>
+  );
+};
+
 // ─── Main component ────────────────────────────────────────────────────────
 const AdminArticlesPage = () => {
   const [articles, setArticles]   = useState([]);
@@ -102,8 +239,9 @@ const AdminArticlesPage = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing]     = useState(null);
   const [saving, setSaving]       = useState(false);
-  const [showPreview, setShowPreview] = useState(false);
+  const [showPreview, setShowPreview]   = useState(false);
   const [previewContent, setPreviewContent] = useState('');
+  const [pickerOpen, setPickerOpen]     = useState(false);
 
   const [imageFile, setImageFile]         = useState(null);
   const [imagePreview, setImagePreview]   = useState(null);
@@ -225,6 +363,11 @@ const AdminArticlesPage = () => {
     setTimeout(() => { ta.focus(); ta.setSelectionRange(lineStart + line.length + 1, lineStart + line.length + 1); }, 0);
   };
 
+  const handlePickerInsert = ({ url, align, caption }) => {
+    const line = `[IMG-${align.toUpperCase()}: ${url}${caption ? ` | ${caption}` : ''}]`;
+    insertLine(line);
+  };
+
   const TOOLBAR = [
     { icon: '## H2', tip: 'Subtítulo grande', action: () => insertLine('## Subtítulo de sección') },
     { icon: '### H3', tip: 'Subtítulo pequeño', action: () => insertLine('### Subtítulo menor') },
@@ -232,9 +375,6 @@ const AdminArticlesPage = () => {
     { icon: '━━', tip: 'Separador horizontal', action: () => insertLine('---') },
     { icon: 'N', tip: 'Negrita (**texto**)', action: () => insertAtCursor('**', '**', 'texto en negrita'), bold: true },
     { icon: 'I', tip: 'Cursiva (*texto*)', action: () => insertAtCursor('*', '*', 'texto en cursiva'), italic: true },
-    { icon: '← Img', tip: 'Imagen flotante izquierda', action: () => insertLine('[IMG-LEFT: https://url-de-imagen.com/foto.jpg | Descripción de la imagen]') },
-    { icon: '→ Img', tip: 'Imagen flotante derecha',   action: () => insertLine('[IMG-RIGHT: https://url-de-imagen.com/foto.jpg | Descripción de la imagen]') },
-    { icon: '↕ Img', tip: 'Imagen centrada ancho completo', action: () => insertLine('[IMG-CENTER: https://url-de-imagen.com/foto.jpg | Descripción de la imagen]') },
   ];
 
   const columns = [
@@ -290,6 +430,8 @@ const AdminArticlesPage = () => {
       </div>
 
       <Table dataSource={articles} columns={columns} rowKey="id" loading={loading} pagination={{ pageSize: 10 }} />
+
+      <ImagePicker open={pickerOpen} onClose={() => setPickerOpen(false)} onInsert={handlePickerInsert} />
 
       <Modal
         title={editing ? 'Editar artículo' : 'Nuevo artículo'}
@@ -356,6 +498,27 @@ const AdminArticlesPage = () => {
                   </button>
                 </Tooltip>
               ))}
+              {/* Botón banco de imágenes */}
+              <Tooltip title="Insertar imagen del banco de imágenes">
+                <button
+                  type="button"
+                  onClick={() => setPickerOpen(true)}
+                  style={{
+                    padding: '3px 10px',
+                    fontSize: 12,
+                    background: '#162235',
+                    border: '1px solid #1677ff',
+                    borderRadius: 4,
+                    color: '#60a5fa',
+                    cursor: 'pointer',
+                    lineHeight: '1.6',
+                    marginLeft: 4,
+                    display: 'flex', alignItems: 'center', gap: 4,
+                  }}
+                >
+                  <PictureOutlined /> Imágenes
+                </button>
+              </Tooltip>
               <Tooltip title="Ver / ocultar vista previa">
                 <button
                   type="button"
