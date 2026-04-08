@@ -171,7 +171,7 @@ const Dashboard = () => {
             return {
               betdate_id: bd.id,
               betdate_name: bd.name,
-              winner: 'Pendiente',
+              winner: 'Sin ganador premio acumulado',
               winner_user_id: null,
               winner_avatar_url: null,
               points: null,
@@ -444,7 +444,7 @@ const Dashboard = () => {
       title: 'Fecha',
       dataIndex: 'betdate_name',
       key: 'betdate_name',
-      width: 90,
+      width: 80,
       render: (text) => <strong>{text}</strong>
     },
     {
@@ -465,7 +465,7 @@ const Dashboard = () => {
             style={{
               fontSize: '12px',
               display: 'inline-block',
-              maxWidth: 120,
+              maxWidth: 80,
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap'
