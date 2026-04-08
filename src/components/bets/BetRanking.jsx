@@ -709,10 +709,10 @@ const BetRanking = ({ betDateId }) => {
               <FireOutlined />
             </div>
             <div>
-              <Text strong style={{ fontSize: 15 }}>Sin resultados</Text>
+              <Text strong style={{ fontSize: 15 }}>Sin apuestas en esta jornada</Text>
               <div>
                 <Text type="secondary">
-                  La fecha está finalizada, pero aún no hay posiciones publicadas.
+                  Ningún participante realizó pronósticos en esta fecha.
                 </Text>
               </div>
             </div>
