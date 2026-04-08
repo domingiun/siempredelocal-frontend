@@ -1,30 +1,23 @@
 // frontend/src/components/auth/ForgotPassword.jsx
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Form, Input, Button, Alert } from 'antd';
+import { MailOutlined, ArrowLeftOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { authAPI } from '../../services/api';
 import logo from '../../assets/logo.png';
+import './Auth.css';
 
 const ForgotPassword = () => {
-  const [channel, setChannel] = useState('email');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+  const [loading, setLoading]   = useState(false);
+  const [success, setSuccess]   = useState(false);
+  const [error, setError]       = useState('');
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async ({ email }) => {
     setError('');
-    setMessage('');
     setLoading(true);
-
     try {
-      const payload = channel === 'email'
-        ? { channel, email }
-        : { channel, phone };
-
-      const response = await authAPI.forgotPassword(payload);
-      setMessage(response.data?.message || 'Si la cuenta existe, recibiras instrucciones para restablecer tu contrasena.');
+      await authAPI.forgotPassword({ channel: 'email', email });
+      setSuccess(true);
     } catch (err) {
       setError(err?.response?.data?.detail || 'No se pudo enviar la solicitud. Intenta de nuevo.');
     } finally {
@@ -33,131 +26,95 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      <img
-        src={logo}
-        alt="Watermark top left"
-        style={{
-          position: 'absolute',
-          width: '56vw',
-          maxWidth: 820,
-          minWidth: 360,
-          opacity: 0.07,
-          left: '-10vw',
-          top: '-12vh',
-          pointerEvents: 'none',
-          userSelect: 'none',
-          filter: 'grayscale(100%)',
-        }}
-      />
-      <img
-        src={logo}
-        alt="Watermark bottom right"
-        style={{
-          position: 'absolute',
-          width: '62vw',
-          maxWidth: 900,
-          minWidth: 420,
-          opacity: 0.08,
-          right: '-8vw',
-          bottom: '-10vh',
-          pointerEvents: 'none',
-          userSelect: 'none',
-          filter: 'grayscale(100%)',
-        }}
-      />
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <div className="flex justify-center mb-4">
-            <img
-              src={logo}
-              alt="Siempre de Local"
-              style={{ width: 184, height: 184, objectFit: 'contain' }}
-            />
-          </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Recuperar contrasena
-          </h2>
+    <div className="auth">
+      <div className="auth__bg" />
+
+      <Link to="/" className="auth__home-link">
+        <ArrowLeftOutlined /> Inicio
+      </Link>
+
+      <div className="auth__card">
+
+        <div className="auth__logo-wrap">
+          <img src={logo} alt="Siempre de Local" className="auth__logo" />
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-              {error}
-            </div>
-          )}
-          {message && (
-            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-              {message}
-            </div>
-          )}
-
-          <div className="rounded-md shadow-sm space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Elige el medio
-              </label>
-              <select
-                value={channel}
-                onChange={(e) => setChannel(e.target.value)}
-                className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              >
-                <option value="email">Correo electronico</option>
-                <option value="whatsapp">WhatsApp</option>
-              </select>
-            </div>
-
-            {channel === 'email' ? (
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                  Correo electronico
-                </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  placeholder="correo@ejemplo.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-            ) : (
-              <div>
-                <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                  Celular
-                </label>
-                <input
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  required
-                  className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  placeholder="ej: +57 300 123 4567"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                />
-              </div>
-            )}
-          </div>
-
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              {loading ? 'Enviando...' : 'Enviar instrucciones'}
-            </button>
-          </div>
-
-          <div className="text-center">
-            <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
-              Volver a iniciar sesion
+        {success ? (
+          <div style={{ textAlign: 'center', padding: '8px 0 16px' }}>
+            <CheckCircleOutlined style={{ fontSize: 48, color: '#52c41a', marginBottom: 16 }} />
+            <h2 className="auth__title">¡Correo enviado!</h2>
+            <p style={{ color: '#64748b', fontSize: 14, lineHeight: 1.6, margin: '0 0 24px' }}>
+              Si tu correo está registrado, recibirás un enlace para restablecer tu contraseña.
+              Revisa también tu carpeta de spam.
+            </p>
+            <p style={{ color: '#475569', fontSize: 13, margin: '0 0 24px' }}>
+              El enlace es válido por <strong style={{ color: '#94a3b8' }}>30 minutos</strong>.
+            </p>
+            <Link to="/login">
+              <Button className="auth__btn-primary" type="primary" block>
+                Volver al inicio de sesión
+              </Button>
             </Link>
           </div>
-        </form>
+        ) : (
+          <>
+            <div className="auth__header">
+              <h2 className="auth__title">Recuperar contraseña</h2>
+              <p className="auth__subtitle">
+                Ingresa tu correo y te enviaremos un enlace para restablecerla
+              </p>
+            </div>
+
+            {error && (
+              <Alert
+                message={error}
+                type="error"
+                showIcon
+                className="auth__alert"
+                closable
+                onClose={() => setError('')}
+              />
+            )}
+
+            <Form layout="vertical" onFinish={handleSubmit} className="auth__form">
+              <Form.Item
+                name="email"
+                label="Correo electrónico"
+                rules={[
+                  { required: true, message: 'Ingresa tu correo' },
+                  { type: 'email', message: 'Correo inválido' },
+                ]}
+              >
+                <Input
+                  prefix={<MailOutlined />}
+                  placeholder="correo@ejemplo.com"
+                  size="large"
+                  autoComplete="email"
+                  inputMode="email"
+                />
+              </Form.Item>
+
+              <Form.Item style={{ marginBottom: 12 }}>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  block
+                  loading={loading}
+                  className="auth__btn-primary"
+                >
+                  Enviar enlace de recuperación
+                </Button>
+              </Form.Item>
+            </Form>
+
+            <div style={{ textAlign: 'center', marginTop: 8 }}>
+              <Link to="/login" style={{ fontSize: 13, color: '#1677ff', fontWeight: 600 }}>
+                <ArrowLeftOutlined style={{ marginRight: 4 }} />
+                Volver al inicio de sesión
+              </Link>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
