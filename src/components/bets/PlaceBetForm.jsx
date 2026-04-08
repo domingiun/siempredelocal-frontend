@@ -4,7 +4,7 @@ import {
   Card, Row, Col, Typography, Button,
   InputNumber, Alert,
   message, Spin, Divider, Tag,
-  Modal
+  Modal, Grid
 } from 'antd';
 import {
   FireOutlined, TeamOutlined, CheckCircleOutlined,
@@ -35,6 +35,8 @@ const PlaceBetForm = () => {
   const [validationResult, setValidationResult] = useState(null);
   const { mode } = useTheme();
   const isDark = mode === 'dark';
+  const screens = Grid.useBreakpoint();
+  const isDesktop = screens.md;
   const lastScrollYRef = useRef(0);
 
   useEffect(() => {
@@ -257,21 +259,21 @@ const PlaceBetForm = () => {
           {/* Local */}
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 }}>
             {match.home_team_logo
-              ? <img src={match.home_team_logo} alt="" style={{ width: 30, height: 30, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-              : <TeamOutlined style={{ fontSize: 20, flexShrink: 0 }} />}
-            <Text style={{ fontSize: 11, lineHeight: 1.25, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+              ? <img src={match.home_team_logo} alt="" style={{ width: isDesktop ? 44 : 30, height: isDesktop ? 44 : 30, objectFit: 'contain', flexShrink: 0 }} />
+              : <TeamOutlined style={{ fontSize: isDesktop ? 30 : 20, flexShrink: 0 }} />}
+            <Text style={{ fontSize: isDesktop ? 14 : 11, fontWeight: isDesktop ? 600 : 400, lineHeight: 1.25, overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
               {match.home_team_name}
             </Text>
           </div>
 
-          <Text type="secondary" style={{ fontSize: 12, flexShrink: 0, padding: '0 2px' }}>vs</Text>
+          <Text type="secondary" style={{ fontSize: isDesktop ? 14 : 12, flexShrink: 0, padding: '0 2px' }}>vs</Text>
 
           {/* Visitante — logo a la derecha */}
           <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 7, minWidth: 0, flexDirection: 'row-reverse' }}>
             {match.away_team_logo
-              ? <img src={match.away_team_logo} alt="" style={{ width: 30, height: 30, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-              : <TeamOutlined style={{ fontSize: 20, flexShrink: 0 }} />}
-            <Text style={{ fontSize: 11, lineHeight: 1.25, overflow: 'hidden', textAlign: 'right', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
+              ? <img src={match.away_team_logo} alt="" style={{ width: isDesktop ? 44 : 30, height: isDesktop ? 44 : 30, objectFit: 'contain', flexShrink: 0 }} />
+              : <TeamOutlined style={{ fontSize: isDesktop ? 30 : 20, flexShrink: 0 }} />}
+            <Text style={{ fontSize: isDesktop ? 14 : 11, fontWeight: isDesktop ? 600 : 400, lineHeight: 1.25, overflow: 'hidden', textAlign: 'right', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
               {match.away_team_name}
             </Text>
           </div>
@@ -580,7 +582,7 @@ const PlaceBetForm = () => {
               (betDate.total_prize || 0) ||
               ((betDate.prize_PTS || 0) + (betDate.accumulated_prize || 0)) ||
               (betDate.prize_cop || 0)
-            ).toLocaleString()} PTS
+            ).toLocaleString()}
           </span>
           <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#1890ff', fontSize: 13 }}>
             <ClockCircleOutlined />
