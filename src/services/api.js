@@ -32,7 +32,9 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       // Limpiar cualquier dato residual de sesión sin exponer detalles
       localStorage.removeItem('user');
-      if (window.location.pathname !== '/login' && window.location.pathname !== '/') {
+      const PUBLIC_PATHS = ['/', '/login', '/register', '/forgot-password', '/reset-password', '/help/security', '/articles'];
+      const isPublic = PUBLIC_PATHS.some(p => window.location.pathname === p || window.location.pathname.startsWith('/articles/'));
+      if (!isPublic) {
         window.location.href = '/login';
       }
     }
