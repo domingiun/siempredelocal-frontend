@@ -90,14 +90,31 @@ import AdminRoute from './components/common/AdminRoute';
 
 const ThemedConfigProvider = ({ children }) => {
   const { mode } = useTheme();
+  const isDark = mode === 'dark';
   return (
     <ConfigProvider
       locale={esES}
       theme={{
-        algorithm: mode === 'dark' ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
+        algorithm: isDark ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
         token: {
           colorPrimary: '#1677ff',
           borderRadius: 8,
+          ...(isDark ? {
+            // Fondo base y de componentes — paleta de la app
+            colorBgBase:        '#0b0f16',
+            colorBgContainer:   '#0c141f',   // inputs, selects cerrados
+            colorBgElevated:    '#0f1824',   // dropdowns, modales, popovers
+            colorBgLayout:      '#0b0f16',
+            colorBgSpotlight:   '#111b28',
+            // Bordes
+            colorBorder:        '#1f2b3a',
+            colorBorderSecondary: '#172030',
+            // Texto
+            colorText:          '#e6edf3',
+            colorTextSecondary: '#94a3b8',
+            colorTextTertiary:  '#64748b',
+            colorTextPlaceholder: '#64748b',
+          } : {}),
         },
       }}
     >
