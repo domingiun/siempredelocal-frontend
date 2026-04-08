@@ -1,6 +1,6 @@
 // frontend/src/pages/bets/ActiveBets.jsx
 import React, { useMemo, useState, useEffect } from 'react';
-import { Typography, Spin, Alert } from 'antd';
+import { Typography, Spin, Alert, Grid } from 'antd';
 import { FireOutlined, TrophyOutlined, CalendarOutlined, RightOutlined } from '@ant-design/icons';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -116,6 +116,8 @@ const ActiveBets = () => {
   const { user } = useAuth();
   const { mode } = useTheme();
   const isDark = mode === 'dark';
+  const screens = Grid.useBreakpoint();
+  const isDesktop = screens.md;
   const [bets, setBets] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -218,16 +220,83 @@ const ActiveBets = () => {
     ? { bg: '#0f1824', border: '#1f2b3a', iconColor: '#64748b' }
     : { bg: '#ffffff', border: '#e5e7eb', iconColor: '#94a3b8' };
 
+  /* ── render de una predicción en desktop ── */
+  const renderPredictionDesktop = (pred, idx, total, bet) => {
+    const match = pred.match;
+    const ms = matchStatusStyle(match?.status, isDark);
+    const isLast = idx === total - 1;
+    const pointColor = pred.points === 3 ? '#52c41a' : pred.points === 1 ? '#1677ff' : isDark ? '#475569' : '#94a3b8';
+    const homeName = match?.home_team?.name || `Equipo ${pred.match_id}`;
+    const awayName = match?.away_team?.name || '';
+    const rowBg = idx % 2 === 0
+      ? (isDark ? 'rgba(255,255,255,.02)' : 'rgba(0,0,0,.015)')
+      : 'transparent';
+
+    return (
+      <div key={`${bet.id}-${pred.match_id}`} style={{
+        display: 'grid',
+        gridTemplateColumns: '32px 1fr 90px 1fr 32px  80px 110px 52px',
+        alignItems: 'center',
+        gap: 8,
+        padding: '10px 16px',
+        background: rowBg,
+        borderBottom: isLast ? 'none' : `1px solid ${isDark ? 'rgba(31,43,58,.6)' : '#f1f5f9'}`,
+      }}>
+        {/* Logo local */}
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          {match?.home_team?.logo_url
+            ? <img src={match.home_team.logo_url} alt="" style={{ width: 28, height: 28, objectFit: 'contain' }} />
+            : <div style={{ width: 28, height: 28, borderRadius: '50%', background: isDark ? '#1f2b3a' : '#e5e7eb' }} />}
+        </div>
+        {/* Nombre local */}
+        <span style={{ fontSize: 13, fontWeight: 600, color: isDark ? '#e2e8f0' : '#1f2937', textAlign: 'right', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {homeName}
+        </span>
+        {/* Pronóstico / resultado */}
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: 15, fontWeight: 800, color: isDark ? '#60a5fa' : '#1677ff', lineHeight: 1 }}>
+            {pred.predicted_home_score} – {pred.predicted_away_score}
+          </div>
+          {pred.hasResult && (
+            <div style={{ fontSize: 11, color: isDark ? '#64748b' : '#9ca3af', marginTop: 2 }}>
+              ({match.home_score}–{match.away_score})
+            </div>
+          )}
+        </div>
+        {/* Nombre visitante */}
+        <span style={{ fontSize: 13, fontWeight: 600, color: isDark ? '#e2e8f0' : '#1f2937', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {awayName}
+        </span>
+        {/* Logo visitante */}
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          {match?.away_team?.logo_url
+            ? <img src={match.away_team.logo_url} alt="" style={{ width: 28, height: 28, objectFit: 'contain' }} />
+            : <div style={{ width: 28, height: 28, borderRadius: '50%', background: isDark ? '#1f2b3a' : '#e5e7eb' }} />}
+        </div>
+        {/* Fecha del partido */}
+        <span style={{ fontSize: 11, color: isDark ? '#64748b' : '#9ca3af', textAlign: 'center' }}>
+          {match?.match_date ? new Date(match.match_date).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }) : '—'}
+        </span>
+        {/* Estado */}
+        <div style={{ display: 'flex', justifyContent: 'center' }}><Pill s={ms} /></div>
+        {/* Puntos */}
+        <div style={{ textAlign: 'right' }}>
+          {pred.isFinished && (
+            <span style={{ fontSize: 14, fontWeight: 800, color: pointColor }}>{pred.points}pt</span>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div style={{
-      padding: '16px',
+      padding: isDesktop ? '24px 32px' : '16px',
       minHeight: '100vh',
-      background: isDark
-        ? 'linear-gradient(180deg,#0b0f16 0%,#0f1824 100%)'
-        : undefined,
+      background: isDark ? 'linear-gradient(180deg,#0b0f16 0%,#0f1824 100%)' : undefined,
     }}>
       {/* Encabezado */}
-      <div style={{ marginBottom: 16 }}>
+      <div style={{ maxWidth: isDesktop ? 900 : undefined, margin: isDesktop ? '0 auto 20px' : '0 0 16px' }}>
         <Title level={3} style={{ margin: 0, color: isDark ? '#e6edf3' : undefined }}>
           <FireOutlined style={{ marginRight: 8, color: '#1677ff' }} />
           Mis Pronósticos
@@ -239,7 +308,7 @@ const ActiveBets = () => {
       ) : groupedBets.length === 0 ? (
         <Alert description="¡Haz pronósticos en alguna fecha disponible para aparecer aquí!" type="info" showIcon />
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxWidth: isDesktop ? 900 : undefined, margin: isDesktop ? '0 auto' : undefined }}>
           {groupedBets.map(group => {
             const statusStyle = betDateTagStyle(group.bet_date_status, isDark);
             return (
@@ -248,7 +317,7 @@ const ActiveBets = () => {
                 card={card}
                 header={
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                    <Text strong style={{ fontSize: 13, color: isDark ? '#e6edf3' : undefined }}>
+                    <Text strong style={{ fontSize: isDesktop ? 14 : 13, color: isDark ? '#e6edf3' : undefined }}>
                       {group.bet_date_name}
                     </Text>
                     <Pill s={{ bg: isDark ? 'rgba(22,119,255,.15)' : '#e6f4ff', border: isDark ? 'rgba(22,119,255,.3)' : '#91caff', text: isDark ? '#60a5fa' : '#0958d9', label: `${group.totalBets} pronósticos` }} />
@@ -265,68 +334,67 @@ const ActiveBets = () => {
                     });
                     return (
                       <div key={bet.id}>
-                        {/* Sub-encabezado del pronóstico */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, padding: '3px 0', borderBottom: `1px solid ${card.border}` }}>
+                        {/* Sub-encabezado */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6, padding: isDesktop ? '6px 16px' : '3px 0', borderBottom: `1px solid ${card.border}` }}>
                           <CalendarOutlined style={{ color: isDark ? '#64748b' : '#94a3b8', fontSize: 11 }} />
                           <Text style={{ fontSize: 11, color: isDark ? '#94a3b8' : '#64748b' }}>
                             {new Date(bet.submitted_at || bet.created_at).toLocaleDateString()}
                           </Text>
-                          <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4, fontWeight: 700, fontSize: 12, color: '#1677ff' }}>
-                            <TrophyOutlined />
-                            {bet.totalPoints || 0} pts
+                          <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 4, fontWeight: 700, fontSize: 13, color: '#1677ff' }}>
+                            <TrophyOutlined /> {bet.totalPoints || 0} pts
                           </span>
                         </div>
 
-                        {/* Lista de predicciones */}
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-                          {sorted.map((pred, idx) => {
-                            const match = pred.match;
-                            const ms = matchStatusStyle(match?.status, isDark);
-                            const isLast = idx === sorted.length - 1;
-                            const pointColor = pred.points === 3 ? '#52c41a' : pred.points === 1 ? '#1677ff' : isDark ? '#475569' : '#94a3b8';
-                            const homeName = match?.home_team?.name || '';
-                            const awayName = match?.away_team?.name || '';
-                            return (
-                              <div
-                                key={`${bet.id}-${pred.match_id}`}
-                                style={{
-                                  padding: '6px 0',
-                                  borderBottom: isLast ? 'none' : `1px solid ${isDark ? 'rgba(31,43,58,.8)' : '#f1f5f9'}`,
-                                }}
-                              >
-                                {/* Fila 1: logos + equipos */}
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 4 }}>
-                                  {match?.home_team?.logo_url
-                                    ? <img src={match.home_team.logo_url} alt="" style={{ width: 16, height: 16, borderRadius: '50%', flexShrink: 0 }} />
-                                    : null}
-                                  <Text style={{ fontSize: 11, color: isDark ? '#cbd5e1' : '#374151', flex: 1, lineHeight: 1.3 }}>
-                                    {match ? `${homeName} vs ${awayName}` : `Partido ${pred.match_id}`}
-                                  </Text>
-                                  {match?.away_team?.logo_url
-                                    ? <img src={match.away_team.logo_url} alt="" style={{ width: 16, height: 16, borderRadius: '50%', flexShrink: 0 }} />
-                                    : null}
-                                </div>
+                        {/* Cabecera de columnas (solo desktop) */}
+                        {isDesktop && (
+                          <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: '32px 1fr 90px 1fr 32px  80px 110px 52px',
+                            gap: 8, padding: '4px 16px 6px',
+                            fontSize: 10, fontWeight: 700, color: isDark ? '#475569' : '#9ca3af',
+                            textTransform: 'uppercase', letterSpacing: '0.06em',
+                          }}>
+                            <span></span>
+                            <span style={{ textAlign: 'right' }}>Local</span>
+                            <span style={{ textAlign: 'center' }}>Pronóstico</span>
+                            <span>Visitante</span>
+                            <span></span>
+                            <span style={{ textAlign: 'center' }}>Fecha</span>
+                            <span style={{ textAlign: 'center' }}>Estado</span>
+                            <span style={{ textAlign: 'right' }}>Pts</span>
+                          </div>
+                        )}
 
-                                {/* Fila 2: pronóstico | resultado | estado | puntos */}
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', paddingLeft: 21 }}>
-                                  <Text style={{ fontSize: 11, fontWeight: 700, color: isDark ? '#60a5fa' : '#0958d9' }}>
-                                    {pred.predicted_home_score}-{pred.predicted_away_score}
-                                  </Text>
-                                  {pred.hasResult && (
-                                    <Text style={{ fontSize: 10, color: isDark ? '#64748b' : '#9ca3af' }}>
-                                      ({match.home_score}-{match.away_score})
-                                    </Text>
-                                  )}
-                                  <Pill s={ms} />
-                                  {pred.isFinished && (
-                                    <span style={{ marginLeft: 'auto', fontSize: 11, fontWeight: 800, color: pointColor }}>
-                                      {pred.points}pt
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-                            );
-                          })}
+                        {/* Filas */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+                          {isDesktop
+                            ? sorted.map((pred, idx) => renderPredictionDesktop(pred, idx, sorted.length, bet))
+                            : sorted.map((pred, idx) => {
+                                const match = pred.match;
+                                const ms = matchStatusStyle(match?.status, isDark);
+                                const isLast = idx === sorted.length - 1;
+                                const pointColor = pred.points === 3 ? '#52c41a' : pred.points === 1 ? '#1677ff' : isDark ? '#475569' : '#94a3b8';
+                                const homeName = match?.home_team?.name || '';
+                                const awayName = match?.away_team?.name || '';
+                                return (
+                                  <div key={`${bet.id}-${pred.match_id}`} style={{ padding: '6px 0', borderBottom: isLast ? 'none' : `1px solid ${isDark ? 'rgba(31,43,58,.8)' : '#f1f5f9'}` }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginBottom: 4 }}>
+                                      {match?.home_team?.logo_url && <img src={match.home_team.logo_url} alt="" style={{ width: 16, height: 16, borderRadius: '50%', flexShrink: 0 }} />}
+                                      <Text style={{ fontSize: 11, color: isDark ? '#cbd5e1' : '#374151', flex: 1, lineHeight: 1.3 }}>
+                                        {match ? `${homeName} vs ${awayName}` : `Partido ${pred.match_id}`}
+                                      </Text>
+                                      {match?.away_team?.logo_url && <img src={match.away_team.logo_url} alt="" style={{ width: 16, height: 16, borderRadius: '50%', flexShrink: 0 }} />}
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', paddingLeft: 21 }}>
+                                      <Text style={{ fontSize: 11, fontWeight: 700, color: isDark ? '#60a5fa' : '#0958d9' }}>{pred.predicted_home_score}-{pred.predicted_away_score}</Text>
+                                      {pred.hasResult && <Text style={{ fontSize: 10, color: isDark ? '#64748b' : '#9ca3af' }}>({match.home_score}-{match.away_score})</Text>}
+                                      <Pill s={ms} />
+                                      {pred.isFinished && <span style={{ marginLeft: 'auto', fontSize: 11, fontWeight: 800, color: pointColor }}>{pred.points}pt</span>}
+                                    </div>
+                                  </div>
+                                );
+                              })
+                          }
                         </div>
                       </div>
                     );
