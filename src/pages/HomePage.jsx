@@ -184,7 +184,7 @@ const HomePage = () => {
             </span>
             <span className="hp__hero-prize-value">
               {totalPrize.toLocaleString()}
-              <span className="hp__hero-prize-unit"> PTS</span>
+              <span className="hp__hero-prize-unit"></span>
             </span>
           </div>
 
