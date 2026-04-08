@@ -164,7 +164,7 @@ const AppHeader = ({ collapsed, setCollapsed }) => {
                 />
                 <Badge 
                   className="credits-badge credits-badge--compact"
-                  count={`${wallet.credits || 0} cr`}
+                  count={`${wallet.credits || 0} credito(s)`}
                   overflowCount={99}
                   style={{ 
                     backgroundColor: wallet.credits > 0 ? '#52c41a' : '#ff4d4f',

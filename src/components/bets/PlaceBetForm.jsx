@@ -588,7 +588,7 @@ const PlaceBetForm = () => {
           </span>
           <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: wallet.credits > 0 ? '#52c41a' : '#ff4d4f', fontWeight: 700, fontSize: 13 }}>
             <FireOutlined />
-            {wallet.credits} cr
+            {wallet.credits} credito(s)
           </span>
         </div>
       </div>

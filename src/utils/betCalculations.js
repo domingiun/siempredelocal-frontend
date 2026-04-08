@@ -125,7 +125,7 @@ export const calculateTimeRemaining = (betDate) => {
     
     if (diffMinutes < 1440) return `${Math.floor(diffMinutes / 60)}h`;
     
-    return `${Math.floor(diffMinutes / 1440)} dÃ­as`;
+    return `${Math.floor(diffMinutes / 1440)} días`;
   } catch (error) {
     console.error('Error calculando tiempo restante:', error);
     return 'Error';
