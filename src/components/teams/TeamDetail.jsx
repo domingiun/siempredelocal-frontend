@@ -1,669 +1,371 @@
 // frontend/src/components/teams/TeamDetail.jsx
 import React, { useState, useEffect } from 'react';
-import { 
-  Card, Button, Space, Typography, Row, Col, 
-  Tag, Avatar, Statistic, Descriptions, Tabs, 
-  Table, message, Divider, Modal 
-} from 'antd';
-import { 
+import { Button, Modal, message, Tag } from 'antd';
+import {
   ArrowLeftOutlined, EditOutlined, DeleteOutlined,
   TeamOutlined, EnvironmentOutlined, TrophyOutlined,
   CalendarOutlined, GlobalOutlined, LinkOutlined,
-  BarChartOutlined, HistoryOutlined, CrownOutlined
+  HistoryOutlined
 } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import competitionService from '../../services/competitionService';
-import TeamCard from './TeamCard';
+import { useTheme } from '../../context/ThemeContext';
 import { formatDateTimeShort, formatForInputUTC } from '../../utils/dateFormatter';
 
-const { Title, Text } = Typography;
+const TABS = [
+  { key: 'info',    label: 'Información',  icon: <TeamOutlined />    },
+  { key: 'stats',   label: 'Estadísticas', icon: <TrophyOutlined />  },
+  { key: 'matches', label: 'Partidos',     icon: <HistoryOutlined /> },
+];
 
 const TeamDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { mode } = useTheme();
+  const isDark = mode === 'dark';
+
   const [loading, setLoading] = useState(true);
   const [team, setTeam] = useState(null);
-  const [competitions, setCompetitions] = useState([]);
   const [matches, setMatches] = useState([]);
   const [teamsInfo, setTeamsInfo] = useState({});
-  const [stats, setStats] = useState({
-    overall: {},
-    recent: [],
-    form: ''
-  });
+  const [activeTab, setActiveTab] = useState('info');
 
-  useEffect(() => {
-    if (id) {
-      fetchTeamDetails();
-    }
-  }, [id]);
+  const card = isDark
+    ? { bg: '#0c141f', border: '#1f2b3a', sub: '#64748b', text: '#e6edf3', muted: '#94a3b8', row: '#0f1824' }
+    : { bg: '#ffffff', border: '#e5e7eb', sub: '#6b7280', text: '#111827', muted: '#9ca3af', row: '#f8fafc' };
+
+  useEffect(() => { if (id) fetchTeamDetails(); }, [id]);
 
   const fetchTeamDetails = async () => {
     setLoading(true);
     try {
-      // Obtener información del equipo
-      const teamResponse = await competitionService.getTeam(id);
-      console.log('TEAM DETAIL → team recibido:', teamResponse.data);
-      setTeam(teamResponse.data);
-      
-      // Obtener competencias del equipo
-      fetchTeamCompetitions();
-      
-      // Obtener partidos recientes
+      const res = await competitionService.getTeam(id);
+      setTeam(res.data);
       fetchRecentMatches();
-      
-    } catch (error) {
-      message.error('Error al cargar los datos del equipo');
+    } catch {
+      message.error('Error al cargar el equipo');
       navigate('/teams');
     } finally {
       setLoading(false);
     }
   };
-  
 
-  const fetchTeamCompetitions = async () => {
+  const fetchRecentMatches = async () => {
     try {
-      const response = await competitionService.getCompetitions();
-      const allCompetitions = response.data || [];
-      
-      // Filtrar competencias donde está el equipo
-      // Nota: Necesitarías un endpoint específico para esto
-      const teamCompetitions = allCompetitions.slice(0, 3); // Temporal
-      setCompetitions(teamCompetitions);
-    } catch (error) {
-      console.error('Error al cargar competencias del equipo:', error);
-    }
-  };
-
-  const fetchTeamsInfo = async (matchList) => {
-    try {
-      // Verificar que team exista y tenga id
-      if (!team || !team.id) {
-        console.warn('Team no disponible para excluir de la búsqueda');
-        return;
+      let data = [], skip = 0;
+      while (true) {
+        const res = await competitionService.getMatches({ limit: 100, skip, team_id: id });
+        const batch = res.data || [];
+        data = data.concat(batch);
+        if (batch.length < 100) break;
+        skip += 100;
       }
-      
-      // Extraer IDs únicos de equipos de todos los partidos
-      const teamIds = [...new Set([
-        ...matchList.map(m => m.home_team_id),
-        ...matchList.map(m => m.away_team_id)
-      ])].filter(id => id && id !== team.id); // Excluir el equipo actual
-          
-      console.log('🔄 Obteniendo información de equipos:', teamIds);
-      
-      // Si no hay otros equipos, retornar
-      if (teamIds.length === 0) {
-        console.log('No hay otros equipos en los partidos');
-        return;
-      }
-      
-      // Obtener información de cada equipo
-      const teamsData = {};
-      for (const teamId of teamIds) {
-        try {
-          const response = await competitionService.getTeam(teamId);
-          if (response.data) {
-            teamsData[teamId] = response.data;
-          }
-        } catch (error) {
-          console.warn(`No se pudo obtener equipo ${teamId}:`, error);
-        }
-      }
-      
-      setTeamsInfo(teamsData);
-      console.log('✅ Información de equipos obtenida:', Object.keys(teamsData).length);
-      
-    } catch (error) {
-      console.error('Error obteniendo información de equipos:', error);
-    }
-  };
-
-  // Modifica fetchRecentMatches para usar la nueva función
-    const fetchRecentMatches = async () => {
-      try {
-        const limit = 100;
-        let skip = 0;
-        let data = [];
-
-        while (true) {
-          const response = await competitionService.getMatches({ 
-            limit,
-            skip,
-            team_id: id 
-          });
-          const batch = response.data || [];
-          data = data.concat(batch);
-          if (batch.length < limit) break;
-          skip += limit;
-        }
-
-        const matchList = data.slice().sort((a, b) => {
-          const aTime = new Date(a.match_date || 0).getTime();
-          const bTime = new Date(b.match_date || 0).getTime();
-          return bTime - aTime;
-        });
-        setMatches(matchList);
-        
-        // Obtener informaci�n de equipos de esos partidos
-        if (matchList.length > 0) {
-          await fetchTeamsInfo(matchList);
-        }
-        
-      } catch (error) {
-        console.error('Error al cargar partidos recientes:', error);
-      }
-    };
-
-  const handleEdit = () => {
-    navigate(`/teams/${id}/edit`);
+      const sorted = data.sort((a, b) => new Date(b.match_date || 0) - new Date(a.match_date || 0));
+      setMatches(sorted);
+      // cargar info de equipos rivales
+      const ids = [...new Set([...sorted.map(m => m.home_team_id), ...sorted.map(m => m.away_team_id)])].filter(tid => tid && String(tid) !== String(id));
+      const info = {};
+      await Promise.all(ids.slice(0, 20).map(async tid => {
+        try { info[tid] = (await competitionService.getTeam(tid)).data; } catch {}
+      }));
+      setTeamsInfo(info);
+    } catch {}
   };
 
   const handleDelete = () => {
     Modal.confirm({
       title: '¿Eliminar equipo?',
-      content: 'Esta acción no se puede deshacer. El equipo será marcado como inactivo.',
-      okText: 'Eliminar',
-      okType: 'danger',
-      cancelText: 'Cancelar',
+      content: 'Esta acción no se puede deshacer.',
+      okText: 'Eliminar', okType: 'danger', cancelText: 'Cancelar',
       onOk: async () => {
-        try {
-          await competitionService.deleteTeam(id);
-          message.success('Equipo eliminado exitosamente');
-          navigate('/teams');
-        } catch (error) {
-          message.error('Error al eliminar el equipo');
-        }
+        try { await competitionService.deleteTeam(id); message.success('Equipo eliminado'); navigate('/teams'); }
+        catch { message.error('Error al eliminar'); }
       },
     });
   };
 
-  const calculateStats = () => {
+  const calcStats = () => {
     if (!team) return {};
-    
-    const totalMatches = team.matches_played || 0;
-    const winRate = totalMatches > 0 ? (team.matches_won / totalMatches * 100) : 0;
-    const drawRate = totalMatches > 0 ? (team.matches_drawn / totalMatches * 100) : 0;
-    const lossRate = totalMatches > 0 ? (team.matches_lost / totalMatches * 100) : 0;
-    const performanceRate = totalMatches > 0 ? (team.points / (totalMatches * 3) * 100) : 0;
-    
+    const p = team.matches_played || 0;
     return {
-      winRate: winRate.toFixed(1),
-      drawRate: drawRate.toFixed(1),
-      lossRate: lossRate.toFixed(1),
-      avgGoalsFor: totalMatches > 0 ? (team.goals_for / totalMatches).toFixed(2) : 0,
-      avgGoalsAgainst: totalMatches > 0 ? (team.goals_against / totalMatches).toFixed(2) : 0,
-      pointsPerMatch: totalMatches > 0 ? (team.points / totalMatches).toFixed(2) : 0,
-      performanceRate: performanceRate.toFixed(1),
+      winRate:   p > 0 ? (team.matches_won    / p * 100).toFixed(1) : '0.0',
+      drawRate:  p > 0 ? (team.matches_drawn  / p * 100).toFixed(1) : '0.0',
+      lossRate:  p > 0 ? (team.matches_lost   / p * 100).toFixed(1) : '0.0',
+      avgGF:     p > 0 ? (team.goals_for      / p).toFixed(2)       : '0.00',
+      avgGC:     p > 0 ? (team.goals_against  / p).toFixed(2)       : '0.00',
+      ppm:       p > 0 ? (team.points         / p).toFixed(2)       : '0.00',
+      perf:      p > 0 ? (team.points / (p * 3) * 100).toFixed(1)   : '0.0',
     };
   };
 
-  const normalizeWebsite = (value) => {
-    if (!value) return '';
-    if (value.startsWith('http://') || value.startsWith('https://')) return value;
-    return `https://${value}`;
+  if (loading) return <div style={{ textAlign: 'center', padding: 60, color: card.muted }}>Cargando...</div>;
+  if (!team)   return <div style={{ padding: 24 }}><Button onClick={() => navigate('/teams')}>Volver</Button></div>;
+
+  const s = calcStats();
+  const websiteUrl = team.website ? (team.website.startsWith('http') ? team.website : `https://${team.website}`) : null;
+
+  /* ── mini helpers de render ── */
+  const InfoRow = ({ icon, label, value }) => (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: 10,
+      padding: '10px 14px',
+      borderBottom: `1px solid ${card.border}`,
+    }}>
+      <span style={{ color: card.sub, fontSize: 13, width: 20, flexShrink: 0 }}>{icon}</span>
+      <span style={{ fontSize: 12, color: card.muted, width: 90, flexShrink: 0 }}>{label}</span>
+      <span style={{ fontSize: 13, fontWeight: 600, color: card.text, flex: 1 }}>{value || '—'}</span>
+    </div>
+  );
+
+  const StatBox = ({ label, value, color }) => (
+    <div style={{
+      flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column',
+      alignItems: 'center', padding: '12px 6px',
+      borderRight: `1px solid ${card.border}`,
+    }}>
+      <span style={{ fontSize: 20, fontWeight: 800, color: color || card.text, lineHeight: 1 }}>{value ?? '—'}</span>
+      <span style={{ fontSize: 9, color: card.muted, textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: 3, textAlign: 'center' }}>{label}</span>
+    </div>
+  );
+
+  const matchStatusColor = (status) => {
+    const v = String(status || '').toLowerCase();
+    if (v.includes('finaliz')) return { bg: 'rgba(34,197,94,.13)', border: 'rgba(34,197,94,.3)', text: '#86efac' };
+    if (v.includes('aplazad') || v.includes('cancel')) return { bg: 'rgba(249,115,22,.13)', border: 'rgba(249,115,22,.3)', text: '#fdba74' };
+    return { bg: 'rgba(59,130,246,.13)', border: 'rgba(59,130,246,.3)', text: '#93c5fd' };
   };
 
-  if (loading) {
-    return (
-      <div style={{ padding: '24px', textAlign: 'center' }}>
-        <Title level={3}>Cargando equipo...</Title>
-      </div>
-    );
-  }
-
-  if (!team) {
-    return (
-      <div style={{ padding: '24px' }}>
-        <Card>
-          <Title level={3}>Equipo no encontrado</Title>
-          <Button onClick={() => navigate('/teams')}>Volver a equipos</Button>
-        </Card>
-      </div>
-    );
-  }
-
-  const calculatedStats = calculateStats();
-  const websiteUrl = normalizeWebsite(team.website);
-
   return (
-    <div style={{ padding: '24px' }}>
-      {/* Header */}
-      <Space orientation="vertical" style={{ width: '100%', marginBottom: '24px' }}>
-        <Button
-          type="link"
-          icon={<ArrowLeftOutlined />}
-          onClick={() => navigate('/teams')}
-          style={{ padding: 0 }}
-        >
-          Volver a equipos
-        </Button>
-        
-        <Row gutter={[24, 24]} align="middle">
-          <Col flex="auto">
-            <Space>
-              {team.logo_url ? (
-                <Avatar src={team.logo_url} size={64} />
-              ) : (
-                <Avatar size={64} style={{ backgroundColor: '#1890ff' }}>
-                  {team.name?.charAt(0)}
-                </Avatar>
-              )}
-              <div>
-                <Title level={2} style={{ margin: 0 }}>{team.name}</Title>
-                <Text type="secondary" style={{ fontSize: '16px' }}>
-                  {team.short_name}
-                </Text>
+    <div style={{ minHeight: '100vh', background: isDark ? '#0b0f16' : '#f0f2f5' }}>
+
+      {/* ── Hero ── */}
+      <div style={{ background: card.bg, borderBottom: `1px solid ${card.border}` }}>
+        {/* Barra de color */}
+        <div style={{ height: 4, background: team.is_active ? '#22c55e' : '#64748b' }} />
+
+        <div style={{ padding: '12px 16px' }}>
+          {/* Back */}
+          <button onClick={() => navigate('/teams')} style={{
+            border: 'none', background: 'transparent', cursor: 'pointer',
+            color: card.sub, fontSize: 12, display: 'flex', alignItems: 'center', gap: 5, marginBottom: 10, padding: 0,
+          }}>
+            <ArrowLeftOutlined /> Volver a equipos
+          </button>
+
+          {/* Logo + nombre + acciones */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            {/* Logo */}
+            <div style={{
+              width: 56, height: 56, borderRadius: 12, flexShrink: 0,
+              background: isDark ? '#0f1824' : '#f1f5f9',
+              border: `1px solid ${card.border}`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden',
+            }}>
+              {team.logo_url
+                ? <img src={team.logo_url} alt="" style={{ width: 44, height: 44, objectFit: 'contain' }} />
+                : <TeamOutlined style={{ fontSize: 24, color: card.muted }} />}
+            </div>
+
+            {/* Nombre */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 16, fontWeight: 800, color: card.text, lineHeight: 1.2 }}>{team.name}</div>
+              {team.short_name && <div style={{ fontSize: 12, color: card.muted, marginTop: 2 }}>{team.short_name}</div>}
+              <div style={{ display: 'flex', gap: 6, marginTop: 5, flexWrap: 'wrap' }}>
+                {team.city && team.country && (
+                  <span style={{ fontSize: 11, color: card.sub }}>
+                    <EnvironmentOutlined style={{ marginRight: 3 }} />{team.city}, {team.country}
+                  </span>
+                )}
+                {team.stadium && (
+                  <span style={{ fontSize: 11, color: card.sub }}>
+                    <CalendarOutlined style={{ marginRight: 3 }} />{team.stadium}
+                  </span>
+                )}
               </div>
-            </Space>
-          </Col>
-          
-          <Col>
-            <Space>
-              <Button
-                type="primary"
-                icon={<EditOutlined />}
-                onClick={handleEdit}
-                style={{
-                  backgroundColor: '#0958d9',
-                  borderColor: '#0958d9',
-                  color: '#ffffff',
-                  fontWeight: 600
-                }}
-              >
+            </div>
+
+            {/* Acciones */}
+            <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+              <Button size="small" type="primary" icon={<EditOutlined />} onClick={() => navigate(`/teams/${id}/edit`)}>
                 Editar
               </Button>
-              <Button
-                danger
-                icon={<DeleteOutlined />}
-                onClick={handleDelete}
-              >
-                Eliminar
-              </Button>
-            </Space>
-          </Col>
-        </Row>
-      </Space>
+              <Button size="small" danger icon={<DeleteOutlined />} onClick={handleDelete} />
+            </div>
+          </div>
 
-      <Row gutter={[24, 24]}>
-        {/* Información principal */}
-        <Col xs={24} lg={16}>
-          <Card>
-            <Tabs
-              defaultActiveKey="info"
-              items={[
-                {
-                  key: 'info',
-                  label: (
-                    <span>
-                      <TeamOutlined />
-                      Información
-                    </span>
-                  ),
-                  children: (
-                    <Descriptions column={{ xs: 1, sm: 2 }} bordered>
-                      <Descriptions.Item label="Nombre">
-                        <Text strong>{team.name}</Text>
-                      </Descriptions.Item>
-                      
-                      <Descriptions.Item label="Nombre Corto">
-                        {team.short_name || 'No especificado'}
-                      </Descriptions.Item>
-                      
-                      <Descriptions.Item label="País">
-                        <Space>
-                          <GlobalOutlined />
-                          {team.country || 'No especificado'}
-                        </Space>
-                      </Descriptions.Item>
-                      
-                      <Descriptions.Item label="Ciudad">
-                        <Space>
-                          <EnvironmentOutlined />
-                          {team.city || 'No especificado'}
-                        </Space>
-                      </Descriptions.Item>
-                      
-                      <Descriptions.Item label="Estadio" span={2}>
-                        <Space>
-                          <CalendarOutlined />
-                          {team.stadium || 'No especificado'}
-                        </Space>
-                      </Descriptions.Item>
-                      
-                      <Descriptions.Item label="Sitio Web">
-                        {team.website ? (
-                          <a 
-                            href={websiteUrl} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                          >
-                            <Space>
-                              <LinkOutlined />
-                              {team.website}
-                            </Space>
-                          </a>
-                        ) : 'No especificado'}
-                      </Descriptions.Item>
-                      
-                      <Descriptions.Item label="Estado">
-                        <Tag color={team.is_active ? 'green' : 'red'}>
-                          {team.is_active ? 'Activo' : 'Inactivo'}
-                        </Tag>
-                      </Descriptions.Item>
-                    </Descriptions>
-                  )
-                },
-                {
-                  key: 'stats',
-                  label: (
-                    <span>
-                      <TrophyOutlined />
-                      Estadísticas
-                    </span>
-                  ),
-                  children: (
-                    <>
-                      <Row gutter={[16, 16]}>
-                        <Col xs={12} sm={6}>
-                          <Statistic
-                            title="Partidos Jugados"
-                            value={team.matches_played || 0}
-                            prefix={<TeamOutlined />}
-                          />
-                        </Col>
-                        
-                        <Col xs={12} sm={6}>
-                          <Statistic
-                            title="Puntos"
-                            value={team.points || 0}
-                            prefix={<TrophyOutlined />}
-                          />
-                        </Col>
-                        
-                        <Col xs={12} sm={6}>
-                          <Statistic
-                            title="Goles a Favor"
-                            value={team.goals_for || 0}
-                            styles={{ value:{color: '#52c41a' }}}
-                          />
-                        </Col>
-                        
-                        <Col xs={12} sm={6}>
-                          <Statistic
-                            title="Goles en Contra"
-                            value={team.goals_against || 0}
-                            styles={{ value:{ color: '#ff4d4f' }}}
-                          />
-                        </Col>
-                        
-                        <Col xs={12} sm={6}>
-                          <Statistic
-                            title="Diferencia"
-                            value={team.goal_difference || 0}
-                            styles={{ value:{  color: team.goal_difference > 0 ? '#52c41a' : 
-                                     team.goal_difference < 0 ? '#ff4d4f' : '#8c8c8c' }
-                            }}
-                            prefix={team.goal_difference > 0 ? '+' : ''}
-                          />
-                        </Col>
-                        
-                        <Col xs={12} sm={6}>
-                          <Statistic
-                            title="Victorias"
-                            value={team.matches_won || 0}
-                          />
-                        </Col>
-                        
-                        <Col xs={12} sm={6}>
-                          <Statistic
-                            title="Empates"
-                            value={team.matches_drawn || 0}
-                          />
-                        </Col>
-                        
-                        <Col xs={12} sm={6}>
-                          <Statistic
-                            title="Derrotas"
-                            value={team.matches_lost || 0}
-                          />
-                        </Col>
-                      </Row>
+          {/* Stat strip */}
+          <div style={{
+            display: 'flex', marginTop: 12, borderRadius: 10, overflow: 'hidden',
+            border: `1px solid ${card.border}`, background: isDark ? '#0a1220' : '#f8fafc',
+          }}>
+            <StatBox label="Partidos"  value={team.matches_played || 0} />
+            <StatBox label="Puntos"    value={team.points || 0}         color="#1677ff" />
+            <StatBox label="GF"        value={team.goals_for || 0}      color="#22c55e" />
+            <StatBox label="GC"        value={team.goals_against || 0}  color="#ef4444" />
+            <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '12px 6px' }}>
+              <span style={{ fontSize: 20, fontWeight: 800, color: '#1677ff', lineHeight: 1 }}>{s.perf}%</span>
+              <span style={{ fontSize: 9, color: card.muted, textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: 3, textAlign: 'center' }}>Rend.</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
-                      <Divider />
+      {/* ── Tabs ── */}
+      <div style={{
+        display: 'flex', gap: 4, padding: '8px 14px',
+        background: isDark ? 'rgba(11,15,22,.9)' : 'rgba(255,255,255,.9)',
+        borderBottom: `1px solid ${card.border}`,
+        position: 'sticky', top: 0, zIndex: 10,
+        backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+        overflowX: 'auto', scrollbarWidth: 'none',
+      }}>
+        {TABS.map(tab => (
+          <button key={tab.key} onClick={() => setActiveTab(tab.key)} style={{
+            display: 'inline-flex', alignItems: 'center', gap: 5,
+            padding: '6px 14px', borderRadius: 999, border: 'none', cursor: 'pointer',
+            fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap',
+            background: activeTab === tab.key ? '#1677ff' : 'transparent',
+            color: activeTab === tab.key ? '#fff' : card.muted,
+            transition: 'background .15s, color .15s',
+          }}>
+            {tab.icon}<span>{tab.label}</span>
+          </button>
+        ))}
+      </div>
 
-                      <Title level={4}>Promedios</Title>
-                      <Row gutter={[16, 16]}>
-                        <Col xs={12} sm={6}>
-                          <Card size="small">
-                            <Statistic
-                              title="% Victorias"
-                              value={calculatedStats.winRate}
-                              suffix="%"
-                              styles={{ value:{ color: '#52c41a'} }}
-                            />
-                          </Card>
-                        </Col>
-                        
-                        <Col xs={12} sm={6}>
-                          <Card size="small">
-                            <Statistic
-                              title="Promedio GF"
-                              value={calculatedStats.avgGoalsFor}
-                              styles={{ value:{color: '#52c41a'} }}
-                            />
-                          </Card>
-                        </Col>
-                        
-                        <Col xs={12} sm={6}>
-                        <Card size="small">
-                          <Statistic
-                            title="Promedio GC"
-                            value={calculatedStats.avgGoalsAgainst}
-                            styles={{
-                              value: { color: '#ff4d4f' }
-                            }}
-                          />
-                        </Card>
-                      </Col>
+      {/* ── Contenido ── */}
+      <div style={{ padding: '12px 0' }}>
 
-                        
-                        <Col xs={12} sm={6}>
-                          <Card size="small">
-                            <Statistic
-                              title="Puntos/Partido"
-                              value={calculatedStats.pointsPerMatch}
-                            />
-                          </Card>
-                        </Col>
-                        <Col xs={12} sm={6}>
-                          <Card size="small">
-                            <Statistic
-                              title="Rendimiento del Equipo"
-                              value={calculatedStats.performanceRate}
-                              suffix="%"
-                              styles={{ value:{ color: '#1890ff' } }}
-                            />
-                          </Card>
-                        </Col>
-                      </Row>
-                    </>
-                  )
-                },
-                {
-                  key: 'matches',
-                  label: (
-                    <span>
-                      <HistoryOutlined />
-                      Partidos Recientes
-                    </span>
-                  ),
-                  children: (
-                    matches.length > 0 ? (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                        {matches.map(match => {
-                          // Obtener nombres de diferentes formas posibles
-                          const homeTeamName = match.home_team?.name || 
-                                              match.home_team_name || 
-                                              `Equipo ${match.home_team_id}`;
-                          
-                          const awayTeamName = match.away_team?.name || 
-                                              match.away_team_name || 
-                                              `Equipo ${match.away_team_id}`;
-                          
-                          // Obtener logos si existen
-                          const homeTeamLogo =
-                            match.home_team?.logo_url ||
-                            match.home_team_logo ||
-                            teamsInfo[match.home_team_id]?.logo_url ||
-                            null;
-                          const awayTeamLogo =
-                            match.away_team?.logo_url ||
-                            match.away_team_logo ||
-                            teamsInfo[match.away_team_id]?.logo_url ||
-                            null;
-                          
-                          return (
-                            <Card key={match.id} size="small" style={{ width: '100%' }}>
-                              <Space orientation="vertical" style={{ width: '100%' }}>
-                                <div style={{ 
-                                  display: 'flex', 
-                                  justifyContent: 'space-between',
-                                  alignItems: 'center' 
-                                }}>
-                                  {/* Equipo local con escudo */}
-                                  <div style={{ flex: 1, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                                    <Text strong style={{ marginRight: '8px' }}>{homeTeamName}</Text>
-                                    {homeTeamLogo && (
-                                      <Avatar 
-                                        src={homeTeamLogo} 
-                                        size="small"
-                                        style={{ width: '24px', height: '24px' }}
-                                      />
-                                    )}
-                                  </div>
-                                  
-                                  {/* Marcador */}
-                                  <div style={{ margin: '0 16px' }}>
-                                    <Space>
-                                      <Text strong style={{ fontSize: '20px' }}>
-                                        {match.home_score || 0}
-                                      </Text>
-                                      <Text> - </Text>
-                                      <Text strong style={{ fontSize: '20px' }}>
-                                        {match.away_score || 0}
-                                      </Text>
-                                    </Space>
-                                  </div>
-                                  
-                                  {/* Equipo visitante con escudo */}
-                                  <div style={{ flex: 1, textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
-                                    {awayTeamLogo && (
-                                      <Avatar 
-                                        src={awayTeamLogo} 
-                                        size="small"
-                                        style={{ width: '24px', height: '24px', marginRight: '8px' }}
-                                      />
-                                    )}
-                                    <Text strong>{awayTeamName}</Text>
-                                  </div>
-                                </div>
-                                
-                                {/* Informacion adicional */}
-                                <div style={{ textAlign: 'center', marginTop: '8px' }}>
-                                  <Text type="secondary">
-                                    {match.match_date
-                                      ? formatDateTimeShort(formatForInputUTC(match.match_date))
-                                      : 'Fecha por definir'}
-                                    {match.stadium && ` • ${match.stadium}`}
-                                    {match.round_name && ` • ${match.round_name}`}
-                                  </Text>
-                                  <div style={{ marginTop: 6 }}>
-                                    <Tag
-                                      color={
-                                        String(match.status || '').toLowerCase().includes('finalizado')
-                                          ? 'green'
-                                          : String(match.status || '').toLowerCase().includes('aplazado')
-                                            ? 'orange'
-                                            : String(match.status || '').toLowerCase().includes('cancelado')
-                                              ? 'red'
-                                              : 'blue'
-                                      }
-                                    >
-                                      {match.status || 'Programado'}
-                                    </Tag>
-                                  </div>
-                                </div>
-                              </Space>
-                            </Card>
-                          );
-                        })}
-                      </div>
+        {/* INFORMACIÓN */}
+        {activeTab === 'info' && (
+          <div style={{ background: card.bg, border: `1px solid ${card.border}`, borderRadius: 12, margin: '0 14px', overflow: 'hidden' }}>
+            <InfoRow icon={<TeamOutlined />}       label="Nombre"      value={team.name} />
+            <InfoRow icon={<TeamOutlined />}       label="Nombre corto" value={team.short_name} />
+            <InfoRow icon={<GlobalOutlined />}     label="País"        value={team.country} />
+            <InfoRow icon={<EnvironmentOutlined />}label="Ciudad"      value={team.city} />
+            <InfoRow icon={<CalendarOutlined />}   label="Estadio"     value={team.stadium} />
+            <div style={{ padding: '10px 14px', borderBottom: `1px solid ${card.border}`, display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ color: card.sub, fontSize: 13, width: 20 }}><LinkOutlined /></span>
+              <span style={{ fontSize: 12, color: card.muted, width: 90, flexShrink: 0 }}>Sitio web</span>
+              {websiteUrl
+                ? <a href={websiteUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, color: '#1677ff', flex: 1 }}>{team.website}</a>
+                : <span style={{ fontSize: 13, color: card.text }}>—</span>}
+            </div>
+            <div style={{ padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ color: card.sub, fontSize: 13, width: 20 }}><TrophyOutlined /></span>
+              <span style={{ fontSize: 12, color: card.muted, width: 90, flexShrink: 0 }}>Estado</span>
+              <span style={{
+                padding: '2px 10px', borderRadius: 999, fontSize: 11, fontWeight: 700,
+                background: team.is_active ? 'rgba(34,197,94,.13)' : 'rgba(100,116,139,.13)',
+                border: `1px solid ${team.is_active ? 'rgba(34,197,94,.3)' : 'rgba(100,116,139,.3)'}`,
+                color: team.is_active ? '#86efac' : '#94a3b8',
+              }}>{team.is_active ? 'Activo' : 'Inactivo'}</span>
+            </div>
+          </div>
+        )}
 
-                    ) : (
-                      <div style={{ textAlign: 'center', padding: '40px' }}>
-                        <Text type="secondary">No hay partidos recientes</Text>
-                      </div>
-                    )
-                  )
-                }
-              ]}
-            />
-          </Card>
-        </Col>
-
-        {/* Panel lateral */}
-        <Col xs={24} lg={8}>
-          <Card title="Vista Previa">
-            <TeamCard 
-              team={team}
-              showActions={false}
-              compact={false}
-            />
-          </Card>
-
-          <Card title="Información General" style={{ marginTop: '16px' }}>
-            <Space orientation="vertical" size="large">
-              <div>
-                <Text strong>Última actualización:</Text>
-                <div>
-                  <Text type="secondary">
-                    {team.updated_at
-                      ? formatDateTimeShort(formatForInputUTC(team.updated_at))
-                      : 'No disponible'}
-                  </Text>
-                </div>
-              </div>
-              
-              <div>
-                <Text strong>Fecha de creación:</Text>
-                <div>
-                  <Text type="secondary">
-                    {team.created_at
-                      ? formatDateTimeShort(formatForInputUTC(team.created_at))
-                      : 'No disponible'}
-                  </Text>
-                </div>
-              </div>
-              
-              {team.is_active === false && (
-                <div>
-                  <Text strong type="danger">Nota:</Text>
-                  <div>
-                    <Text type="secondary">
-                      Este equipo está marcado como inactivo y no aparecerá 
-                      en nuevas competencias.
-                    </Text>
+        {/* ESTADÍSTICAS */}
+        {activeTab === 'stats' && (
+          <div style={{ margin: '0 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {/* Resultados */}
+            <div style={{ background: card.bg, border: `1px solid ${card.border}`, borderRadius: 12, overflow: 'hidden' }}>
+              <div style={{ padding: '8px 14px', fontSize: 11, fontWeight: 700, color: card.sub, textTransform: 'uppercase', letterSpacing: '0.06em', borderBottom: `1px solid ${card.border}` }}>Resultados</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', textAlign: 'center' }}>
+                {[
+                  { l: 'Victorias', v: team.matches_won   || 0, c: '#22c55e' },
+                  { l: 'Empates',   v: team.matches_drawn || 0, c: '#f59e0b' },
+                  { l: 'Derrotas',  v: team.matches_lost  || 0, c: '#ef4444' },
+                  { l: 'Diferencia',v: (team.goal_difference > 0 ? '+' : '') + (team.goal_difference || 0), c: team.goal_difference > 0 ? '#22c55e' : team.goal_difference < 0 ? '#ef4444' : card.muted },
+                ].map((it, i) => (
+                  <div key={i} style={{ padding: '14px 8px', borderRight: i < 3 ? `1px solid ${card.border}` : 'none' }}>
+                    <div style={{ fontSize: 22, fontWeight: 800, color: it.c, lineHeight: 1 }}>{it.v}</div>
+                    <div style={{ fontSize: 10, color: card.muted, marginTop: 3, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{it.l}</div>
                   </div>
-                </div>
-              )}
-            </Space>
-          </Card>
-        </Col>
-      </Row>
+                ))}
+              </div>
+            </div>
+
+            {/* Promedios */}
+            <div style={{ background: card.bg, border: `1px solid ${card.border}`, borderRadius: 12, overflow: 'hidden' }}>
+              <div style={{ padding: '8px 14px', fontSize: 11, fontWeight: 700, color: card.sub, textTransform: 'uppercase', letterSpacing: '0.06em', borderBottom: `1px solid ${card.border}` }}>Promedios</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)' }}>
+                {[
+                  { l: '% Victorias',   v: `${s.winRate}%`,  c: '#22c55e' },
+                  { l: 'Rendimiento',   v: `${s.perf}%`,     c: '#1677ff' },
+                  { l: 'Prom. GF',      v: s.avgGF,          c: '#22c55e' },
+                  { l: 'Prom. GC',      v: s.avgGC,          c: '#ef4444' },
+                  { l: 'Puntos/Partido',v: s.ppm,            c: card.text },
+                  { l: '% Empates',     v: `${s.drawRate}%`, c: '#f59e0b' },
+                ].map((it, i) => (
+                  <div key={i} style={{
+                    padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    borderBottom: i < 4 ? `1px solid ${card.border}` : 'none',
+                    borderRight: i % 2 === 0 ? `1px solid ${card.border}` : 'none',
+                  }}>
+                    <span style={{ fontSize: 12, color: card.muted }}>{it.l}</span>
+                    <span style={{ fontSize: 14, fontWeight: 800, color: it.c }}>{it.v}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* PARTIDOS */}
+        {activeTab === 'matches' && (
+          <div style={{ margin: '0 14px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {matches.length === 0
+              ? <div style={{ textAlign: 'center', padding: 40, color: card.muted }}>No hay partidos registrados</div>
+              : matches.map(match => {
+                  const homeN = match.home_team?.name || teamsInfo[match.home_team_id]?.name || `Equipo ${match.home_team_id}`;
+                  const awayN = match.away_team?.name || teamsInfo[match.away_team_id]?.name || `Equipo ${match.away_team_id}`;
+                  const homeLogo = match.home_team?.logo_url || teamsInfo[match.home_team_id]?.logo_url;
+                  const awayLogo = match.away_team?.logo_url || teamsInfo[match.away_team_id]?.logo_url;
+                  const sc = matchStatusColor(match.status);
+                  const finished = String(match.status || '').toLowerCase().includes('finaliz');
+                  return (
+                    <div key={match.id} style={{
+                      background: card.bg, border: `1px solid ${card.border}`,
+                      borderRadius: 10, padding: '10px 14px',
+                    }}>
+                      {/* Meta */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, alignItems: 'center' }}>
+                        <span style={{ fontSize: 10, color: card.muted }}>
+                          {match.match_date ? formatDateTimeShort(formatForInputUTC(match.match_date)) : 'Fecha por definir'}
+                          {match.round_name ? ` · ${match.round_name}` : ''}
+                        </span>
+                        <span style={{ padding: '1px 8px', borderRadius: 999, fontSize: 10, fontWeight: 600, background: sc.bg, border: `1px solid ${sc.border}`, color: sc.text }}>
+                          {match.status || 'Programado'}
+                        </span>
+                      </div>
+                      {/* Equipos y marcador */}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        {/* Local */}
+                        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 6, minWidth: 0 }}>
+                          <span style={{ fontSize: 12, fontWeight: 600, color: card.text, textAlign: 'right', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{homeN}</span>
+                          {homeLogo ? <img src={homeLogo} alt="" style={{ width: 22, height: 22, objectFit: 'contain', flexShrink: 0 }} /> : null}
+                        </div>
+                        {/* Marcador */}
+                        <div style={{ textAlign: 'center', flexShrink: 0, minWidth: 52 }}>
+                          {finished
+                            ? <span style={{ fontSize: 15, fontWeight: 800, color: card.text }}>{match.home_score ?? 0} - {match.away_score ?? 0}</span>
+                            : <span style={{ fontSize: 13, color: card.muted }}>vs</span>}
+                        </div>
+                        {/* Visitante */}
+                        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 6, minWidth: 0 }}>
+                          {awayLogo ? <img src={awayLogo} alt="" style={{ width: 22, height: 22, objectFit: 'contain', flexShrink: 0 }} /> : null}
+                          <span style={{ fontSize: 12, fontWeight: 600, color: card.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{awayN}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+            }
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
 export default TeamDetail;
-
-
