@@ -587,6 +587,22 @@ const CompetitionForm = () => {
                   </Form.Item>
                 </Col>
 
+                <Col xs={24} md={12}>
+                  <Form.Item
+                    name="status"
+                    label="Estado"
+                    rules={[{ required: true, message: 'Selecciona el estado' }]}
+                  >
+                    <Select className="competition-form-select competition-form-select-dark" size="large" placeholder="Selecciona el estado">
+                      <Option value="draft">Programado (borrador)</Option>
+                      <Option value="scheduled">Programado</Option>
+                      <Option value="ongoing">En curso</Option>
+                      <Option value="completed">Finalizado</Option>
+                      <Option value="cancelled">Cancelado</Option>
+                    </Select>
+                  </Form.Item>
+                </Col>
+
                 <Col xs={24}>
                   <Divider>Plantillas Predefinidas</Divider>
                   <Select
