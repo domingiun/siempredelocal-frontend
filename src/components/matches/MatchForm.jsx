@@ -859,9 +859,10 @@ const MatchForm = ({
             >
               <DatePicker
                 className="dark-datepicker"
-                showTime={{ 
+                showTime={{
                   format: 'hh:mm',
-                  use12Hours: true
+                  use12Hours: true,
+                  minuteStep: 5
                 }}
                 format="YYYY-MM-DD hh:mm A"
                 style={{ width: '100%' }}
