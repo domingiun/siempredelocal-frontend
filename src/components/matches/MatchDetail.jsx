@@ -290,21 +290,21 @@ const MatchDetail = () => {
   return (
     <div style={{ padding: '24px' }}>
       {/* Header con escudos */}
-      <Card style={{ marginBottom: '24px', background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)' }}>
+      <Card style={{ marginBottom: '24px', background: 'linear-gradient(135deg, #0d1f3c 0%, #0c1625 100%)', border: '1px solid rgba(255,255,255,.08)' }}>
         <Row gutter={[24, 24]} align="middle">
           {/* Equipo Local */}
           <Col xs={24} md={8} style={{ textAlign: 'center' }}>
             <Space orientation="vertical" size="middle">
               {renderTeamLogo(homeTeam, 100)}
               <div>
-                <Title level={2} style={{ margin: 0 }}>{homeTeamName}</Title>
+                <Title level={2} style={{ margin: 0, color: '#e6edf3' }}>{homeTeamName}</Title>
                 {homeTeam?.short_name && (
-                  <Text type="secondary" strong style={{ fontSize: '16px' }}>
+                  <Text strong style={{ fontSize: '16px', color: '#94a3b8' }}>
                     ({homeTeam.short_name})
                   </Text>
                 )}
                 {homeTeam?.country && (
-                  <div style={{ marginTop: 4 }}>
+                  <div style={{ marginTop: 4, color: '#64748b' }}>
                     <FlagOutlined /> {homeTeam.country}
                   </div>
                 )}
@@ -370,7 +370,7 @@ const MatchDetail = () => {
                 ) : (
                   <>
                     <div style={{ textAlign: 'center' }}>
-                      <Title level={1} style={{ margin: 0, fontSize: '72px', color: match.status === 'Finalizado' ? '#1890ff' : '#000' }}>
+                      <Title level={1} style={{ margin: 0, fontSize: '72px', color: match.status === 'Finalizado' ? '#4096ff' : '#e6edf3' }}>
                         {match.home_score || 0}
                       </Title>
                       <div style={{ marginTop: 8 }}>
@@ -379,7 +379,7 @@ const MatchDetail = () => {
                     </div>
                     
                     <div style={{ textAlign: 'center' }}>
-                      <Title level={1} style={{ margin: 0, fontSize: '48px' }}>VS</Title>
+                      <Title level={1} style={{ margin: 0, fontSize: '48px', color: '#94a3b8' }}>VS</Title>
                       <div style={{ marginTop: 8 }}>
                         <Text type="secondary">
                           {formatDateTimeWithOffset(match.match_date, -5)}
@@ -388,7 +388,7 @@ const MatchDetail = () => {
                     </div>
                     
                     <div style={{ textAlign: 'center' }}>
-                      <Title level={1} style={{ margin: 0, fontSize: '72px', color: match.status === 'Finalizado' ? '#1890ff' : '#000' }}>
+                      <Title level={1} style={{ margin: 0, fontSize: '72px', color: match.status === 'Finalizado' ? '#4096ff' : '#e6edf3' }}>
                         {match.away_score || 0}
                       </Title>
                       <div style={{ marginTop: 8 }}>
@@ -434,14 +434,14 @@ const MatchDetail = () => {
             <Space orientation="vertical" size="middle">
               {renderTeamLogo(awayTeam, 100)}
               <div>
-                <Title level={2} style={{ margin: 0 }}>{awayTeamName}</Title>
+                <Title level={2} style={{ margin: 0, color: '#e6edf3' }}>{awayTeamName}</Title>
                 {awayTeam?.short_name && (
-                  <Text type="secondary" strong style={{ fontSize: '16px' }}>
+                  <Text strong style={{ fontSize: '16px', color: '#94a3b8' }}>
                     ({awayTeam.short_name})
                   </Text>
                 )}
                 {awayTeam?.country && (
-                  <div style={{ marginTop: 4 }}>
+                  <div style={{ marginTop: 4, color: '#64748b' }}>
                     <FlagOutlined /> {awayTeam.country}
                   </div>
                 )}
