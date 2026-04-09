@@ -557,10 +557,10 @@ const EditMatchPage = () => {
                       key={f.fixture_id ?? i}
                       style={{
                         padding: '10px 14px',
-                        border: `1px solid ${f.names_match ? '#b7eb8f' : '#ffa39e'}`,
+                        border: `1px solid ${f.names_match ? '#52c41a' : '#ff4d4f'}`,
                         borderRadius: 8,
                         marginBottom: 8,
-                        background: f.names_match ? '#f6ffed' : '#fff2f0',
+                        background: f.names_match ? 'rgba(82,196,26,0.08)' : 'rgba(255,77,79,0.08)',
                       }}
                     >
                       <Row gutter={8} align="middle">
@@ -581,7 +581,7 @@ const EditMatchPage = () => {
                               <span style={{ color: '#94a3b8' }}>Tu BD: </span>
                               {f.local_home_team
                                 ? <><strong>{f.local_home_team}</strong> vs <strong>{f.local_away_team}</strong></>
-                                : <span style={{ color: '#ffa39e' }}>Sin partido local para esta fecha</span>
+                                : <span style={{ color: '#ff7875' }}>Sin partido local para esta fecha</span>
                               }
                             </div>
                           </div>
