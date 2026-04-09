@@ -8,16 +8,21 @@ import {
 import { 
   formatDateTimeUTC
 } from '../../utils/dateFormatter';
-import { 
+import {
   ArrowLeftOutlined, LoadingOutlined,
   CalendarOutlined, TeamOutlined, TrophyOutlined,
   EditOutlined, DeleteOutlined, SaveOutlined,
-  HistoryOutlined, WarningOutlined
+  HistoryOutlined, WarningOutlined,
+  SyncOutlined, SearchOutlined,
+  CheckCircleOutlined, ClockCircleOutlined
 } from '@ant-design/icons';
+import { DatePicker } from 'antd';
+import dayjs from 'dayjs';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import MatchForm from '../../components/matches/MatchForm';
 import competitionService from '../../services/competitionService';
+import api from '../../services/api';
 import './EditMatchPage.css';
 
 const { Title, Text } = Typography;
@@ -31,9 +36,15 @@ const EditMatchPage = () => {
   const [competition, setCompetition] = useState(null);
   const [round, setRound] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [updating, setUpdating] = useState(false);
+  const [updating, setUpdating]       = useState(false);
   const [originalData, setOriginalData] = useState(null);
-  const [hasChanges, setHasChanges] = useState(false);
+  const [hasChanges, setHasChanges]   = useState(false);
+
+  // API-football state
+  const [apiSearchDate,    setApiSearchDate]    = useState(null);
+  const [apiFixtures,      setApiFixtures]      = useState([]);
+  const [apiSearchLoading, setApiSearchLoading] = useState(false);
+  const [apiSyncLoading,   setApiSyncLoading]   = useState(false);
 
   useEffect(() => {
     if (user?.role !== 'admin') return;
@@ -179,6 +190,46 @@ const EditMatchPage = () => {
       }
     });
   };
+
+  // ── API-football handlers ──────────────────────────────────────────────
+
+  const handleNamePreview = async () => {
+    if (!apiSearchDate) { message.warning('Selecciona una fecha'); return; }
+    setApiSearchLoading(true);
+    setApiFixtures([]);
+    try {
+      const dateStr = apiSearchDate.format('YYYY-MM-DD');
+      const res = await api.get(`/matches/admin/name-preview?date=${dateStr}`);
+      setApiFixtures(res.data.comparisons || []);
+      if (!res.data.comparisons?.length) message.info('Sin fixtures en api-football para esa fecha');
+    } catch (err) {
+      message.error(err?.response?.data?.detail || 'Error consultando api-football');
+    } finally {
+      setApiSearchLoading(false);
+    }
+  };
+
+  const handleSyncNow = async () => {
+    setApiSyncLoading(true);
+    try {
+      const res = await api.post('/matches/admin/sync-now');
+      const { updated, skipped, no_match, errors, api_called } = res.data;
+      if (!api_called) {
+        message.info('Sin partidos pendientes hoy — no se consumió ningún request de API');
+      } else if (no_match > 0 && updated === 0) {
+        message.warning(`Sync ejecutado pero ${no_match} partido(s) no encontraron match por nombre. Verifica la comparación de nombres.`);
+      } else {
+        message.success(`Sync completado: ${updated} actualizados, ${skipped} sin cambios`);
+      }
+      fetchMatchData();
+    } catch (err) {
+      message.error(err?.response?.data?.detail || 'Error en sync');
+    } finally {
+      setApiSyncLoading(false);
+    }
+  };
+
+  // ── End API-football handlers ──────────────────────────────────────────
 
   const handleForceUpdate = async () => {
     setUpdating(true);
@@ -433,9 +484,137 @@ const EditMatchPage = () => {
           />
         </Col>
 
+        {/* Panel api-football */}
+        <Col span={24}>
+          <Card
+            title={
+              <Space>
+                <SyncOutlined style={{ color: '#1677ff' }} />
+                <span>Sincronización automática — api-football</span>
+                {match.api_synced_at && (
+                  <Tag color="green" icon={<CheckCircleOutlined />}>Sincronizado</Tag>
+                )}
+              </Space>
+            }
+            extra={
+              <Button
+                icon={<SyncOutlined />}
+                loading={apiSyncLoading}
+                onClick={handleSyncNow}
+                size="small"
+              >
+                Sync ahora
+              </Button>
+            }
+          >
+            {/* Estado de la última sync */}
+            <Descriptions size="small" column={2} style={{ marginBottom: 16 }}>
+              <Descriptions.Item label="Última sync">
+                {match.api_synced_at
+                  ? <Space><ClockCircleOutlined />{formatDate(match.api_synced_at)}</Space>
+                  : <span style={{ color: '#94a3b8' }}>Aún no sincronizado — se intentará en el próximo ciclo de 10 min si los nombres coinciden</span>
+                }
+              </Descriptions.Item>
+              {match.api_fixture_id && (
+                <Descriptions.Item label="Fixture ID interno">
+                  <Tag color="blue">#{match.api_fixture_id}</Tag>
+                </Descriptions.Item>
+              )}
+            </Descriptions>
+
+            {/* Comparador de nombres */}
+            <div style={{ borderTop: '1px solid rgba(0,0,0,.06)', paddingTop: 16 }}>
+              <p style={{ margin: '0 0 12px', fontWeight: 600, fontSize: 13 }}>
+                Comparar nombres con api-football
+              </p>
+              <p style={{ margin: '0 0 12px', color: '#64748b', fontSize: 12 }}>
+                Si el sync no funciona, verifica que los nombres de los equipos coincidan con los de api-football.
+                Busca por la fecha del partido y renombra los equipos si hay diferencias.
+              </p>
+              <Space.Compact style={{ width: '100%', maxWidth: 480 }}>
+                <DatePicker
+                  placeholder="Fecha del partido"
+                  value={apiSearchDate}
+                  onChange={setApiSearchDate}
+                  defaultValue={match.match_date ? dayjs(match.match_date) : null}
+                  style={{ flex: 1 }}
+                  format="YYYY-MM-DD"
+                />
+                <Button
+                  type="primary"
+                  icon={<SearchOutlined />}
+                  loading={apiSearchLoading}
+                  onClick={handleNamePreview}
+                >
+                  Ver comparación
+                </Button>
+              </Space.Compact>
+
+              {apiFixtures.length > 0 && (
+                <div style={{ marginTop: 16 }}>
+                  {apiFixtures.map((f, i) => (
+                    <div
+                      key={f.fixture_id ?? i}
+                      style={{
+                        padding: '10px 14px',
+                        border: `1px solid ${f.names_match ? '#b7eb8f' : '#ffa39e'}`,
+                        borderRadius: 8,
+                        marginBottom: 8,
+                        background: f.names_match ? '#f6ffed' : '#fff2f0',
+                      }}
+                    >
+                      <Row gutter={8} align="middle">
+                        <Col flex="auto">
+                          <Space wrap size={4}>
+                            <Tag color="geekblue" style={{ fontSize: 11 }}>{f.league}</Tag>
+                            {f.names_match
+                              ? <Tag color="success" icon={<CheckCircleOutlined />}>Coincide</Tag>
+                              : <Tag color="error">No coincide</Tag>
+                            }
+                          </Space>
+                          <div style={{ marginTop: 6, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}>
+                            <div style={{ fontSize: 12 }}>
+                              <span style={{ color: '#94a3b8' }}>API: </span>
+                              <strong>{f.api_home_team}</strong> vs <strong>{f.api_away_team}</strong>
+                            </div>
+                            <div style={{ fontSize: 12 }}>
+                              <span style={{ color: '#94a3b8' }}>Tu BD: </span>
+                              {f.local_home_team
+                                ? <><strong>{f.local_home_team}</strong> vs <strong>{f.local_away_team}</strong></>
+                                : <span style={{ color: '#ffa39e' }}>Sin partido local para esta fecha</span>
+                              }
+                            </div>
+                          </div>
+                        </Col>
+                        {!f.names_match && f.local_match_id && (
+                          <Col>
+                            <Button
+                              size="small"
+                              type="dashed"
+                              onClick={() => {
+                                navigator.clipboard.writeText(
+                                  `Local: ${f.local_home_team} → API: ${f.api_home_team}\n` +
+                                  `Local: ${f.local_away_team} → API: ${f.api_away_team}`
+                                );
+                                message.info('Nombres copiados al portapapeles');
+                              }}
+                            >
+                              Copiar diferencias
+                            </Button>
+                          </Col>
+                        )}
+                      </Row>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </Card>
+        </Col>
+
         {/* Panel de acciones avanzadas */}
         <Col span={24}>
-          <Card 
+          <Card
             title={<Space><WarningOutlined />Acciones Avanzadas</Space>}
             type="inner"
           >
