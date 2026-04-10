@@ -587,6 +587,16 @@ const Dashboard = () => {
           border-left: 4px solid #f97316;
           background: linear-gradient(135deg, #ffffff 0%, #fff2e6 100%);
         }
+        .dash-prize {
+          border: 1px solid rgba(251,191,36,0.3) !important;
+          background: linear-gradient(135deg, #1a1200 0%, #2a1e00 100%) !important;
+          box-shadow: 0 0 20px rgba(251,191,36,0.08) !important;
+        }
+        .dash-prize--accent {
+          border-color: rgba(249,115,22,0.35) !important;
+          background: linear-gradient(135deg, #1a0e00 0%, #2a1500 100%) !important;
+          box-shadow: 0 0 20px rgba(249,115,22,0.10) !important;
+        }
         .dashboard-shell--dark .dash-highlight {
           background: linear-gradient(135deg, #0f1824 0%, #0f241a 100%);
         }
@@ -901,24 +911,48 @@ const Dashboard = () => {
         </Col>
 
         <Col xs={24} sm={6}>
-          <Card loading={loading} className="dash-stat dash-warn">
-            <Statistic
-              title="Premio última fecha activa"
-              value={stats.lastActivePrize}
-              suffix="puntos"
-              prefix={<span className="sport-icon orange"><CrownOutlined /></span>}
-            />
+          <Card loading={loading} className="dash-stat dash-prize">
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', color: '#94a3b8', marginBottom: 4 }}>
+                <CrownOutlined style={{ marginRight: 6, color: '#f97316' }} />
+                Premio última fecha activa
+              </div>
+              <div style={{
+                fontSize: 32,
+                fontWeight: 800,
+                lineHeight: 1.1,
+                background: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 50%, #f97316 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}>
+                {(stats.lastActivePrize || 0).toLocaleString('es-CO')}
+              </div>
+              <div style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>puntos</div>
+            </div>
           </Card>
         </Col>
 
         <Col xs={24} sm={6}>
-          <Card loading={loading} className="dash-stat dash-warn">
-            <Statistic
-              title="Premio acumulado"
-              value={stats.accumulatedPrize}
-              suffix="puntos"
-              prefix={<span className="sport-icon orange"><StarOutlined /></span>}
-            />
+          <Card loading={loading} className="dash-stat dash-prize dash-prize--accent">
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', color: '#94a3b8', marginBottom: 4 }}>
+                <StarOutlined style={{ marginRight: 6, color: '#f59e0b' }} />
+                Premio acumulado
+              </div>
+              <div style={{
+                fontSize: 32,
+                fontWeight: 800,
+                lineHeight: 1.1,
+                background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}>
+                {(stats.accumulatedPrize || 0).toLocaleString('es-CO')}
+              </div>
+              <div style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>puntos</div>
+            </div>
           </Card>
         </Col>
 
