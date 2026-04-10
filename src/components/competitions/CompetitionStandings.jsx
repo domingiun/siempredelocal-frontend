@@ -1,6 +1,6 @@
 // frontend/src/components/competitions/CompetitionStandings.jsx
 import React, { useEffect, useMemo, useState } from 'react';
-import { Card, Table, Avatar, Tag, Space, Typography, message, Image, Tooltip, Select, Divider } from 'antd';
+import { Card, Table, Avatar, Tag, Space, Typography, message, Image, Tooltip, Select, Divider, Grid } from 'antd';
 import { TrophyOutlined, FireFilled, CrownOutlined, ArrowDownOutlined } from '@ant-design/icons';
 import { useTheme } from '../../context/ThemeContext';
 import competitionService from '../../services/competitionService';
@@ -28,6 +28,8 @@ const CompetitionStandings = ({ competitionId }) => {
   const [historyLoading, setHistoryLoading] = useState(false);
   const { mode } = useTheme();
   const isDark = mode === 'dark';
+  const screens = Grid.useBreakpoint();
+  const isMobile = !screens.md;
 
   useEffect(() => {
     if (competitionId) {
@@ -633,9 +635,9 @@ const CompetitionStandings = ({ competitionId }) => {
         </div>
       )}
 
-      <Divider style={{ margin: '20px 0 12px' }} />
+      {!isMobile && <Divider style={{ margin: '20px 0 12px' }} />}
 
-      <div style={{ padding: '0 16px 16px' }}>
+      {!isMobile && <div style={{ padding: '0 16px 16px' }}>
         <Space direction="vertical" style={{ width: '100%' }} size="small">
             <Space style={{ width: '100%', justifyContent: 'space-between' }}>
               <Text strong>Gráfica: Posición por Jornada</Text>
@@ -711,8 +713,8 @@ const CompetitionStandings = ({ competitionId }) => {
             )}
           </div>
         </Space>
-      </div>
-      
+      </div>}
+
       <div className="standings-legend">
         <div className="legend-item">
           <div className="legend-color" style={{ background: '#52c41a' }}></div>
