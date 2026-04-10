@@ -41,24 +41,22 @@ const CompetitionMatches = ({ competitionId, competitionName }) => {
   }, [competitionId]);
 
   const fetchTeamsInfo = async (ids) => {
-    const unique = [...new Set(ids.filter(Boolean))];
+    const unique = [...new Set(ids.filter(Boolean))].filter(id => !teamsInfo[id]);
+    if (!unique.length) return;
+
+    const results = await Promise.allSettled(
+      unique.map(id => competitionService.getTeam(id))
+    );
+
     const newTeams = {};
+    results.forEach((result, i) => {
+      const id = unique[i];
+      newTeams[id] = result.status === 'fulfilled'
+        ? result.value.data
+        : { id, name: `Equipo ${id}` };
+    });
 
-    for (const id of unique) {
-      if (!teamsInfo[id]) {
-        try {
-          const res = await competitionService.getTeam(id);
-          newTeams[id] = res.data;
-        } catch (error) {
-          console.error(`Error obteniendo equipo ${id}:`, error);
-          newTeams[id] = { id, name: `Equipo ${id}` };
-        }
-      }
-    }
-
-    if (Object.keys(newTeams).length) {
-      setTeamsInfo(prev => ({ ...prev, ...newTeams }));
-    }
+    setTeamsInfo(prev => ({ ...prev, ...newTeams }));
   };
 
   const fetchMatches = async () => {
