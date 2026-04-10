@@ -189,7 +189,7 @@ const HomePage = () => {
           </div>
 
           <p className="hp__hero-tagline">
-            Pronostica los marcadores, compite con la comunidad y gana puntos.
+            Pronostica los marcadores, compite con la comunidad y Gana!.
           </p>
 
           <div className="hp__hero-stats">

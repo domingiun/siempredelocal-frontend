@@ -928,7 +928,6 @@ const Dashboard = () => {
               }}>
                 {(stats.lastActivePrize || 0).toLocaleString('es-CO')}
               </div>
-              <div style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>puntos</div>
             </div>
           </Card>
         </Col>
@@ -951,7 +950,6 @@ const Dashboard = () => {
               }}>
                 {(stats.accumulatedPrize || 0).toLocaleString('es-CO')}
               </div>
-              <div style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>puntos</div>
             </div>
           </Card>
         </Col>
