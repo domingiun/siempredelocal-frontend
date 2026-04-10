@@ -213,13 +213,17 @@ const EditMatchPage = () => {
     setApiSyncLoading(true);
     try {
       const res = await api.post('/matches/admin/sync-now');
-      const { updated, skipped, no_match, errors, api_called } = res.data;
+      const { updated, skipped, no_match, errors, api_called, fixtures_fetched, pending_in_db } = res.data;
       if (!api_called) {
-        message.info('Sin partidos pendientes hoy — no se consumió ningún request de API');
+        message.info('Sin partidos pendientes hoy en BD — no se consumió request de API');
+      } else if (fixtures_fetched === 0) {
+        message.warning('API llamada pero devolvió 0 fixtures. Verifica API_FOOTBALL_KEY o la fecha del partido.');
+      } else if (pending_in_db === 0) {
+        message.warning(`API OK (${fixtures_fetched} fixtures). Pero 0 partidos pendientes encontrados en BD — revisa la fecha/estado del partido.`);
       } else if (no_match > 0 && updated === 0) {
-        message.warning(`Sync ejecutado pero ${no_match} partido(s) no encontraron match por nombre. Verifica la comparación de nombres.`);
+        message.warning(`${no_match} partido(s) no encontraron match por nombre en los ${fixtures_fetched} fixtures de la API.`);
       } else {
-        message.success(`Sync completado: ${updated} actualizados, ${skipped} sin cambios`);
+        message.success(`Sync OK: ${updated} actualizados, ${skipped} sin cambios (${fixtures_fetched} fixtures, ${pending_in_db} pendientes en BD)`);
       }
       fetchMatchData();
     } catch (err) {
