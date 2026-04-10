@@ -626,88 +626,62 @@ const RoundDetail = () => {
 
       {/* Partido con más goles */}
       {stats?.highestScoringMatch?.match && (
-        <Card 
-          title="Partido con más goles" 
+        <Card
+          title="Partido con más goles"
           style={{ marginTop: 24 }}
           extra={
-            <Tag color="gold" style={{ fontSize: '18x', padding: '4px 12px' }}>
+            <Tag color="gold" style={{ padding: '4px 12px' }}>
               {stats.highestScoringMatch.total} goles
             </Tag>
           }
         >
-          <Row align="middle" gutter={[16, 16]}>
-            {/* Escudo Local */}
-            <Col span={4} style={{ textAlign: 'right' }}>
+          {/* Layout compacto responsive */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+            {/* Local */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, minWidth: 0 }}>
               <Avatar
-                size={64}
+                size={isMobile ? 40 : 56}
                 src={stats.highestScoringMatch.match.home_team?.logo_url}
-                style={{ 
-                  backgroundColor: stats.highestScoringMatch.match.home_team?.logo_url ? 'transparent' : '#1890ff',
-                  border: '2px solid #1890ff'
-                }}
+                style={{ border: '2px solid #1890ff', backgroundColor: 'transparent', marginBottom: 4 }}
               >
-                {!stats.highestScoringMatch.match.home_team?.logo_url && 
-                stats.highestScoringMatch.match.home_team?.name?.charAt(0)?.toUpperCase()}
+                {stats.highestScoringMatch.match.home_team?.name?.charAt(0)}
               </Avatar>
-            </Col>
-            
-            {/* Equipo Local */}
-            <Col span={4} style={{ textAlign: 'center' }}>
-              <Text strong style={{ display: 'block' }}>
-                {stats.highestScoringMatch.match.home_team?.name}
+              <Text strong style={{ fontSize: isMobile ? 11 : 13, textAlign: 'center', lineHeight: 1.2 }}>
+                {stats.highestScoringMatch.match.home_team?.short_name || stats.highestScoringMatch.match.home_team?.name}
               </Text>
-              {stats.highestScoringMatch.match.home_team?.short_name && (
-                <Text type="secondary" style={{ fontSize: '12px' }}>
-                  {stats.highestScoringMatch.match.home_team.short_name}
-                </Text>
-              )}
-            </Col>
-            
+            </div>
+
             {/* Marcador */}
-            <Col span={8} style={{ textAlign: 'center' }}>
+            <div style={{ textAlign: 'center', flexShrink: 0 }}>
               <div style={{
-                fontSize: '32px',
-                fontWeight: 'bold',
-                background: isDark
-                  ? 'linear-gradient(135deg, #1a2744, #0d1f3c)'
-                  : 'linear-gradient(135deg, #f5f5f5, #e8e8e8)',
+                fontSize: isMobile ? 22 : 32,
+                fontWeight: 800,
+                background: isDark ? 'linear-gradient(135deg, #1a2744, #0d1f3c)' : 'linear-gradient(135deg, #f5f5f5, #e8e8e8)',
                 color: isDark ? '#4096ff' : '#1d3557',
-                padding: '12px',
-                borderRadius: '8px',
-                border: isDark ? '1px solid rgba(64,150,255,0.25)' : '1px solid #d9d9d9'
+                padding: isMobile ? '6px 12px' : '12px 20px',
+                borderRadius: 8,
+                border: isDark ? '1px solid rgba(64,150,255,0.25)' : '1px solid #d9d9d9',
+                whiteSpace: 'nowrap',
               }}>
                 {stats.highestScoringMatch.match.home_score} - {stats.highestScoringMatch.match.away_score}
               </div>
-              <Tag color="green" style={{ marginTop: 8 }}>Finalizado</Tag>
-            </Col>
-            
-            {/* Equipo Visitante */}
-            <Col span={4} style={{ textAlign: 'center' }}>
-              <Text strong style={{ display: 'block' }}>
-                {stats.highestScoringMatch.match.away_team?.name}
-              </Text>
-              {stats.highestScoringMatch.match.away_team?.short_name && (
-                <Text type="secondary" style={{ fontSize: '12px' }}>
-                  {stats.highestScoringMatch.match.away_team.short_name}
-                </Text>
-              )}
-            </Col>
-            
-            {/* Escudo Visitante */}
-            <Col span={4} style={{ textAlign: 'left' }}>
+              <Tag color="green" style={{ marginTop: 6 }}>Finalizado</Tag>
+            </div>
+
+            {/* Visitante */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, minWidth: 0 }}>
               <Avatar
-                size={64}
+                size={isMobile ? 40 : 56}
                 src={stats.highestScoringMatch.match.away_team?.logo_url}
-                style={{ 
-                  backgroundColor: stats.highestScoringMatch.match.away_team?.logo_url ? 'transparent' : '#52c41a',
-                  border: '2px solid #52c41a'
-                }}
+                style={{ border: '2px solid #52c41a', backgroundColor: 'transparent', marginBottom: 4 }}
               >
-                {!stats.highestScoringMatch.match.away_team?.logo_url && 
-                stats.highestScoringMatch.match.away_team?.name?.charAt(0)?.toUpperCase()}
+                {stats.highestScoringMatch.match.away_team?.name?.charAt(0)}
               </Avatar>
-            </Col>
-          </Row>
+              <Text strong style={{ fontSize: isMobile ? 11 : 13, textAlign: 'center', lineHeight: 1.2 }}>
+                {stats.highestScoringMatch.match.away_team?.short_name || stats.highestScoringMatch.match.away_team?.name}
+              </Text>
+            </div>
+          </div>
           
           {/* Información del partido */}
           <div style={{ textAlign: 'center', marginTop: 16 }}>
