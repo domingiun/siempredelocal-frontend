@@ -890,6 +890,29 @@ const Dashboard = () => {
           </Card>
         </Col>
 
+        {/* Premio acumulado: en móvil aparece 4to (después de Partidos); en desktop va en fila 2 */}
+        <Col xs={24} sm={6}>
+          <Card loading={loading} className="dash-stat dash-prize dash-prize--accent">
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', color: '#94a3b8', marginBottom: 4 }}>
+                <StarOutlined style={{ marginRight: 6, color: '#f59e0b' }} />
+                Premio acumulado
+              </div>
+              <div style={{
+                fontSize: 32,
+                fontWeight: 800,
+                lineHeight: 1.1,
+                background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}>
+                {(stats.accumulatedPrize || 0).toLocaleString('es-CO')}
+              </div>
+            </div>
+          </Card>
+        </Col>
+
         <Col xs={0} sm={6}>
           <Card loading={loading} className="dash-stat">
             <Statistic
@@ -927,28 +950,6 @@ const Dashboard = () => {
                 backgroundClip: 'text',
               }}>
                 {(stats.lastActivePrize || 0).toLocaleString('es-CO')}
-              </div>
-            </div>
-          </Card>
-        </Col>
-
-        <Col xs={24} sm={6}>
-          <Card loading={loading} className="dash-stat dash-prize dash-prize--accent">
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', color: '#94a3b8', marginBottom: 4 }}>
-                <StarOutlined style={{ marginRight: 6, color: '#f59e0b' }} />
-                Premio acumulado
-              </div>
-              <div style={{
-                fontSize: 32,
-                fontWeight: 800,
-                lineHeight: 1.1,
-                background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}>
-                {(stats.accumulatedPrize || 0).toLocaleString('es-CO')}
               </div>
             </div>
           </Card>
