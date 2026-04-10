@@ -588,18 +588,6 @@ const BetRanking = ({ betDateId }) => {
                     />
                   </Space>
                 </Col>
-                <Col>
-                  <Space size="small">
-                    <Text type="secondary">Vista oscura</Text>
-                    <Switch
-                      checked={isDark}
-                      onChange={(checked) => setMode(checked ? 'dark' : 'light')}
-                      className="toggle-dark"
-                      checkedChildren="ON"
-                      unCheckedChildren="OFF"
-                    />
-                  </Space>
-                </Col>
               </Row>
             </Col>
           )}

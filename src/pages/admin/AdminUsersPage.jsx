@@ -515,18 +515,6 @@ const AdminUsersPage = () => {
                     Gestiona los usuarios del sistema, roles y permisos.
                   </Text>
                 </Col>
-                <Col>
-                  <Space size="small">
-                    <Text type="secondary">Vista oscura</Text>
-                    <Switch
-                      checked={isDark}
-                      onChange={(checked) => setMode(checked ? 'dark' : 'light')}
-                      className="toggle-dark"
-                      checkedChildren="ON"
-                      unCheckedChildren="OFF"
-                    />
-                  </Space>
-                </Col>
               </Row>
             </Space>
           </Card>

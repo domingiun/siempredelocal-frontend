@@ -160,18 +160,6 @@ const TransactionHistoryPage = () => {
           <Title level={2} style={{ margin: 0 }}>Historial de Transacciones</Title>
           <Text type="secondary">Todas tus transacciones en un solo lugar</Text>
         </Col>
-        <Col>
-          <Space size="small">
-            <Text type="secondary">Vista oscura</Text>
-            <Switch
-              checked={isDark}
-              onChange={(checked) => setMode(checked ? 'dark' : 'light')}
-              className="toggle-dark"
-              checkedChildren="ON"
-              unCheckedChildren="OFF"
-            />
-          </Space>
-        </Col>
       </Row>
 
       <Card>
