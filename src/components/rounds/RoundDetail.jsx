@@ -12,6 +12,7 @@ import {
   FieldTimeOutlined, ArrowLeftOutlined
 } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTheme } from '../../context/ThemeContext';
 import competitionService from '../../services/competitionService';
 import { useAuth } from '../../context/AuthContext';
 import { 
@@ -30,6 +31,8 @@ const RoundDetail = () => {
   const { competitionId, roundId } = useParams();
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
+  const { mode } = useTheme();
+  const isDark = mode === 'dark';
   
   const [round, setRound] = useState(null);
   const [matches, setMatches] = useState([]);
@@ -217,10 +220,13 @@ const RoundDetail = () => {
                   fontWeight: 'bold',
                   minWidth: '40px',
                   textAlign: 'center',
-                  background: 'linear-gradient(135deg, #f5f5f5, #e8e8e8)',
+                  background: isDark
+                    ? 'linear-gradient(135deg, #1a2744, #0d1f3c)'
+                    : 'linear-gradient(135deg, #f5f5f5, #e8e8e8)',
+                  color: isDark ? '#4096ff' : '#1d3557',
                   padding: '4px 12px',
                   borderRadius: '6px',
-                  border: '1px solid #d9d9d9'
+                  border: isDark ? '1px solid rgba(64,150,255,0.25)' : '1px solid #d9d9d9'
                 }}>
                   {record.home_score} - {record.away_score}
                 </div>
