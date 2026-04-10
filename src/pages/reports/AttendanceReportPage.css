@@ -1,100 +1,50 @@
-/* Dark mode for Attendance Report */
-body[data-theme="dark"] .attendance-report-page {
-  color: #e6edf3;
+.attendance-report-page {
+  padding: 4px 0;
 }
 
-body[data-theme="dark"] .attendance-report-page .ant-card {
-  background: #0f1724;
-  border-color: #1f2b3a;
-  color: #e6edf3;
+.attendance-report-page .ant-table {
+  background: transparent !important;
+  color: #cbd5e1;
 }
 
-body[data-theme="dark"] .attendance-report-page .ant-card-head {
-  background: #0f1724;
-  border-bottom-color: #1f2b3a;
+.attendance-report-page .ant-table-thead > tr > th {
+  background: #0f172a !important;
+  color: #64748b !important;
+  border-bottom: 1px solid #1e293b !important;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-body[data-theme="dark"] .attendance-report-page .ant-card-head-title,
-body[data-theme="dark"] .attendance-report-page .ant-card-head-title * {
-  color: #e6edf3 !important;
+.attendance-report-page .ant-table-tbody > tr > td {
+  background: #0f172a !important;
+  color: #cbd5e1 !important;
+  border-bottom: 1px solid #1e293b !important;
 }
 
-body[data-theme="dark"] .attendance-report-page .ant-typography,
-body[data-theme="dark"] .attendance-report-page .ant-typography * {
-  color: #e6edf3;
+.attendance-report-page .ant-table-tbody > tr:hover > td {
+  background: #1e293b !important;
 }
 
-body[data-theme="dark"] .attendance-report-page .ant-typography-secondary {
-  color: #9fb0c2 !important;
+.attendance-report-page .ant-pagination-item a,
+.attendance-report-page .ant-pagination-prev button,
+.attendance-report-page .ant-pagination-next button {
+  color: #94a3b8 !important;
 }
 
-body[data-theme="dark"] .attendance-report-page .ant-statistic-title {
-  color: #9fb0c2;
+.attendance-report-page .ant-pagination-item-active {
+  background: #1e3a8a !important;
+  border-color: #1e3a8a !important;
 }
 
-body[data-theme="dark"] .attendance-report-page .ant-statistic-content-value {
-  color: #e6edf3 !important;
+.attendance-report-page .ant-select-selector {
+  background: rgba(255,255,255,0.1) !important;
+  border-color: rgba(255,255,255,0.2) !important;
+  color: #fff !important;
+  border-radius: 8px !important;
 }
 
-body[data-theme="dark"] .attendance-report-page .ant-statistic-content-prefix,
-body[data-theme="dark"] .attendance-report-page .ant-statistic-content-suffix {
-  color: #e6edf3 !important;
-}
-
-body[data-theme="dark"] .attendance-report-page .ant-table {
-  background: #0f1724;
-  color: #e6edf3;
-}
-
-body[data-theme="dark"] .attendance-report-page .ant-table-thead > tr > th {
-  background: #0c141f;
-  color: #e6edf3;
-  border-color: #1f2b3a;
-}
-
-body[data-theme="dark"] .attendance-report-page .ant-table-tbody > tr > td {
-  background: #0f1724;
-  color: #e6edf3;
-  border-color: #1f2b3a;
-}
-
-body[data-theme="dark"] .attendance-report-page .ant-table-tbody > tr:hover > td {
-  background: #132033;
-}
-
-body[data-theme="dark"] .attendance-report-page .ant-select-selector {
-  background: #0b1624 !important;
-  border-color: #2b3a4f !important;
-  color: #e6edf3 !important;
-}
-
-body[data-theme="dark"] .attendance-report-page .ant-select-selection-item,
-body[data-theme="dark"] .attendance-report-page .ant-select-selection-placeholder {
-  color: #e6edf3;
-}
-
-body[data-theme="dark"] .attendance-report-page .ant-alert {
-  background: #142132;
-  border-color: #2b3a4f;
-  color: #e6edf3;
-}
-
-body[data-theme="dark"] .attendance-report-page .ant-alert-message,
-body[data-theme="dark"] .attendance-report-page .ant-alert-description,
-body[data-theme="dark"] .attendance-report-page .ant-alert-description * {
-  color: #e6edf3 !important;
-}
-
-/* Dropdowns */
-body[data-theme="dark"] .ant-select-dropdown {
-  background: #0f1724;
-  border-color: #1f2b3a;
-}
-
-body[data-theme="dark"] .ant-select-item-option-content {
-  color: #e6edf3;
-}
-
-body[data-theme="dark"] .ant-select-item-option-active {
-  background: #132033;
+.attendance-report-page .ant-select-selection-item,
+.attendance-report-page .ant-select-arrow {
+  color: #fff !important;
 }
