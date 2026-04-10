@@ -68,6 +68,13 @@ const AttendanceReportPage = () => {
     [usersCredits]
   );
 
+  const totalLastBetdate = useMemo(
+    () => usersCredits.reduce((sum, user) => sum + Number(user.credits_used_last_betdate || 0), 0),
+    [usersCredits]
+  );
+
+  const lastBetdateName = data?.lastBetdateName || null;
+
   const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
   const getAvatarSrc = (avatarUrl) => {
     if (!avatarUrl) return undefined;
@@ -99,6 +106,16 @@ const AttendanceReportPage = () => {
       dataIndex: 'total_invested_cop',
       key: 'total_invested_cop',
       render: (value) => `$${Number(value || 0).toLocaleString('es-CO')}`
+    },
+    {
+      title: lastBetdateName ? `Últ. Fecha (${lastBetdateName})` : 'Últ. Fecha',
+      dataIndex: 'credits_used_last_betdate',
+      key: 'credits_used_last_betdate',
+      render: (value) => (
+        <span style={{ fontWeight: value > 0 ? 600 : 400, color: value > 0 ? '#16a34a' : '#94a3b8' }}>
+          {value || 0}
+        </span>
+      ),
     },
     {
       title: 'Premios recibidos',
@@ -176,19 +193,28 @@ const AttendanceReportPage = () => {
       </Row>
 
       <Row gutter={[16, 16]}>
-        <Col xs={24} md={12}>
+        <Col xs={24} md={8}>
           <Card style={kpiCardStyle}>
             <Statistic
-              title="Creditos usados en el periodo"
+              title="Créditos usados en el periodo"
               value={totalUsedCredits}
             />
           </Card>
         </Col>
-        <Col xs={24} md={12}>
+        <Col xs={24} md={8}>
           <Card style={kpiCardStyle}>
             <Statistic
-              title="Creditos disponibles para pronósticos"
+              title="Créditos disponibles para pronósticos"
               value={totalAvailableCredits}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} md={8}>
+          <Card style={kpiCardStyle}>
+            <Statistic
+              title={lastBetdateName ? `Créditos usados en "${lastBetdateName}"` : 'Créditos en última fecha'}
+              value={totalLastBetdate}
+              valueStyle={{ color: totalLastBetdate > 0 ? '#16a34a' : undefined }}
             />
           </Card>
         </Col>

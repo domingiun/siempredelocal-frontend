@@ -141,6 +141,10 @@ const reportService = {
         usersCreditsRes.status === 'fulfilled'
           ? (usersCreditsRes.value.data?.users || [])
           : [],
+      lastBetdateName:
+        usersCreditsRes.status === 'fulfilled'
+          ? (usersCreditsRes.value.data?.last_betdate_name || null)
+          : null,
       financial: financialKpis.status === 'fulfilled' ? financialKpis.value.data : {},
       integration: integrationStats.status === 'fulfilled' ? integrationStats.value.data : {},
       financialRange:

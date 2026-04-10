@@ -8,14 +8,16 @@ import {
   Form,
   InputNumber,
   message,
+  Progress,
   Row,
   Space,
   Spin,
   Statistic,
   Table,
+  Tooltip,
   Typography,
 } from 'antd';
-import { DollarOutlined, ReloadOutlined } from '@ant-design/icons';
+import { AppstoreOutlined, DollarOutlined, InfoCircleOutlined, ReloadOutlined, TrophyOutlined } from '@ant-design/icons';
 import { useAuth } from '../../context/AuthContext';
 import reportService from '../../services/reportService';
 import './FinancialReportPage.css';
@@ -103,6 +105,12 @@ const FinancialReportPage = () => {
       setSubmittingReset(false);
     }
   };
+
+  const revenue = summary?.total_revenue_cop || 0;
+  const prizePool = summary?.total_prize_pool_cop || 0;
+  const appPool = summary?.total_app_pool_cop || 0;
+  const prizePercent = revenue > 0 ? Math.round((prizePool / revenue) * 100) : 0;
+  const appPercent = revenue > 0 ? Math.round((appPool / revenue) * 100) : 0;
 
   const columns = useMemo(
     () => [
@@ -209,27 +217,72 @@ const FinancialReportPage = () => {
 
       <Row gutter={[16, 16]}>
         <Col xs={24} md={8}>
-          <Card style={kpiCardStyle}><Statistic title="Creditos usados" value={summary?.total_credits_used || 0} /></Card>
+          <Card style={kpiCardStyle}><Statistic title="Créditos usados" value={summary?.total_credits_used || 0} /></Card>
+        </Col>
+        <Col xs={24} md={8}>
+          <Card style={kpiCardStyle}><Statistic title="Premios pagados" value={summary?.total_prizes_paid_cop || 0} prefix="$" valueStyle={{ color: '#16a34a' }} /></Card>
+        </Col>
+        <Col xs={24} md={8}>
+          <Card style={kpiCardStyle}><Statistic title="Canjes aprobados" value={summary?.total_canjes_cop || 0} prefix="$" /></Card>
         </Col>
       </Row>
 
-      <Row gutter={[16, 16]}>
-        <Col xs={24} md={12}>
-          <Card style={kpiCardStyle}><Statistic title="Total acumulado para premio" value={summary?.total_prize_pool_cop || 0} prefix="$" /></Card>
-        </Col>
-        <Col xs={24} md={12}>
-          <Card style={kpiCardStyle}><Statistic title="Total acumulado para la aplicacion" value={summary?.total_app_pool_cop || 0} prefix="$" /></Card>
-        </Col>
-      </Row>
-
-      <Row gutter={[16, 16]}>
-        <Col xs={24} md={12}>
-          <Card style={kpiCardStyle}><Statistic title="Total premios pagados" value={summary?.total_prizes_paid_cop || 0} prefix="$" /></Card>
-        </Col>
-        <Col xs={24} md={12}>
-          <Card style={kpiCardStyle}><Statistic title="Total canjes aprobados" value={summary?.total_canjes_cop || 0} prefix="$" /></Card>
-        </Col>
-      </Row>
+      <Card
+        title={
+          <Space>
+            <DollarOutlined />
+            Distribución de ingresos
+            <Tooltip title="Basado en el acumulado teórico según créditos vendidos. Premio ≈ 39%, App ≈ 61% por crédito por defecto.">
+              <InfoCircleOutlined style={{ color: '#94a3b8', fontSize: 14 }} />
+            </Tooltip>
+          </Space>
+        }
+        style={sectionCardStyle}
+      >
+        <Row gutter={[24, 24]}>
+          <Col xs={24} md={12}>
+            <Space direction="vertical" style={{ width: '100%' }}>
+              <Space>
+                <TrophyOutlined style={{ color: '#f59e0b' }} />
+                <Text strong>Acumulado para premio</Text>
+                <Text type="secondary">({prizePercent}%)</Text>
+              </Space>
+              <Progress
+                percent={prizePercent}
+                strokeColor={{ '0%': '#f59e0b', '100%': '#d97706' }}
+                format={() => `$${prizePool.toLocaleString('es-CO')}`}
+              />
+            </Space>
+          </Col>
+          <Col xs={24} md={12}>
+            <Space direction="vertical" style={{ width: '100%' }}>
+              <Space>
+                <AppstoreOutlined style={{ color: '#3b82f6' }} />
+                <Text strong>Acumulado para la aplicación</Text>
+                <Text type="secondary">({appPercent}%)</Text>
+              </Space>
+              <Progress
+                percent={appPercent}
+                strokeColor={{ '0%': '#3b82f6', '100%': '#1d4ed8' }}
+                format={() => `$${appPool.toLocaleString('es-CO')}`}
+              />
+            </Space>
+          </Col>
+          <Col xs={24}>
+            <Alert
+              type="info"
+              showIcon
+              icon={<InfoCircleOutlined />}
+              message={
+                <span>
+                  <strong>IVA (19%)</strong> — La plataforma opera con <code>APPLY_TAXES=False</code>. Los impuestos no se descuentan automáticamente. El valor informativo del IVA sobre el acumulado app sería{' '}
+                  <strong>${Math.round((appPool || 0) * 0.19).toLocaleString('es-CO')}</strong>.
+                </span>
+              }
+            />
+          </Col>
+        </Row>
+      </Card>
 
       <Card title="Resumen rapido por plan" style={sectionCardStyle}>
         <Row gutter={[16, 16]}>
