@@ -890,7 +890,7 @@ const Dashboard = () => {
           </Card>
         </Col>
 
-        <Col xs={24} sm={6}>
+        <Col xs={0} sm={6}>
           <Card loading={loading} className="dash-stat">
             <Statistic
               title="Usuarios activos"
