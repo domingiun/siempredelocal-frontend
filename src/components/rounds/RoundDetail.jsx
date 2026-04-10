@@ -13,6 +13,7 @@ import {
 } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
+import { Grid } from 'antd';
 import competitionService from '../../services/competitionService';
 import { useAuth } from '../../context/AuthContext';
 import { 
@@ -33,6 +34,8 @@ const RoundDetail = () => {
   const { isAdmin } = useAuth();
   const { mode } = useTheme();
   const isDark = mode === 'dark';
+  const screens = Grid.useBreakpoint();
+  const isMobile = !screens.md;
   
   const [round, setRound] = useState(null);
   const [matches, setMatches] = useState([]);
@@ -427,50 +430,51 @@ const RoundDetail = () => {
 
       {/* Estadísticas */}
       {stats && (
-        <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-          <Col xs={24} sm={6}>
-            <Card size="small">
-              <Statistic
-                title="Total Partidos"
-                value={stats.totalMatches}
-                prefix={<CalendarOutlined />}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={6}>
-            <Card size="small">
-              <Statistic
-                title="Partidos Jugados"
-                value={stats.finishedMatches}
-                suffix={`/ ${stats.totalMatches}`}
-                prefix={<CheckCircleOutlined />}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={6}>
-            <Card size="small">
-              <Statistic
-                title="Total Goles"
-                value={stats.totalGoals}
-                prefix={<TeamOutlined />}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={6}>
-            <Card size="small">
-              <Statistic
-                title="Promedio Goles"
-                value={stats.avgGoals}
-                suffix="por partido"
-              />
-            </Card>
-          </Col>
-        </Row>
+        isMobile ? (
+          <Card size="small" style={{ marginBottom: 16 }}>
+            <Row>
+              {[
+                { label: 'Partidos', value: stats.totalMatches },
+                { label: 'Jugados', value: `${stats.finishedMatches}/${stats.totalMatches}` },
+                { label: 'Goles', value: stats.totalGoals },
+                { label: 'Prom.', value: `${stats.avgGoals}` },
+              ].map(({ label, value }) => (
+                <Col span={6} key={label} style={{ textAlign: 'center', padding: '4px 0' }}>
+                  <div style={{ fontSize: 18, fontWeight: 700 }}>{value}</div>
+                  <div style={{ fontSize: 10, color: '#94a3b8', textTransform: 'uppercase' }}>{label}</div>
+                </Col>
+              ))}
+            </Row>
+          </Card>
+        ) : (
+          <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+            <Col xs={24} sm={6}>
+              <Card size="small">
+                <Statistic title="Total Partidos" value={stats.totalMatches} prefix={<CalendarOutlined />} />
+              </Card>
+            </Col>
+            <Col xs={24} sm={6}>
+              <Card size="small">
+                <Statistic title="Partidos Jugados" value={stats.finishedMatches} suffix={`/ ${stats.totalMatches}`} prefix={<CheckCircleOutlined />} />
+              </Card>
+            </Col>
+            <Col xs={24} sm={6}>
+              <Card size="small">
+                <Statistic title="Total Goles" value={stats.totalGoals} prefix={<TeamOutlined />} />
+              </Card>
+            </Col>
+            <Col xs={24} sm={6}>
+              <Card size="small">
+                <Statistic title="Promedio Goles" value={stats.avgGoals} suffix="por partido" />
+              </Card>
+            </Col>
+          </Row>
+        )
       )}
 
       {/* Información de la jornada */}
       <Row gutter={[16, 16]}>
-        <Col xs={24} lg={8}>
+        <Col xs={0} lg={8}>
           <Card title="Información de la Jornada" style={{ height: '100%' }}>
             <Descriptions column={1} size="small">
               <Descriptions.Item label="Nombre">
@@ -517,7 +521,7 @@ const RoundDetail = () => {
         </Col>
 
         <Col xs={24} lg={16}>
-          <Card 
+          <Card
             title={
               <Space>
                 <CalendarOutlined />
@@ -525,30 +529,97 @@ const RoundDetail = () => {
                 <Tag>{matches.length} partidos</Tag>
               </Space>
             }
-            extra={
-              <Progress 
-                percent={Math.round((stats?.finishedMatches / stats?.totalMatches) * 100)} 
-                size="small" 
+            extra={!isMobile && (
+              <Progress
+                percent={Math.round((stats?.finishedMatches / stats?.totalMatches) * 100)}
+                size="small"
                 style={{ width: 150 }}
               />
-            }
+            )}
           >
-            <Table
-              columns={columns}
-              dataSource={matches}
-              rowKey="id"
-              loading={loading}
-              pagination={false}
-              scroll={{ x: 800 }}
-              rowClassName={(record) => {
-                switch (record.status) {
-                  case 'Finalizado': return 'status-finished';
-                  case 'En curso': return 'status-ongoing';
-                  case 'Programado': return 'status-scheduled';
-                  default: return '';
-                }
-              }}
-            />
+            {isMobile ? (
+              <div>
+                {matches.map(m => {
+                  const isFinished = m.status === 'Finalizado';
+                  const isLive = m.status === 'En curso';
+                  const dateInfo = formatDateTableUTC(m.match_date);
+                  return (
+                    <div
+                      key={m.id}
+                      style={{
+                        padding: '10px 0',
+                        borderBottom: `1px solid ${isDark ? '#1f2b3a' : '#f0f0f0'}`,
+                      }}
+                    >
+                      {/* Fecha + estado */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                        <Text type="secondary" style={{ fontSize: 11 }}>
+                          {dateInfo.date} · {dateInfo.time}
+                        </Text>
+                        <Tag
+                          color={isFinished ? 'green' : isLive ? 'blue' : 'default'}
+                          style={{ margin: 0, fontSize: 10 }}
+                        >
+                          {m.status}
+                        </Tag>
+                      </div>
+                      {/* Equipos + marcador */}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        {/* Local */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1 }}>
+                          <Avatar size={24} src={m.home_team?.logo_url}>
+                            {m.home_team?.name?.charAt(0)}
+                          </Avatar>
+                          <Text strong style={{ fontSize: 12 }}>
+                            {m.home_team?.short_name || m.home_team?.name || `E${m.home_team_id}`}
+                          </Text>
+                        </div>
+                        {/* Marcador */}
+                        <div style={{
+                          padding: '2px 10px',
+                          borderRadius: 6,
+                          background: isDark ? '#1a2744' : '#f0f0f0',
+                          color: isFinished ? '#4096ff' : (isDark ? '#e6edf3' : '#333'),
+                          fontWeight: 700,
+                          fontSize: 14,
+                          minWidth: 52,
+                          textAlign: 'center',
+                          border: isDark ? '1px solid rgba(64,150,255,0.2)' : '1px solid #d9d9d9',
+                        }}>
+                          {isFinished ? `${m.home_score} - ${m.away_score}` : 'vs'}
+                        </div>
+                        {/* Visitante */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, justifyContent: 'flex-end' }}>
+                          <Text strong style={{ fontSize: 12 }}>
+                            {m.away_team?.short_name || m.away_team?.name || `E${m.away_team_id}`}
+                          </Text>
+                          <Avatar size={24} src={m.away_team?.logo_url}>
+                            {m.away_team?.name?.charAt(0)}
+                          </Avatar>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <Table
+                columns={columns}
+                dataSource={matches}
+                rowKey="id"
+                loading={loading}
+                pagination={false}
+                scroll={{ x: 800 }}
+                rowClassName={(record) => {
+                  switch (record.status) {
+                    case 'Finalizado': return 'status-finished';
+                    case 'En curso': return 'status-ongoing';
+                    case 'Programado': return 'status-scheduled';
+                    default: return '';
+                  }
+                }}
+              />
+            )}
           </Card>
         </Col>
       </Row>
