@@ -16,92 +16,117 @@ body[data-theme="dark"] .bet-page {
 
 .bet-hero {
   position: relative;
-  padding: 28px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 36px 40px;
   margin-bottom: 24px;
-  border-radius: 16px;
-  border: 1px solid rgba(16, 185, 129, 0.18);
-  background: linear-gradient(135deg, #ffffff 0%, #ecfff6 60%, #eef6ff 100%);
+  border-radius: 20px;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  background: linear-gradient(135deg, #060d18 0%, #0b1a2e 60%, #0d1f3c 100%);
   overflow: hidden;
   font-family: "Space Grotesk", "IBM Plex Sans", "Segoe UI", sans-serif;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255,255,255,0.05);
 }
-body[data-theme="dark"] .bet-hero {
-  border: 1px solid #1f2b3a;
-  background: linear-gradient(135deg, #0c141f 0%, #0f1b2a 60%, #111b28 100%);
+body[data-theme="light"] .bet-hero {
+  background: linear-gradient(135deg, #0b1a2e 0%, #0d2244 60%, #0f2a58 100%);
+}
+
+/* Orbs decorativos de fondo */
+.bet-hero__orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  pointer-events: none;
+}
+.bet-hero__orb--green {
+  width: 300px;
+  height: 300px;
+  top: -80px;
+  left: -60px;
+  background: radial-gradient(circle, rgba(16,185,129,0.18) 0%, transparent 70%);
+}
+.bet-hero__orb--blue {
+  width: 250px;
+  height: 250px;
+  bottom: -80px;
+  right: 160px;
+  background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%);
+}
+
+.bet-hero__content {
+  position: relative;
+  z-index: 1;
+  flex: 1;
 }
 
 .bet-hero__eyebrow {
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
   font-size: 12px;
-  color: #0f766e;
-  margin-bottom: 8px;
-}
-body[data-theme="dark"] .bet-hero__eyebrow {
-  color: #7dd3fc;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #34d399;
+  margin-bottom: 10px;
 }
 
 .bet-hero__title {
-  font-size: 28px;
-  font-weight: 700;
-  color: #0b1b2b;
-  margin-bottom: 8px;
-}
-body[data-theme="dark"] .bet-hero__title {
+  font-size: 36px;
+  font-weight: 800;
   color: #e6edf3;
+  margin-bottom: 10px;
+  line-height: 1.15;
+}
+.bet-hero__title--accent {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #f97316 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .bet-hero__subtitle {
   font-size: 15px;
-  color: #38516b;
-  max-width: 640px;
-}
-body[data-theme="dark"] .bet-hero__subtitle {
-  color: #cbd5e1;
+  color: #94a3b8;
+  max-width: 520px;
+  line-height: 1.6;
 }
 
 .bet-hero__meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 16px;
-  font-size: 12px;
-  color: #0f4c5c;
+  gap: 10px;
+  margin-top: 20px;
 }
-body[data-theme="dark"] .bet-hero__meta {
-  color: #9fb0c2;
-}
-
 .bet-hero__meta span {
-  padding: 6px 10px;
+  padding: 6px 14px;
   border-radius: 999px;
-  border: 1px solid rgba(16, 185, 129, 0.25);
-  background: rgba(16, 185, 129, 0.12);
-}
-body[data-theme="dark"] .bet-hero__meta span {
-  border-color: rgba(59, 130, 246, 0.35);
-  background: rgba(59, 130, 246, 0.18);
-  color: #e6edf3;
+  font-size: 12px;
+  font-weight: 500;
+  color: #e2e8f0;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(4px);
 }
 
-.bet-hero__accent {
+/* Logo a la derecha */
+.bet-hero__logo-wrap {
+  position: relative;
+  flex-shrink: 0;
+  margin-left: 32px;
+  z-index: 1;
+}
+.bet-hero__logo-glow {
   position: absolute;
-  right: -40px;
-  bottom: -60px;
-  width: 220px;
-  height: 220px;
-  background: radial-gradient(circle at 30% 30%, rgba(59, 130, 246, 0.35), transparent 60%);
-  filter: blur(2px);
+  inset: -20px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(251,191,36,0.18) 0%, transparent 70%);
+  filter: blur(20px);
 }
-
 .bet-hero__logo {
-  position: absolute;
-  right: 24px;
-  bottom: 10px;
-  width: 220px;
-  height: 220px;
-  opacity: 0.18;
+  width: 180px;
+  height: 180px;
   object-fit: contain;
-  pointer-events: none;
+  position: relative;
+  filter: drop-shadow(0 0 24px rgba(251,191,36,0.25));
 }
 
 .bet-page__grid {
@@ -139,19 +164,14 @@ body[data-theme="dark"] .bet-panel--list {
 
 @media (max-width: 992px) {
   .bet-hero {
-    padding: 22px 20px;
+    padding: 28px 24px;
   }
-
   .bet-hero__title {
-    font-size: 24px;
+    font-size: 28px;
   }
-
   .bet-hero__logo {
-    width: 160px;
-    height: 160px;
-    right: 12px;
-    bottom: 6px;
-    opacity: 0.14;
+    width: 130px;
+    height: 130px;
   }
 }
 
