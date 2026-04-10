@@ -44,7 +44,9 @@ const EditMatchPage = () => {
   const [apiSearchDate,    setApiSearchDate]    = useState(null);
   const [apiFixtures,      setApiFixtures]      = useState([]);
   const [apiSearchLoading, setApiSearchLoading] = useState(false);
-  const [apiSyncLoading,   setApiSyncLoading]   = useState(false);
+  const [apiSyncLoading,      setApiSyncLoading]      = useState(false);
+  const [schedulerStatus,     setSchedulerStatus]     = useState(null);
+  const [schedulerLoading,    setSchedulerLoading]    = useState(false);
 
   useEffect(() => {
     if (user?.role !== 'admin') return;
@@ -208,6 +210,18 @@ const EditMatchPage = () => {
       message.error(err?.response?.data?.detail || 'Error consultando api-football');
     } finally {
       setApiSearchLoading(false);
+    }
+  };
+
+  const handleSchedulerStatus = async () => {
+    setSchedulerLoading(true);
+    try {
+      const res = await api.get('/matches/admin/scheduler-status');
+      setSchedulerStatus(res.data);
+    } catch (err) {
+      message.error('Error consultando el scheduler');
+    } finally {
+      setSchedulerLoading(false);
     }
   };
 
@@ -503,14 +517,25 @@ const EditMatchPage = () => {
               </Space>
             }
             extra={
-              <Button
-                icon={<SyncOutlined />}
-                loading={apiSyncLoading}
-                onClick={handleSyncNow}
-                size="small"
-              >
-                Sync ahora
-              </Button>
+              <Space>
+                <Button
+                  icon={<SyncOutlined />}
+                  loading={schedulerLoading}
+                  onClick={handleSchedulerStatus}
+                  size="small"
+                >
+                  Estado scheduler
+                </Button>
+                <Button
+                  icon={<SyncOutlined />}
+                  loading={apiSyncLoading}
+                  onClick={handleSyncNow}
+                  size="small"
+                  type="primary"
+                >
+                  Sync ahora
+                </Button>
+              </Space>
             }
           >
             {/* Estado de la última sync */}
@@ -527,6 +552,39 @@ const EditMatchPage = () => {
                 </Descriptions.Item>
               )}
             </Descriptions>
+
+            {/* Estado del scheduler */}
+            {schedulerStatus && (
+              <div style={{ borderTop: '1px solid rgba(0,0,0,.06)', paddingTop: 16, marginBottom: 16 }}>
+                <Space style={{ marginBottom: 8 }}>
+                  <Tag color={schedulerStatus.scheduler_running ? 'green' : 'red'}>
+                    {schedulerStatus.scheduler_running ? 'Scheduler activo' : 'Scheduler detenido'}
+                  </Tag>
+                  <span style={{ fontSize: 12, color: '#64748b' }}>
+                    {schedulerStatus.total_jobs} job(s) programados · {schedulerStatus.pending_matches_next_36h} partido(s) pendientes (36h)
+                  </span>
+                </Space>
+                <Table
+                  size="small"
+                  pagination={false}
+                  dataSource={schedulerStatus.matches}
+                  rowKey="match_id"
+                  columns={[
+                    { title: 'ID', dataIndex: 'match_id', width: 60 },
+                    { title: 'Fecha (COT)', dataIndex: 'match_date_col', width: 160 },
+                    { title: 'Estado en BD', dataIndex: 'status', width: 120 },
+                    {
+                      title: 'Job programado',
+                      dataIndex: 'job_scheduled',
+                      width: 130,
+                      render: (v) => v
+                        ? <Tag color="green">Sí</Tag>
+                        : <Tag color="orange">No</Tag>,
+                    },
+                  ]}
+                />
+              </div>
+            )}
 
             {/* Comparador de nombres */}
             <div style={{ borderTop: '1px solid rgba(0,0,0,.06)', paddingTop: 16 }}>
