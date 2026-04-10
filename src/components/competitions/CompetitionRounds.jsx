@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Card, Table, Tag, Space, Button, Typography,
-  Row, Col, Progress, Statistic, message, Avatar, Tooltip
+  Row, Col, Progress, Statistic, message, Avatar, Tooltip, Grid
 } from 'antd';
 import {
   CalendarOutlined, CheckCircleOutlined,
@@ -25,6 +25,8 @@ const CompetitionRounds = ({ competitionId }) => {
   const navigate = useNavigate();
   const { mode } = useTheme();
   const isDark = mode === 'dark';
+  const screens = Grid.useBreakpoint();
+  const isMobile = !screens.md;
 
   useEffect(() => {
     fetchRounds();
@@ -126,13 +128,25 @@ const CompetitionRounds = ({ competitionId }) => {
   const columns = [
     {
       title: 'Jornada',
-      render: (_, r) => <Text strong>{r.name || `Jornada ${r.round_number}`}</Text>
+      render: (_, r) => {
+        const status = getRoundStatus(r);
+        if (isMobile) {
+          return (
+            <div>
+              <Text strong style={{ fontSize: 13 }}>J{r.round_number}</Text>
+              <div style={{ marginTop: 2 }}>{getStatusTag(status)}</div>
+            </div>
+          );
+        }
+        return <Text strong>{r.name || `Jornada ${r.round_number}`}</Text>;
+      }
     },
     {
       title: '#',
       dataIndex: 'round_number',
-      width: 80,
+      width: 60,
       align: 'center',
+      responsive: ['md'],
       sorter: (a, b) => a.round_number - b.round_number
     },
     {
@@ -144,8 +158,8 @@ const CompetitionRounds = ({ competitionId }) => {
         ).length;
 
         return (
-          <div style={{ textAlign: 'center' }}>
-            <Text>{finished}/{matches.length}</Text>
+          <div style={{ textAlign: 'center', minWidth: isMobile ? 60 : 80 }}>
+            <Text style={{ fontSize: isMobile ? 12 : 14 }}>{finished}/{matches.length}</Text>
             <Progress
               percent={matches.length ? (finished / matches.length) * 100 : 0}
               size="small"
@@ -157,13 +171,16 @@ const CompetitionRounds = ({ competitionId }) => {
     },
     {
       title: 'Estado',
+      responsive: ['md'],
       render: (_, r) => getStatusTag(getRoundStatus(r))
     },
     {
-      title: 'Accion',
+      title: '',
+      width: isMobile ? 50 : 80,
       render: (_, r) => (
         <Button
           type="link"
+          size={isMobile ? 'small' : 'middle'}
           icon={<EyeOutlined />}
           onClick={() =>
             navigate(`/competitions/${competitionId}/rounds/${r.id}`, {
@@ -171,7 +188,7 @@ const CompetitionRounds = ({ competitionId }) => {
             })
           }
         >
-          Ver
+          {!isMobile && 'Ver'}
         </Button>
       )
     }
@@ -186,26 +203,29 @@ const CompetitionRounds = ({ competitionId }) => {
         <CalendarOutlined /> Jornadas de la Competencia
       </Title>
 
-      <Row gutter={16} style={{ marginBottom: 20 }}>
-        <Col span={8}>
-          <Statistic title="Jornadas" value={rounds.length} prefix={<CalendarOutlined />} />
-        </Col>
-        <Col span={8}>
-          <Statistic title="Completadas" value={completed.length} prefix={<CheckCircleOutlined />} />
-        </Col>
-        <Col span={8}>
-          <Statistic title="Progreso" value={progress.toFixed(2)} suffix="%" prefix={<PlayCircleOutlined />} />
-        </Col>
-      </Row>
-
-      <Progress
-        percent={progress}
-        status="active"
-        style={{ marginBottom: 10 }}
-        format={(percent) => (
-          <span className="competition-progress-text">{percent.toFixed(2)}%</span>
-        )}
-      />
+      {!isMobile && (
+        <>
+          <Row gutter={16} style={{ marginBottom: 20 }}>
+            <Col span={8}>
+              <Statistic title="Jornadas" value={rounds.length} prefix={<CalendarOutlined />} />
+            </Col>
+            <Col span={8}>
+              <Statistic title="Completadas" value={completed.length} prefix={<CheckCircleOutlined />} />
+            </Col>
+            <Col span={8}>
+              <Statistic title="Progreso" value={progress.toFixed(2)} suffix="%" prefix={<PlayCircleOutlined />} />
+            </Col>
+          </Row>
+          <Progress
+            percent={progress}
+            status="active"
+            style={{ marginBottom: 10 }}
+            format={(percent) => (
+              <span className="competition-progress-text">{percent.toFixed(2)}%</span>
+            )}
+          />
+        </>
+      )}
 
       <Table
         columns={columns}
