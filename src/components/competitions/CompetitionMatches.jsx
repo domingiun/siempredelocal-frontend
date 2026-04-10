@@ -2,9 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import {
   Card, Table, Tag, Space, Button,
-  Row, Typography, Avatar, Tooltip, Badge, Alert
+  Row, Typography, Avatar, Tooltip, Badge, Alert, Grid
 } from 'antd';
 import { Select } from 'antd';
+
+const { useBreakpoint } = Grid;
 import {
   EyeOutlined, EditOutlined, PlusOutlined,
   TeamOutlined, EnvironmentOutlined,
@@ -31,6 +33,8 @@ const CompetitionMatches = ({ competitionId, competitionName }) => {
   const { canCreateMatch, canEdit, isAdmin } = usePermissions();
   const { mode } = useTheme();
   const isDark = mode === 'dark';
+  const screens = useBreakpoint();
+  const isMobile = !screens.md;
 
   useEffect(() => {
     fetchMatches();
@@ -350,107 +354,186 @@ const CompetitionMatches = ({ competitionId, competitionName }) => {
     new Set(matches.map(m => m.round_number).filter(Boolean))
   ).sort((a, b) => a - b);
 
-  return (
-    <Card className="competition-tab-card">
-      <Row justify="space-between" style={{ marginBottom: 20, alignItems: 'center' }}>
-        <div>
-          <Title level={4} style={{ margin: 0 }}>
-            <CalendarOutlined style={{ marginRight: 8 }} />
-            {competitionName} – Partidos
-          </Title>
-          <Text type="secondary">
-            {matches.length} partidos encontrados • 
-            {isAdmin ? ' Permisos de administrador' : ' Contacta con un administrador para crear o editar partidos'}
-          </Text>
+  const renderMobileCard = (match) => {
+    const homeTeam = teamsInfo[match.home_team_id] || {};
+    const awayTeam = teamsInfo[match.away_team_id] || {};
+    const isFinished = match.status === 'Finalizado';
+    const isLive = match.status === 'En curso';
+    const { date: dateStr, time: timeStr } = formatDateTableUTC(match.match_date || '');
+
+    return (
+      <div
+        key={match.id}
+        style={{
+          border: `1px solid ${isLive ? '#f59e0b' : isDark ? 'rgba(255,255,255,.08)' : '#e8e8e8'}`,
+          borderRadius: 10,
+          padding: '12px 14px',
+          marginBottom: 10,
+          background: isDark ? '#0c1625' : '#fff',
+        }}
+      >
+        {/* Fila superior: jornada + fecha + estado */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {getRoundBadge(match)}
+            <span style={{ fontSize: 12, color: isDark ? '#9fb0c2' : '#666' }}>
+              {dateStr} · {timeStr}
+            </span>
+          </div>
+          <Tag
+            color={getStatusColor(match.status)}
+            style={{
+              margin: 0, fontSize: 11,
+              ...(isDark ? {
+                background: isFinished ? '#0b1f16' : isLive ? '#231a0e' : '#111b2a',
+                borderColor: isFinished ? '#1f8a4c' : isLive ? '#7a4b10' : '#254a92',
+                color: isFinished ? '#86efac' : isLive ? '#fdba74' : '#93c5fd',
+              } : {})
+            }}
+          >
+            {match.status || 'Programado'}
+          </Tag>
         </div>
 
-        <Space>
-          {/* Filtro por jornada */}
-          <Space>
-            <Text strong>Jornada:</Text>
+        {/* Fila central: equipo local — marcador — equipo visitante */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+          {/* Local */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+            <Avatar src={homeTeam.logo_url} size={36}>
+              {homeTeam.name?.charAt(0) || 'L'}
+            </Avatar>
+            <Text strong style={{ fontSize: 12, textAlign: 'center', lineHeight: '1.2', color: isDark ? '#e6edf3' : undefined }}>
+              {homeTeam.name || 'Local'}
+            </Text>
+          </div>
+
+          {/* Marcador */}
+          <div style={{ textAlign: 'center', minWidth: 56 }}>
+            <div style={{
+              fontSize: 22, fontWeight: 800, letterSpacing: 2,
+              color: isFinished ? '#4096ff' : isDark ? '#e6edf3' : '#1a1a2e'
+            }}>
+              {isFinished ? `${match.home_score ?? 0} - ${match.away_score ?? 0}` : 'VS'}
+            </div>
+          </div>
+
+          {/* Visitante */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+            <Avatar src={awayTeam.logo_url} size={36}>
+              {awayTeam.name?.charAt(0) || 'V'}
+            </Avatar>
+            <Text strong style={{ fontSize: 12, textAlign: 'center', lineHeight: '1.2', color: isDark ? '#e6edf3' : undefined }}>
+              {awayTeam.name || 'Visitante'}
+            </Text>
+          </div>
+        </div>
+
+        {/* Fila inferior: estadio + acciones */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10, paddingTop: 8, borderTop: `1px solid ${isDark ? 'rgba(255,255,255,.06)' : '#f0f0f0'}` }}>
+          <Text style={{ fontSize: 11, color: isDark ? '#64748b' : '#999' }}>
+            <EnvironmentOutlined style={{ marginRight: 4 }} />
+            {match.stadium || 'Por definir'}
+          </Text>
+          <Space size={4}>
+            <Button size="small" type="text" icon={<EyeOutlined />} onClick={() => navigate(`/matches/${match.id}`)} />
+            {canEditMatch() && (
+              <Button size="small" type="text" icon={<EditOutlined />} onClick={() => handleEditMatchClick(match.id)} />
+            )}
+          </Space>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <Card className="competition-tab-card">
+      {/* Header */}
+      <div style={{ marginBottom: 16 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
+          <div>
+            <Title level={4} style={{ margin: 0 }}>
+              <CalendarOutlined style={{ marginRight: 8 }} />
+              {competitionName} – Partidos
+            </Title>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              {matches.length} partidos encontrados
+            </Text>
+          </div>
+          <Space wrap>
             <Select
               className="competition-round-select"
-              style={{ width: 120 }}
+              style={{ width: isMobile ? 140 : 120 }}
               placeholder="Todas"
               allowClear
               value={selectedRound}
               onChange={value => setSelectedRound(value)}
             >
               {availableRounds.map(round => (
-                <Select.Option key={round} value={round}>
-                  Jornada {round}
-                </Select.Option>
+                <Select.Option key={round} value={round}>Jornada {round}</Select.Option>
               ))}
             </Select>
-          </Space>
-
-          {/* Botón nuevo partido - SOLO PARA ADMIN */}
-          {canCreateMatch() ? (
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={handleNewMatchClick}
-            >
-              Nuevo Partido
-            </Button>
-          ) : (
-            <Tooltip title="Solo administradores pueden crear partidos">
-              <Button
-                type="default"
-                icon={<LockOutlined />}
-                disabled
-                style={{ 
-                  borderColor: '#d9d9d9', 
-                  color: '#d9d9d9',
-                  cursor: 'not-allowed'
-                }}
-              >
-                Nuevo Partido
+            {canCreateMatch() ? (
+              <Button type="primary" icon={<PlusOutlined />} onClick={handleNewMatchClick}>
+                {isMobile ? 'Nuevo' : 'Nuevo Partido'}
               </Button>
-            </Tooltip>
-          )}
-        </Space>
-      </Row>
-
-      <Table
-        columns={columns}
-        dataSource={sortedMatches}
-        rowKey="id"
-        loading={loading}
-        pagination={{ 
-          pageSize: 10,
-          showSizeChanger: true,
-          showTotal: (total) => `Total ${total} partidos`
-        }}
-        locale={{
-          emptyText: (
-            <div style={{ padding: 40, textAlign: 'center' }}>
-              <TeamOutlined style={{ fontSize: 50, color: isDark ? '#6b7c93' : '#ccc', marginBottom: 16 }} />
-              <p>No hay partidos en esta competencia</p>
-              
-              {/* Mostrar botón o mensaje según permisos */}
-              {canCreateMatch() ? (
-                <Button 
-                  type="primary" 
-                  onClick={handleNewMatchClick}
-                  style={{ marginTop: 16 }}
-                >
-                  Crear primer partido
+            ) : (
+              <Tooltip title="Solo administradores pueden crear partidos">
+                <Button type="default" icon={<LockOutlined />} disabled>
+                  {isMobile ? 'Nuevo' : 'Nuevo Partido'}
                 </Button>
-              ) : (
-                <Alert
-                  title="Sin permisos de creación"
-                  description="Para crear partidos, contacta con un administrador del sistema."
-                  type="warning"
-                  showIcon
-                  style={{ marginTop: 16, maxWidth: 400, margin: '0 auto' }}
-                />
-              )}
+              </Tooltip>
+            )}
+          </Space>
+        </div>
+      </div>
+
+      {/* Vista móvil: tarjetas */}
+      {isMobile ? (
+        <div>
+          {sortedMatches.length === 0 ? (
+            <div style={{ padding: 40, textAlign: 'center' }}>
+              <TeamOutlined style={{ fontSize: 40, color: '#6b7c93', marginBottom: 12 }} />
+              <p>No hay partidos en esta competencia</p>
             </div>
-          )
-        }}
-        style={{ marginTop: 16 }}
-      />
+          ) : (
+            sortedMatches.map(match => renderMobileCard(match))
+          )}
+        </div>
+      ) : (
+        /* Vista escritorio: tabla */
+        <Table
+          columns={columns}
+          dataSource={sortedMatches}
+          rowKey="id"
+          loading={loading}
+          pagination={{
+            pageSize: 10,
+            showSizeChanger: true,
+            showTotal: (total) => `Total ${total} partidos`
+          }}
+          locale={{
+            emptyText: (
+              <div style={{ padding: 40, textAlign: 'center' }}>
+                <TeamOutlined style={{ fontSize: 50, color: isDark ? '#6b7c93' : '#ccc', marginBottom: 16 }} />
+                <p>No hay partidos en esta competencia</p>
+                {canCreateMatch() ? (
+                  <Button type="primary" onClick={handleNewMatchClick} style={{ marginTop: 16 }}>
+                    Crear primer partido
+                  </Button>
+                ) : (
+                  <Alert
+                    description="Para crear partidos, contacta con un administrador del sistema."
+                    type="warning"
+                    showIcon
+                    style={{ marginTop: 16, maxWidth: 400, margin: '0 auto' }}
+                  />
+                )}
+              </div>
+            )
+          }}
+          style={{ marginTop: 8 }}
+        />
+      )}
     </Card>
   );
 };
