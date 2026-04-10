@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Card, Row, Col, Statistic, Table, Space, Tag,
-  Progress, Button, Avatar, Typography, Switch
+  Progress, Button, Avatar, Typography, Switch, Grid
 } from 'antd';
 import {
   TrophyOutlined, TeamOutlined, CalendarOutlined,
@@ -26,6 +26,8 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const { mode, setMode } = useTheme();
   const isDark = mode === 'dark';
+  const screens = Grid.useBreakpoint();
+  const isMobile = !screens.md;
   const [competitions, setCompetitions] = useState([]);
   const [teams, setTeams] = useState([]);
   const [betdates, setBetdates] = useState([]);
@@ -899,7 +901,7 @@ const Dashboard = () => {
                 Premio acumulado
               </div>
               <div style={{
-                fontSize: 32,
+                fontSize: isMobile ? 22 : 32,
                 fontWeight: 800,
                 lineHeight: 1.1,
                 background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
