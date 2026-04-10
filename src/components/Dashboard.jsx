@@ -1089,8 +1089,8 @@ const Dashboard = () => {
             className="dash-panel"
           >
             {stats.recentMatches.map(match => {
-              const home = teams.find(t => t.id === match.home_team_id);
-              const away = teams.find(t => t.id === match.away_team_id);
+              const home = teams.find(t => String(t.id) === String(match.home_team_id));
+              const away = teams.find(t => String(t.id) === String(match.away_team_id));
               
               const statusInfo = getMatchStatusInfo(match.status);
 
@@ -1161,17 +1161,23 @@ const Dashboard = () => {
                         padding: '8px 0'
                       }}>
                       {/* Equipo local */}
-                      <div style={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        gap: '8px', 
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
                         flex: 1,
                         justifyContent: 'flex-start'
                       }}>
-                        <Avatar src={home?.logo_url} size={24}>
-                          {getTeamLabel(home?.name)?.charAt(0)}
-                        </Avatar>
-                        <strong style={{ 
+                        {getAvatarSrc(home?.logo_url) ? (
+                          <img
+                            src={getAvatarSrc(home?.logo_url)}
+                            alt={home?.name || ''}
+                            style={{ width: isMobile ? 24 : 56, height: isMobile ? 24 : 56, objectFit: 'contain', flexShrink: 0 }}
+                          />
+                        ) : (
+                          <Avatar size={isMobile ? 24 : 56}>{getTeamLabel(match.home_team_name)?.charAt(0)}</Avatar>
+                        )}
+                        <strong style={{
                           fontSize: '12px',
                           color: isScheduled ? (isDark ? '#9fb0c2' : '#8c8c8c') : (isDark ? '#e6edf3' : '#000')
                         }}>
@@ -1180,8 +1186,8 @@ const Dashboard = () => {
                       </div>
 
                       {/* Marcador */}
-                      <div style={{ 
-                        fontWeight: 'bold', 
+                      <div style={{
+                        fontWeight: 'bold',
                         fontSize: '12px',
                         minWidth: '70px',
                         textAlign: 'center',
@@ -1196,23 +1202,29 @@ const Dashboard = () => {
                       </div>
 
                       {/* Equipo visitante */}
-                      <div style={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        gap: '8px', 
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
                         flex: 1,
                         justifyContent: 'flex-end'
                       }}>
-                        <strong style={{ 
+                        <strong style={{
                           fontSize: '12px',
                           color: isScheduled ? (isDark ? '#9fb0c2' : '#8c8c8c') : (isDark ? '#e6edf3' : '#000'),
                           textAlign: 'right'
                         }}>
                           {getTeamLabel(match.away_team_name)}
                         </strong>
-                        <Avatar src={away?.logo_url} size={24}>
-                          {getTeamLabel(away?.name)?.charAt(0)}
-                        </Avatar>
+                        {getAvatarSrc(away?.logo_url) ? (
+                          <img
+                            src={getAvatarSrc(away?.logo_url)}
+                            alt={away?.name || ''}
+                            style={{ width: isMobile ? 24 : 56, height: isMobile ? 24 : 56, objectFit: 'contain', flexShrink: 0 }}
+                          />
+                        ) : (
+                          <Avatar size={isMobile ? 24 : 56}>{getTeamLabel(match.away_team_name)?.charAt(0)}</Avatar>
+                        )}
                       </div>
                     </div>
 
