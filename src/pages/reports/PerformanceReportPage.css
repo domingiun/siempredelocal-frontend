@@ -1,89 +1,18 @@
-/* Dark mode for Performance Report */
-body[data-theme="dark"] .performance-report-page {
-  color: #e6edf3;
+.performance-report-page {
+  padding: 4px 0;
 }
 
-body[data-theme="dark"] .performance-report-page .ant-card {
-  background: #0f1724;
-  border-color: #1f2b3a;
-  color: #e6edf3;
+.performance-report-page .ant-select-selector {
+  background: rgba(255,255,255,0.1) !important;
+  border-color: rgba(255,255,255,0.2) !important;
+  color: #fff !important;
+  border-radius: 8px !important;
 }
 
-body[data-theme="dark"] .performance-report-page .ant-card-head {
-  background: #0f1724;
-  border-bottom-color: #1f2b3a;
+.performance-report-page .ant-select-selection-item {
+  color: #fff !important;
 }
 
-body[data-theme="dark"] .performance-report-page .ant-card-head-title,
-body[data-theme="dark"] .performance-report-page .ant-card-head-title * {
-  color: #e6edf3 !important;
-}
-
-body[data-theme="dark"] .performance-report-page .ant-typography,
-body[data-theme="dark"] .performance-report-page .ant-typography * {
-  color: #e6edf3;
-}
-
-body[data-theme="dark"] .performance-report-page .ant-typography-secondary {
-  color: #9fb0c2 !important;
-}
-
-body[data-theme="dark"] .performance-report-page .ant-statistic-title {
-  color: #9fb0c2;
-}
-
-body[data-theme="dark"] .performance-report-page .ant-statistic-content-value {
-  color: #e6edf3 !important;
-}
-
-body[data-theme="dark"] .performance-report-page .ant-divider {
-  border-color: #1f2b3a;
-}
-
-body[data-theme="dark"] .performance-report-page .ant-divider-inner-text,
-body[data-theme="dark"] .performance-report-page .ant-divider-inner-text * {
-  color: #e6edf3;
-}
-
-body[data-theme="dark"] .performance-report-page .ant-tag {
-  background: #142132;
-  border-color: #2b3a4f;
-  color: #e6edf3;
-}
-
-body[data-theme="dark"] .performance-report-page .ant-select-selector {
-  background: #0b1624 !important;
-  border-color: #2b3a4f !important;
-  color: #e6edf3 !important;
-}
-
-body[data-theme="dark"] .performance-report-page .ant-select-selection-item,
-body[data-theme="dark"] .performance-report-page .ant-select-selection-placeholder {
-  color: #e6edf3;
-}
-
-/* Dropdowns */
-body[data-theme="dark"] .ant-select-dropdown {
-  background: #0f1724;
-  border-color: #1f2b3a;
-}
-
-body[data-theme="dark"] .ant-select-item-option-content {
-  color: #e6edf3;
-}
-
-body[data-theme="dark"] .ant-select-item-option-active {
-  background: #132033;
-}
-
-body[data-theme="dark"] .performance-report-page .ant-alert {
-  background: #142132;
-  border-color: #2b3a4f;
-  color: #e6edf3;
-}
-
-body[data-theme="dark"] .performance-report-page .ant-alert-message,
-body[data-theme="dark"] .performance-report-page .ant-alert-description,
-body[data-theme="dark"] .performance-report-page .ant-alert-description * {
-  color: #e6edf3 !important;
+.performance-report-page .ant-select-arrow {
+  color: rgba(255,255,255,0.6) !important;
 }
