@@ -451,13 +451,15 @@ const CompetitionMatches = ({ competitionId, competitionName }) => {
       <div style={{ marginBottom: 16 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
           <div>
-            <Title level={4} style={{ margin: 0 }}>
+            <Title level={isMobile ? 5 : 4} style={{ margin: 0 }}>
               <CalendarOutlined style={{ marginRight: 8 }} />
               {competitionName} – Partidos
             </Title>
-            <Text type="secondary" style={{ fontSize: 12 }}>
-              {matches.length} partidos encontrados
-            </Text>
+            {!isMobile && (
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                {matches.length} partidos encontrados
+              </Text>
+            )}
           </div>
           <Space wrap>
             <Select
