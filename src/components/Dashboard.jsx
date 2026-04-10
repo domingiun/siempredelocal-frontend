@@ -400,8 +400,8 @@ const Dashboard = () => {
       title: 'Nombre',
       dataIndex: 'name',
       render: (text, record) => (
-        <Space orientation="vertical" size={0}>
-          <strong>{text}</strong>
+        <Space orientation="vertical" size={0} style={{ cursor: 'pointer' }} onClick={() => navigate(`/competitions/${record.id}`)}>
+          <strong style={{ color: '#4096ff' }}>{text}</strong>
           <small>{record.season}</small>
         </Space>
       )
