@@ -42,25 +42,19 @@ const CompetitionStandings = ({ competitionId }) => {
   const fetchStandingsWithForm = async () => {
     setLoading(true);
     try {
-      console.log('📡 Llamando a standings con forma reciente:', competitionId);
-
-
       // Intentar obtener standings por grupos si aplica
       try {
         const groupsRes = await competitionService.getStandingsGroups(competitionId);
         const groupsData = groupsRes?.data?.groups_data || null;
         setGroupStandings(groupsData && Object.keys(groupsData).length ? groupsData : null);
-      } catch (groupError) {
+      } catch {
         setGroupStandings(null);
       }
 
       const response = await competitionService.getStandingsWithRecentForm(competitionId, { form_limit: 5 });
       let standings = Array.isArray(response) ? response : response.data;
 
-      console.log('✅ Standings con forma recibidos:', standings);
-
       if (!Array.isArray(standings) || standings.length === 0) {
-        console.warn('⚠️ Standings con forma vacíos. Usando fallback estándar.');
         const fallbackRes = await competitionService.getStandings(competitionId);
         standings = Array.isArray(fallbackRes) ? fallbackRes : fallbackRes.data;
       }
@@ -145,30 +139,11 @@ const CompetitionStandings = ({ competitionId }) => {
   // Procesar datos de standings
   const processStandingsData = (standings) => {
     if (!standings || !Array.isArray(standings)) {
-      console.error('❌ Datos de standings inválidos:', standings);
       setStandings([]);
       return;
     }
-    
-        console.log('🔍 INSpeccionando primer equipo:', {
-          raw: standings[0],
-          keys: Object.keys(standings[0]),
-          team_object: standings[0].team,
-          has_name: 'team_name' in standings[0],
-          has_logo: 'team_logo' in standings[0]
-        });
-    
-    
+
     const normalizedData = standings.map((item, index) => {
-      // Log para debug
-      console.log(`Equipo ${index + 1}:`, {
-        id: item.id,
-        team_id: item.team_id,
-        team_name: item.team_name,
-        team_logo: item.team_logo,
-        has_team_object: !!item.team
-      });
-      
       const rawPosition = Number(item.position);
       const normalizedPosition = Number.isFinite(rawPosition) && rawPosition > 0
         ? rawPosition
@@ -202,7 +177,6 @@ const CompetitionStandings = ({ competitionId }) => {
       };
     });
 
-    console.log('📊 Standings procesados:', normalizedData.slice(0, 2));
     setStandings(normalizedData);
   };
 
