@@ -201,7 +201,9 @@ const EditMatchPage = () => {
       const dateStr = apiSearchDate.format('YYYY-MM-DD');
       const res = await api.get(`/matches/admin/name-preview?date=${dateStr}`);
       setApiFixtures(res.data.comparisons || []);
-      if (!res.data.comparisons?.length) message.info('Sin fixtures en api-football para esa fecha');
+      if (!res.data.comparisons?.length) {
+        message.warning(res.data.message || 'Sin fixtures en api-football para esa fecha', 8);
+      }
     } catch (err) {
       message.error(err?.response?.data?.detail || 'Error consultando api-football');
     } finally {
