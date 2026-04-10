@@ -594,13 +594,16 @@ const RoundDetail = () => {
             
             {/* Marcador */}
             <Col span={8} style={{ textAlign: 'center' }}>
-              <div style={{ 
-                fontSize: '32px', 
+              <div style={{
+                fontSize: '32px',
                 fontWeight: 'bold',
-                backgroundColor: '#fafafa',
+                background: isDark
+                  ? 'linear-gradient(135deg, #1a2744, #0d1f3c)'
+                  : 'linear-gradient(135deg, #f5f5f5, #e8e8e8)',
+                color: isDark ? '#4096ff' : '#1d3557',
                 padding: '12px',
                 borderRadius: '8px',
-                border: '1px solid #d9d9d9'
+                border: isDark ? '1px solid rgba(64,150,255,0.25)' : '1px solid #d9d9d9'
               }}>
                 {stats.highestScoringMatch.match.home_score} - {stats.highestScoringMatch.match.away_score}
               </div>

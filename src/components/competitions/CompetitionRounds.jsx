@@ -56,26 +56,29 @@ const CompetitionRounds = ({ competitionId }) => {
 
       const map = {};
       const teamIds = [];
-      for (const r of roundsData) {
-        try {
-          const mRes = await competitionService.getMatchesByRound(r.id);
-          const raw = mRes.data;
+
+      // Cargar partidos de todas las jornadas en paralelo
+      const matchResults = await Promise.allSettled(
+        roundsData.map(r => competitionService.getMatchesByRound(r.id))
+      );
+      matchResults.forEach((result, i) => {
+        const r = roundsData[i];
+        if (result.status === 'fulfilled') {
+          const raw = result.value.data;
           const matches = Array.isArray(raw)
             ? raw
             : Array.isArray(raw?.matches)
               ? raw.matches
               : [];
           map[r.id] = matches;
-
           matches.forEach(m => {
             if (m.home_team_id) teamIds.push(m.home_team_id);
             if (m.away_team_id) teamIds.push(m.away_team_id);
           });
-        } catch (err) {
-          console.error(`Error cargando partidos de la jornada ${r.id}`, err);
+        } else {
           map[r.id] = [];
         }
-      }
+      });
 
       setMatchesByRound(map);
       await fetchTeamsInfo(teamIds);
@@ -87,22 +90,20 @@ const CompetitionRounds = ({ competitionId }) => {
   };
 
   const fetchTeamsInfo = async (ids) => {
-    const unique = [...new Set(ids.filter(Boolean))];
+    const unique = [...new Set(ids.filter(Boolean))].filter(id => !teamsInfo[id]);
+    if (!unique.length) return;
+
+    const results = await Promise.allSettled(
+      unique.map(id => competitionService.getTeam(id))
+    );
     const newTeams = {};
-    for (const id of unique) {
-      if (!teamsInfo[id]) {
-        try {
-          const res = await competitionService.getTeam(id);
-          newTeams[id] = res.data;
-        } catch (error) {
-          console.error(`Error obteniendo equipo ${id}:`, error);
-          newTeams[id] = { id, name: `Equipo ${id}` };
-        }
-      }
-    }
-    if (Object.keys(newTeams).length) {
-      setTeamsInfo(prev => ({ ...prev, ...newTeams }));
-    }
+    results.forEach((result, i) => {
+      const id = unique[i];
+      newTeams[id] = result.status === 'fulfilled'
+        ? result.value.data
+        : { id, name: `Equipo ${id}` };
+    });
+    setTeamsInfo(prev => ({ ...prev, ...newTeams }));
   };
 
   const getRoundStatus = (round) => {
