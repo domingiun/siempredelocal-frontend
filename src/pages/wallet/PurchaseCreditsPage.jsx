@@ -4,6 +4,7 @@ import { Card, Row, Col, Button, Typography, Alert, Spin, Modal, Tag } from 'ant
 import { ArrowLeftOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useWallet } from '../../context/WalletContext';
+import { useAuth } from '../../context/AuthContext';
 import betService from '../../services/betService';
 import './PurchaseCreditsPage.css';
 
@@ -11,6 +12,7 @@ const { Title, Text } = Typography;
 
 const PurchaseCreditsPage = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { purchaseCredits } = useWallet();
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -40,19 +42,49 @@ const PurchaseCreditsPage = () => {
     try {
       const result = await purchaseCredits(plan.id);
       if (result.success) {
+        const waMessage = encodeURIComponent(
+          `Hola, soy *${user?.username || 'usuario'}* y acabo de solicitar una recarga de *${plan.credits} créditos* por $${plan.final_price.toLocaleString()} COP en SiempreDeLocal. Adjunto el comprobante de pago para su verificación.`
+        );
+        const waUrl = `https://wa.me/573218424968?text=${waMessage}`;
+
         Modal.success({
-          title: '¡ Recarga Exitosa!',
+          title: '¡Solicitud de recarga enviada!',
+          width: 480,
           content: (
-            <div>
-              <p>Has Solicitado la recarga de <strong>{plan.credits} créditos</strong>.</p>
-              <p>Total recarga: <strong>${plan.final_price.toLocaleString()}</strong></p>
-              <p>Los créditos estaran disponibles en tu cajón al momento de ser verificados por el administrator.</p>
-              <p>La trasnsaccion se vera registrada en tu historial de transacciones como <strong>"Pendiente"</strong> hasta ser autorizada</p>
-              <p>Si tienes alguna duda, contacta con soporte.</p>
-              
+            <div style={{ lineHeight: 1.7 }}>
+              <p>Tu solicitud de <strong>{plan.credits} créditos</strong> por <strong>${plan.final_price.toLocaleString()} COP</strong> fue registrada correctamente.</p>
+              <p style={{ marginBottom: 4 }}>Para completar la recarga debes:</p>
+              <ol style={{ paddingLeft: 20, marginBottom: 12 }}>
+                <li>Realizar el pago por <strong>Nequi</strong> al número registrado.</li>
+                <li>Enviar el comprobante de pago por <strong>WhatsApp</strong> al número de soporte.</li>
+                <li>Una vez verificado, los créditos se acreditarán a tu cuenta.</li>
+              </ol>
+              <p style={{ fontSize: 12, color: '#888' }}>
+                La transacción aparecerá como <strong>"Pendiente"</strong> en tu historial hasta ser autorizada por el administrador.
+              </p>
+              <a
+                href={waUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  marginTop: 8,
+                  padding: '10px 20px',
+                  backgroundColor: '#25D366',
+                  color: '#fff',
+                  borderRadius: 8,
+                  fontWeight: 700,
+                  fontSize: 15,
+                  textDecoration: 'none',
+                }}
+              >
+                📲 Enviar comprobante por WhatsApp
+              </a>
             </div>
           ),
-          okText: 'Recargar Ahora',
+          okText: 'Ver mi wallet',
           okButtonProps: {
             style: {
               backgroundColor: '#0b1e5b',
