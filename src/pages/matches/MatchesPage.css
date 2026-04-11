@@ -92,3 +92,15 @@ body[data-theme="dark"] .ant-select-item-option-selected:not(.ant-select-item-op
     display: none !important;
   }
 }
+
+/* Mobile: hide extra filters, counter and view toggle */
+@media (max-width: 767px) {
+  .matches-filter-search,
+  .matches-filter-round,
+  .matches-filter-date,
+  .matches-filter-clear,
+  .matches-results-counter,
+  .matches-view-toggle {
+    display: none !important;
+  }
+}

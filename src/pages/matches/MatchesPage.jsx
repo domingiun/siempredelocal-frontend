@@ -575,7 +575,7 @@ const MatchesPage = () => {
 
         {/* Filtros */}
         <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-          <Col xs={24} md={6}>
+          <Col xs={24} md={6} className="matches-filter-search">
             <Input
               placeholder="Buscar equipo, estadio, jornada..."
               prefix={<SearchOutlined />}
@@ -584,7 +584,7 @@ const MatchesPage = () => {
               allowClear
             />
           </Col>
-          
+
           <Col xs={24} md={4}>
             <Select
               placeholder="Estado"
@@ -601,7 +601,7 @@ const MatchesPage = () => {
             </Select>
           </Col>
           
-          <Col xs={24} md={5}>
+          <Col xs={24} md={5} className="matches-filter-round">
             <Select
               placeholder="Jornada"
               style={{ width: '100%' }}
@@ -642,7 +642,7 @@ const MatchesPage = () => {
             />
           </Col>
           
-          <Col xs={24} md={2}>
+          <Col xs={24} md={2} className="matches-filter-clear">
             <Button
               icon={<FilterOutlined />}
               onClick={handleClearFilters}
@@ -655,7 +655,7 @@ const MatchesPage = () => {
         </Row>
 
         {/* Contador de resultados */}
-        <div style={{ marginBottom: 16 }}>
+        <div style={{ marginBottom: 16 }} className="matches-results-counter">
           <Space>
             <Text>
               Mostrando <strong>{filteredMatches.length}</strong> de <strong>{matches.length}</strong> partidos cargados
@@ -669,7 +669,7 @@ const MatchesPage = () => {
         </div>
 
         {/* Modo de visualización */}
-        <div style={{ marginBottom: 16, textAlign: 'right' }}>
+        <div style={{ marginBottom: 16, textAlign: 'right' }} className="matches-view-toggle">
           <Space.Compact>
             <Button
               type="default"
