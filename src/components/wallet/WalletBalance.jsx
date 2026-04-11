@@ -55,6 +55,10 @@ const WalletBalance = ({ compact = false, showActions = true }) => {
     wins: 0
   });
 
+  const pendingCredits = (transactions || [])
+    .filter(tx => tx.transaction_type === 'CREDIT_PURCHASE' && tx.status === 'pending')
+    .reduce((sum, tx) => sum + (tx.credits_affected || 0), 0);
+
   useEffect(() => {
     if (user) {
       fetchCreditInfo();
@@ -691,9 +695,24 @@ const WalletBalance = ({ compact = false, showActions = true }) => {
                       </Text>
                     </Col>
                   </Row>
+
+                  {pendingCredits > 0 && (
+                    <Row justify="space-between" align="middle" style={{ marginTop: 8, background: 'rgba(255,193,7,0.2)', borderRadius: 6, padding: '4px 8px' }}>
+                      <Col>
+                        <Text style={{ color: '#ffe58f', fontSize: 12 }}>
+                          ⏳ Créditos pendientes:
+                        </Text>
+                      </Col>
+                      <Col>
+                        <Tag color="warning" style={{ margin: 0, fontWeight: 700 }}>
+                          +{pendingCredits}
+                        </Tag>
+                      </Col>
+                    </Row>
+                  )}
                 </Space>
-                
-                <Button 
+
+                <Button
                   type="default"
                   className="btn-outline-primary"
                   block
