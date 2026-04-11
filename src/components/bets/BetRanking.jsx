@@ -753,12 +753,16 @@ const BetRanking = ({ betDateId }) => {
 
       {isDateFinished && ranking.length > 0 && (
         <Table
-          columns={columns}
+          columns={columns.map(col => {
+            if (col.key === 'prize' || col.key === 'exact_predictions') {
+              return { ...col, responsive: ['md'] };
+            }
+            return col;
+          })}
           dataSource={ranking}
           rowKey="bet_id"
           pagination={{ pageSize: 20 }}
           size="small"
-          scroll={{ x: 560 }}
         />
       )}
 
@@ -855,12 +859,10 @@ const BetRanking = ({ betDateId }) => {
                         </div>
                       )}
                       <div style={{
-                        fontSize: 11, fontWeight: 600,
+                        fontSize: 11,
                         color: isDark ? '#94a3b8' : '#64748b',
-                        background: isDark ? 'rgba(255,255,255,0.06)' : '#f1f5f9',
-                        borderRadius: 6, padding: '2px 8px',
                       }}>
-                        🎯 {pred}
+                        Pronóstico: <strong>{pred}</strong>
                       </div>
                     </div>
 
