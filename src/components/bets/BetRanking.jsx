@@ -181,6 +181,15 @@ const BetRanking = ({ betDateId }) => {
         return bTime - aTime;
       });
       setAvailableDates(ordered);
+
+      // Auto-seleccionar la última fecha finalizada si no viene betDateId externo
+      if (!betDateId) {
+        const lastFinished = ordered.find(d => {
+          const s = normalizeMatchStatus(d.status);
+          return s === 'finished' || s.includes('finalizada') || s.includes('finalizado');
+        });
+        if (lastFinished) setSelectedBetDateId(lastFinished.id);
+      }
     } catch (error) {
       console.error('Error cargando fechas para ranking:', error);
       setAvailableDates([]);
@@ -555,84 +564,118 @@ const BetRanking = ({ betDateId }) => {
           }
         }
       `}</style>
-      <Card style={{ marginBottom: 16 }}>
-        <Row gutter={[16, 16]}>
-          <Col span={24}>
-            <Title level={4}>
-              <TrophyOutlined style={{ marginRight: 8 }} />
-              Ranking - {betDate?.name} 
+      {/* Header */}
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
+          <div style={{
+            width: 40, height: 40, borderRadius: 10, flexShrink: 0,
+            background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 20, boxShadow: '0 4px 12px rgba(245,158,11,0.4)'
+          }}>
+            <TrophyOutlined style={{ color: '#fff' }} />
+          </div>
+          <div>
+            <Title level={4} style={{ margin: 0 }}>
+              Ranking — {betDate?.name || '...'}
             </Title>
-            <Text>
-              Una vez <strong>finalizada la fecha</strong>, podrás ver los resultados de todos los participantes, junto con sus predicciones y su puntuación.
-            </Text>
-          </Col>
+          </div>
+        </div>
 
-          {dateOptions.length > 0 && (
-            <Col span={24}>
-              <Row justify="space-between" align="middle" gutter={[12, 12]}>
-                <Col>
-                  <Space wrap>
-                    <Text type="secondary">Selecciona aqui la Fecha de Pronóstico para ver el <strong>Ranking</strong>:</Text>
-                    <Select
-                      style={{ minWidth: 260 }}
-                      value={selectedBetDateId}
-                      onChange={(value) => setSelectedBetDateId(value)}
-                      options={dateOptions.map((d) => ({
-                        value: d.id,
-                        label: (() => {
-                          const base = d.name || `Fecha #${d.id}`;
-                          const statusLabel = getBetDateStatusLabel(d.status);
-                          return statusLabel ? `${base} (${statusLabel})` : base;
-                        })()
-                      }))}
-                    />
-                  </Space>
-                </Col>
-              </Row>
-            </Col>
-          )}
+        {dateOptions.length > 0 && (
+          <Select
+            style={{ width: '100%', maxWidth: 320 }}
+            value={selectedBetDateId}
+            onChange={(value) => setSelectedBetDateId(value)}
+            options={dateOptions.map((d) => ({
+              value: d.id,
+              label: (() => {
+                const base = d.name || `Fecha #${d.id}`;
+                const statusLabel = getBetDateStatusLabel(d.status);
+                return statusLabel ? `${base} (${statusLabel})` : base;
+              })()
+            }))}
+          />
+        )}
+      </div>
 
-          {userRanking && (
-            <Col span={24}>
-              <Card
-                style={{
-                  background: 'linear-gradient(135deg, #1890ff 0%, #36cfc9 100%)',
-                  color: 'white'
-                }}
-              >
-                <Row justify="space-between" align="middle">
-                  <Col>
-                    <Space>
-                      <Title level={3} style={{ color: 'white', margin: 0 }}>
-                        {userPosition}
-                      </Title>
-                      <div>
-                        <Text strong style={{ color: 'white', display: 'block' }}>
-                          Tu posición.
-                        </Text>
-                        <Text style={{ color: 'rgba(255, 255, 255, 0.85)', fontSize: '18px' }}>
-                          {userRanking.points} puntos - {(userRanking.exact_scores ?? userRanking.exact_predictions ?? 0)} aciertos exactos
-                        </Text>
-                      </div>
-                    </Space>
-                  </Col>
-                  <Col>
-                    {userRanking.points >= 13 && userPosition === 1 ? (
-                      <Tag color="gold" style={{ fontSize: '16px', padding: '8px 16px' }}>
-                        <TrophyOutlined /> GANADOR
-                      </Tag>
-                    ) : (
-                      <Text style={{ color: 'white', fontSize: '14px' }}>
-                        {userRanking.points >= 13 ? 'Calificado para premio' : 'Necesitas 13+ puntos'}
-                      </Text>
-                    )}
-                  </Col>
-                </Row>
-              </Card>
+      {/* Card posición del usuario */}
+      {userRanking && (
+        <div style={{
+          marginBottom: 20,
+          borderRadius: 16,
+          overflow: 'hidden',
+          background: 'linear-gradient(135deg, #0f2557 0%, #1e3a8a 50%, #0f766e 100%)',
+          padding: '20px 24px',
+          position: 'relative',
+          boxShadow: '0 8px 32px rgba(30,58,138,0.35)',
+        }}>
+          {/* orbs decorativos */}
+          <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(14,165,233,0.15)' }} />
+          <div style={{ position: 'absolute', bottom: -20, right: 80, width: 70, height: 70, borderRadius: '50%', background: 'rgba(20,184,166,0.12)' }} />
+
+          <Row align="middle" gutter={[16, 12]}>
+            {/* Posición */}
+            <Col flex="none">
+              <div style={{
+                width: 64, height: 64, borderRadius: 16,
+                background: 'rgba(255,255,255,0.12)',
+                border: '2px solid rgba(255,255,255,0.2)',
+                display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'center',
+                backdropFilter: 'blur(8px)',
+              }}>
+                <span style={{ fontSize: 26, fontWeight: 900, color: '#fff', lineHeight: 1 }}>{userPosition}</span>
+                <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)', fontWeight: 600, letterSpacing: 1 }}>LUGAR</span>
+              </div>
             </Col>
-          )}
-        </Row>
-      </Card>
+
+            {/* Stats */}
+            <Col flex="auto">
+              <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>
+                Tu posición
+              </div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, flexWrap: 'wrap' }}>
+                <span style={{ fontSize: 32, fontWeight: 900, color: '#fff', lineHeight: 1 }}>
+                  {userRanking.points}
+                </span>
+                <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.65)', fontWeight: 500 }}>puntos</span>
+                <span style={{ fontSize: 13, color: '#67e8f9', fontWeight: 600, marginLeft: 4 }}>
+                  · {(userRanking.exact_scores ?? userRanking.exact_predictions ?? 0)} exactos
+                </span>
+              </div>
+            </Col>
+
+            {/* Badge estado */}
+            <Col flex="none">
+              {userRanking.points >= 13 && userPosition === 1 ? (
+                <div style={{
+                  background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                  borderRadius: 10, padding: '8px 16px',
+                  display: 'flex', alignItems: 'center', gap: 6,
+                  boxShadow: '0 4px 14px rgba(245,158,11,0.5)',
+                }}>
+                  <TrophyOutlined style={{ color: '#fff', fontSize: 16 }} />
+                  <span style={{ color: '#fff', fontWeight: 800, fontSize: 13 }}>GANADOR</span>
+                </div>
+              ) : (
+                <div style={{
+                  background: userRanking.points >= 13 ? 'rgba(52,211,153,0.2)' : 'rgba(255,255,255,0.1)',
+                  border: `1px solid ${userRanking.points >= 13 ? 'rgba(52,211,153,0.5)' : 'rgba(255,255,255,0.15)'}`,
+                  borderRadius: 10, padding: '8px 14px', textAlign: 'center',
+                }}>
+                  <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                    {userRanking.points >= 13 ? 'Calificado' : 'Meta'}
+                  </div>
+                  <div style={{ fontSize: 15, fontWeight: 800, color: userRanking.points >= 13 ? '#34d399' : '#fff' }}>
+                    {userRanking.points >= 13 ? '✓ Premio' : `${13 - userRanking.points} pts más`}
+                  </div>
+                </div>
+              )}
+            </Col>
+          </Row>
+        </div>
+      )}
 
       {!isDateFinished && (
         <Card
