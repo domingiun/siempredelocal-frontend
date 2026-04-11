@@ -17,10 +17,9 @@ class BetService {
     }
   }
 
-  async getBetDateDetails(betDateId) { 
+  async getBetDateDetails(betDateId) {
     try {
-      console.log('📅 Obteniendo detalle de fecha...');
-      const response = await api.get(`/bet-integration/betdate/${betDateId}`);
+      const response = await api.get(`/betdates/${betDateId}`);
       return response;
     } catch (error) {
       console.error('❌ Error obteniendo detalle de fecha:', error);

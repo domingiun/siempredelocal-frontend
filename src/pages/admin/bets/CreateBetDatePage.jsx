@@ -238,11 +238,31 @@ const CreateBetDateAdmin = () => {
         start_datetime: betDate.start_datetime ? dayjs(betDate.start_datetime) : null,
         close_datetime: betDate.close_datetime ? dayjs(betDate.close_datetime) : null
       });
+      // Cargar partidos disponibles si se va a permitir editar
+      if (betDate.status === 'open' && (betDate.bet_count || 0) === 0) {
+        loadAvailableMatches();
+      }
       setEditVisible(true);
     } catch (error) {
       console.error('Error cargando detalle de fecha:', error);
       message.error('No se pudo cargar la fecha para editar');
     }
+  };
+
+  const addMatchToEdit = (match) => {
+    if (editingMatchIds.length >= 10) {
+      message.warning('Máximo 10 partidos por fecha');
+      return;
+    }
+    if (editingMatchIds.includes(match.id)) {
+      message.warning('Este partido ya está en la fecha');
+      return;
+    }
+    setEditingMatchIds([...editingMatchIds, match.id]);
+  };
+
+  const removeMatchFromEdit = (matchId) => {
+    setEditingMatchIds(editingMatchIds.filter(id => id !== matchId));
   };
 
   const handleUpdateBetDate = async (values) => {
@@ -626,6 +646,7 @@ const CreateBetDateAdmin = () => {
         }}
         onOk={() => editForm.submit()}
         okText="Guardar cambios"
+        width={editingBetDate?.status === 'open' && (editingBetDate?.bet_count || 0) === 0 ? 900 : 520}
       >
         <Form form={editForm} layout="vertical" onFinish={handleUpdateBetDate}>
           <Form.Item
@@ -636,26 +657,119 @@ const CreateBetDateAdmin = () => {
             <Input />
           </Form.Item>
 
-          <Form.Item
-            label="Fecha y hora de inicio"
-            name="start_datetime"
-            rules={[{ required: true, message: 'Seleccione fecha de inicio' }]}
-          >
-            <DatePicker showTime style={{ width: '100%' }} />
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item
+                label="Fecha y hora de inicio"
+                name="start_datetime"
+                rules={[{ required: true, message: 'Seleccione fecha de inicio' }]}
+              >
+                <DatePicker showTime style={{ width: '100%' }} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item label="Fecha y hora de cierre" name="close_datetime">
+                <DatePicker showTime style={{ width: '100%' }} />
+              </Form.Item>
+            </Col>
+          </Row>
 
-          <Form.Item
-            label="Fecha y hora de cierre"
-            name="close_datetime"
-          >
-            <DatePicker showTime style={{ width: '100%' }} />
-          </Form.Item>
+          {/* Edición de partidos — solo si open y sin apuestas */}
+          {editingBetDate?.status === 'open' && (editingBetDate?.bet_count || 0) === 0 ? (
+            <>
+              <Divider>Partidos de esta fecha ({editingMatchIds.length}/10)</Divider>
 
-          <Alert
-            type="info"
-            showIcon
-            message="Los partidos asociados no se modifican desde aquí"
-          />
+              {/* Partidos actuales seleccionados */}
+              <div style={{ marginBottom: 12 }}>
+                <Space wrap>
+                  {editingMatchIds.map(matchId => {
+                    const m = availableMatches.find(x => x.id === matchId)
+                      || (editingBetDate.matches || []).find(x => x.id === matchId);
+                    const label = m
+                      ? `${m.home_team || m.home_team_name || '?'} vs ${m.away_team || m.away_team_name || '?'}`
+                      : `Partido #${matchId}`;
+                    return (
+                      <Tag
+                        key={matchId}
+                        color="blue"
+                        closable
+                        onClose={() => removeMatchFromEdit(matchId)}
+                      >
+                        {label}
+                      </Tag>
+                    );
+                  })}
+                  {editingMatchIds.length === 0 && (
+                    <Text type="secondary">Sin partidos seleccionados</Text>
+                  )}
+                </Space>
+              </div>
+
+              {editingMatchIds.length < 10 && (
+                <Alert
+                  type="warning"
+                  showIcon
+                  message={`Selecciona ${10 - editingMatchIds.length} partido(s) más para completar la fecha`}
+                  style={{ marginBottom: 12 }}
+                />
+              )}
+
+              {/* Selector de partidos disponibles */}
+              <Input
+                placeholder="Buscar partido..."
+                prefix={<SearchOutlined />}
+                value={matchSearch}
+                onChange={e => setMatchSearch(e.target.value)}
+                style={{ marginBottom: 8 }}
+              />
+              <div style={{ maxHeight: 260, overflow: 'auto' }}>
+                <Table
+                  dataSource={filteredMatches.filter(m => !editingMatchIds.includes(m.id))}
+                  rowKey="id"
+                  size="small"
+                  pagination={false}
+                  columns={[
+                    {
+                      title: 'Partido',
+                      render: (_, r) => (
+                        <div>
+                          <strong>{r.home_team}</strong> vs <strong>{r.away_team}</strong>
+                          <div style={{ fontSize: 11, color: '#888' }}>
+                            {r.competition} • {formatDateTimeShort(formatForInputUTC(r.match_date))}
+                          </div>
+                        </div>
+                      ),
+                    },
+                    {
+                      title: '',
+                      width: 80,
+                      render: (_, r) => (
+                        <Button
+                          size="small"
+                          type="primary"
+                          icon={<PlusOutlined />}
+                          disabled={editingMatchIds.length >= 10}
+                          onClick={() => addMatchToEdit(r)}
+                        >
+                          Agregar
+                        </Button>
+                      ),
+                    },
+                  ]}
+                />
+              </div>
+            </>
+          ) : (
+            <Alert
+              type={editingBetDate?.status !== 'open' ? 'warning' : 'info'}
+              showIcon
+              message={
+                editingBetDate?.status !== 'open'
+                  ? `Los partidos no se pueden cambiar: la fecha está en estado "${editingBetDate?.status}"`
+                  : `Los partidos no se pueden cambiar: ya hay ${editingBetDate?.bet_count} pronóstico(s) registrado(s)`
+              }
+            />
+          )}
         </Form>
       </Modal>
     </div>
