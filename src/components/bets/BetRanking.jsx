@@ -295,101 +295,95 @@ const BetRanking = ({ betDateId }) => {
 
   const columns = [
     {
-      title: 'Posición',
+      title: 'Pos',
       dataIndex: 'position',
       key: 'position',
       render: (position) => (
-        <div style={{ textAlign: 'center', width: 40 }}>
+        <div style={{ textAlign: 'center', width: 28 }}>
           {getPositionIcon(position)}
         </div>
       ),
-      width: 80,
+      width: 44,
     },
     {
       title: 'Usuario',
       key: 'user',
-      render: (_, record) => (
-        <Space>
-          <Avatar
-            size="small"
-            src={getAvatarSrc(
-              record.user_id === user?.id ? user?.avatar_url : userAvatars[record.user_id]
-            )}
-            icon={
-              !(record.user_id === user?.id ? user?.avatar_url : userAvatars[record.user_id])
-                ? <UserOutlined />
-                : undefined
-            }
-            style={{
-              backgroundColor: record.user_id === user?.id ? '#1890ff' : '#d9d9d9'
-            }}
-          />
-          <div>
-            <Text strong={record.user_id === user?.id}>
-              {record.username}
-              {record.user_id === user?.id && (
-                <Tag color="blue" style={{ marginLeft: 8 }}>Tu</Tag>
-              )}
-            </Text>
-          </div>
-        </Space>
-      ),
+      render: (_, record) => {
+        const isWinner = record.position === 1 && record.points >= 13;
+        const avatarSrc = getAvatarSrc(
+          record.user_id === user?.id ? user?.avatar_url : userAvatars[record.user_id]
+        );
+        return (
+          <Space size={6}>
+            <Avatar
+              size={26}
+              src={avatarSrc}
+              icon={!avatarSrc ? <UserOutlined /> : undefined}
+              style={{ backgroundColor: record.user_id === user?.id ? '#1890ff' : '#d9d9d9', flexShrink: 0 }}
+            />
+            <div style={{ lineHeight: 1.3 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
+                <span style={{ fontSize: 12, fontWeight: record.user_id === user?.id ? 700 : 400 }}>
+                  {record.username}
+                </span>
+                {record.user_id === user?.id && (
+                  <Tag color="blue" style={{ fontSize: 10, padding: '0 4px', lineHeight: '15px', margin: 0 }}>Tú</Tag>
+                )}
+                {isWinner && (
+                  <Tag color="gold" style={{ fontSize: 10, padding: '0 4px', lineHeight: '15px', margin: 0 }}>Ganador</Tag>
+                )}
+              </div>
+            </div>
+          </Space>
+        );
+      },
     },
     {
-      title: 'Puntos',
+      title: 'Pts',
       dataIndex: 'points',
       key: 'points',
-      render: (points) => (
-        <Badge
-          count={points}
-          style={{
-            backgroundColor: points >= 13 ? '#52c41a' : '#1890ff',
-            fontSize: '14px'
-          }}
-        />
-      ),
-      width: 100,
+      render: (points, record) => {
+        const isWinner = record.position === 1 && points >= 13;
+        return (
+          <Badge
+            count={points}
+            style={{
+              backgroundColor: isWinner ? '#d97706' : points >= 8 ? '#52c41a' : '#1890ff',
+              fontSize: '13px',
+            }}
+          />
+        );
+      },
+      width: 56,
     },
     {
       title: 'Premio',
       key: 'prize',
+      responsive: ['md'],
       render: (_, record) => {
         if (record.position === 1 && record.points >= 13) {
           return (
-            <Text strong style={{ color: '#52c41a' }}>
+            <Text strong style={{ color: '#52c41a', fontSize: 12 }}>
               ${Number(prizePaidTotal || 0).toLocaleString()}
             </Text>
           );
         }
-        return <Text type="secondary">-</Text>;
+        return <Text type="secondary" style={{ fontSize: 12 }}>—</Text>;
       },
-      width: 120,
+      width: 100,
     },
     {
-      title: 'Aciertos Exactos',
+      title: 'Exactos',
       dataIndex: 'exact_scores',
       key: 'exact_predictions',
+      responsive: ['md'],
       render: (exact, record) => (
-        <Space>
-          <FireOutlined />
-          <Text>{(exact ?? record.exact_predictions ?? 0)}/10</Text>
+        <Space size={3}>
+          <FireOutlined style={{ fontSize: 11 }} />
+          <Text style={{ fontSize: 12 }}>{(exact ?? record.exact_predictions ?? 0)}/10</Text>
         </Space>
       ),
-      width: 120,
-    },
-    {
-      title: 'Ver',
-      key: 'view',
-      render: (_, record) => (
-        <Button
-          icon={<EyeOutlined />}
-          size="small"
-          onClick={() => openBetPreview(record)}
-        >
-          Ver
-        </Button>
-      ),
-      width: 90,
+      width: 80,
     },
   ];
 
@@ -752,18 +746,22 @@ const BetRanking = ({ betDateId }) => {
       )}
 
       {isDateFinished && ranking.length > 0 && (
-        <Table
-          columns={columns.map(col => {
-            if (col.key === 'prize' || col.key === 'exact_predictions') {
-              return { ...col, responsive: ['md'] };
-            }
-            return col;
-          })}
-          dataSource={ranking}
-          rowKey="bet_id"
-          pagination={{ pageSize: 20 }}
-          size="small"
-        />
+        <>
+          <div style={{ fontSize: 11, color: isDark ? '#64748b' : '#94a3b8', marginBottom: 6, textAlign: 'right' }}>
+            Toca una fila para ver el pronóstico
+          </div>
+          <Table
+            columns={columns}
+            dataSource={ranking}
+            rowKey="bet_id"
+            pagination={{ pageSize: 20 }}
+            size="small"
+            onRow={(record) => ({
+              onClick: () => openBetPreview(record),
+              style: { cursor: 'pointer' },
+            })}
+          />
+        </>
       )}
 
       <Modal
