@@ -88,7 +88,8 @@ const CreateBetDateAdmin = () => {
     try {
       setLoadingBetDates(true);
       const response = await betService.getBetDates();
-      setBetDates(response.data || []);
+      const sorted = (response.data || []).slice().sort((a, b) => b.id - a.id);
+      setBetDates(sorted);
     } catch (error) {
       console.error('Error cargando fechas:', error);
       message.error('Error al cargar fechas de pronósticos');
@@ -227,7 +228,7 @@ const CreateBetDateAdmin = () => {
 
   const openEditModal = async (betDateId) => {
     try {
-      const response = await betService.getBetDateDetails(betDateId);
+      const response = await betService.getBetDateDetailsAdmin(betDateId);
       const betDate = response.data;
       const matchIds = (betDate.matches || []).map(m => m.id);
 

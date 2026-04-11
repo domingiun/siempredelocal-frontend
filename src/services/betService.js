@@ -19,10 +19,20 @@ class BetService {
 
   async getBetDateDetails(betDateId) {
     try {
-      const response = await api.get(`/betdates/${betDateId}`);
+      const response = await api.get(`/bet-integration/betdate/${betDateId}`);
       return response;
     } catch (error) {
       console.error('❌ Error obteniendo detalle de fecha:', error);
+      throw error;
+    }
+  }
+
+  async getBetDateDetailsAdmin(betDateId) {
+    try {
+      const response = await api.get(`/betdates/${betDateId}`);
+      return response;
+    } catch (error) {
+      console.error('❌ Error obteniendo detalle de fecha (admin):', error);
       throw error;
     }
   }
