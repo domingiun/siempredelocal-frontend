@@ -766,110 +766,127 @@ const BetRanking = ({ betDateId }) => {
         open={previewOpen}
         onCancel={() => setPreviewOpen(false)}
         footer={null}
-        title="Pronóstico del usuario"
-        width={900}
+        title={null}
+        width={600}
+        style={{ top: 20 }}
+        styles={{ body: { padding: 0 } }}
       >
         {previewLoading ? (
-          <div style={{ textAlign: 'center', padding: '20px' }}>
-            <Spin />
+          <div style={{ textAlign: 'center', padding: '40px' }}>
+            <Spin size="large" />
           </div>
         ) : previewPredictions.length === 0 ? (
-          <Alert
-            type="info"
-            showIcon
-            title="No hay pronósticos para mostrar."
-          />
+          <div style={{ padding: 24 }}>
+            <Alert type="info" showIcon message="No hay pronósticos para mostrar." />
+          </div>
         ) : (
-          <>
-            <Space wrap>
-              <Tag color="blue">Usuario: {previewBet?.username || 'N/D'}</Tag>
-              <Tag color="geekblue">Bet ID: {previewBet?.bet_id}</Tag>
-              <Tag color="green">
-                Total puntos: {previewPredictions.reduce((sum, p) => sum + (p.points || 0), 0)}
-              </Tag>
-            </Space>
-            <Divider />
-            <Table
-              size="small"
-              pagination={false}
-              rowKey={(row, idx) => `${row.match_id}-${idx}`}
-              dataSource={previewPredictions}
-              columns={[
-                {
-                  title: 'Partido',
-                  key: 'match',
-                  render: (_, row) => {
-                    const match = row.match;
-                    if (!match) return `Partido ${row.match_id}`;
-                    const home = match.home_team?.name || match.home_team;
-                    const away = match.away_team?.name || match.away_team;
-                    const homeLogo = match.home_team?.logo_url || match.home_logo;
-                    const awayLogo = match.away_team?.logo_url || match.away_logo;
-                    return (
-                      <Space align="center" wrap>
-                        {homeLogo ? (
-                          <img
-                            src={homeLogo}
-                            alt={home || 'Local'}
-                            style={{ width: 28, height: 28, borderRadius: '50%' }}
-                          />
-                        ) : null}
-                        <Text strong>{home}</Text>
-                        <Text type="secondary">vs</Text>
-                        <Text strong>{away}</Text>
-                        {awayLogo ? (
-                          <img
-                            src={awayLogo}
-                            alt={away || 'Visitante'}
-                            style={{ width: 28, height: 28, borderRadius: '50%' }}
-                          />
-                        ) : null}
-                      </Space>
-                    );
-                  },
-                },
-                {
-                  title: 'Fecha',
-                  key: 'date',
-                  render: (_, row) => {
-                    const match = row.match;
-                    return match?.match_date ? formatDateTimeShortUTC(match.match_date) : '-';
-                  },
-                  width: 160,
-                },
-                {
-                  title: 'Pronóstico',
-                  key: 'pred',
-                  render: (_, row) => (
-                    <span>
-                      {row.predicted_home_score} - {row.predicted_away_score}
-                    </span>
-                  ),
-                  width: 120,
-                },
-                {
-                  title: 'Resultado',
-                  key: 'result',
-                  render: (_, row) => {
-                    const match = row.match;
-                    if (!row.finished || !match) return 'Pendiente';
-                    return `${match.home_score} - ${match.away_score}`;
-                  },
-                  width: 120,
-                },
-                {
-                  title: 'Puntos',
-                  key: 'points',
-                  render: (_, row) => (
-                    <Tag color={row.points === 3 ? 'green' : row.points === 1 ? 'blue' : 'default'}>
-                      {row.points} pts
-                    </Tag>
-                  ),
-                  width: 100,
-                },
-              ]}
-            />
-          </>
+          <div style={{ background: isDark ? '#0a0f16' : '#f8fafc' }}>
+            {/* Header del modal */}
+            <div style={{
+              background: 'linear-gradient(135deg, #0f2557 0%, #1e3a8a 100%)',
+              padding: '20px 24px',
+              borderRadius: '8px 8px 0 0',
+            }}>
+              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 4 }}>
+                Pronóstico de
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
+                <span style={{ fontSize: 20, fontWeight: 800, color: '#fff' }}>
+                  {previewBet?.username || 'Usuario'}
+                </span>
+                <div style={{
+                  background: 'rgba(255,255,255,0.15)',
+                  borderRadius: 10, padding: '6px 14px',
+                  display: 'flex', alignItems: 'center', gap: 8,
+                }}>
+                  <TrophyOutlined style={{ color: '#fbbf24' }} />
+                  <span style={{ color: '#fff', fontWeight: 800, fontSize: 18 }}>
+                    {previewPredictions.reduce((s, p) => s + (p.points || 0), 0)}
+                  </span>
+                  <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12 }}>pts</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Lista de predicciones */}
+            <div style={{ padding: '12px 16px', maxHeight: '70vh', overflowY: 'auto' }}>
+              {previewPredictions.map((row, idx) => {
+                const match = row.match;
+                const home = match?.home_team?.name || match?.home_team || '?';
+                const away = match?.away_team?.name || match?.away_team || '?';
+                const homeLogo = match?.home_team?.logo_url || match?.home_logo;
+                const awayLogo = match?.away_team?.logo_url || match?.away_logo;
+                const result = row.finished && match ? `${match.home_score} - ${match.away_score}` : null;
+                const pred = `${row.predicted_home_score} - ${row.predicted_away_score}`;
+                const pts = row.points || 0;
+                const ptColor = pts === 3 ? '#22c55e' : pts === 1 ? '#60a5fa' : '#475569';
+                const ptBg   = pts === 3 ? 'rgba(34,197,94,0.15)' : pts === 1 ? 'rgba(96,165,250,0.15)' : (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)');
+
+                return (
+                  <div key={`${row.match_id}-${idx}`} style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    padding: '10px 12px',
+                    marginBottom: 8,
+                    borderRadius: 12,
+                    background: isDark ? '#0f1824' : '#fff',
+                    border: `1px solid ${isDark ? '#1e293b' : '#e2e8f0'}`,
+                  }}>
+                    {/* Nº */}
+                    <div style={{ fontSize: 11, fontWeight: 700, color: '#64748b', width: 18, flexShrink: 0, textAlign: 'center' }}>
+                      {idx + 1}
+                    </div>
+
+                    {/* Local */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, width: 44, flexShrink: 0 }}>
+                      {homeLogo
+                        ? <img src={homeLogo} alt={home} style={{ width: 28, height: 28, objectFit: 'contain' }} />
+                        : <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#334155', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: '#94a3b8' }}>{home.charAt(0)}</div>
+                      }
+                      <span style={{ fontSize: 10, color: isDark ? '#94a3b8' : '#64748b', textAlign: 'center', maxWidth: 44, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{home}</span>
+                    </div>
+
+                    {/* Scores */}
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                      {result && (
+                        <div style={{ fontSize: 15, fontWeight: 800, color: isDark ? '#e2e8f0' : '#0f172a', letterSpacing: 1 }}>
+                          {result}
+                        </div>
+                      )}
+                      <div style={{
+                        fontSize: 11, fontWeight: 600,
+                        color: isDark ? '#94a3b8' : '#64748b',
+                        background: isDark ? 'rgba(255,255,255,0.06)' : '#f1f5f9',
+                        borderRadius: 6, padding: '2px 8px',
+                      }}>
+                        🎯 {pred}
+                      </div>
+                    </div>
+
+                    {/* Visitante */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, width: 44, flexShrink: 0 }}>
+                      {awayLogo
+                        ? <img src={awayLogo} alt={away} style={{ width: 28, height: 28, objectFit: 'contain' }} />
+                        : <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#334155', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, color: '#94a3b8' }}>{away.charAt(0)}</div>
+                      }
+                      <span style={{ fontSize: 10, color: isDark ? '#94a3b8' : '#64748b', textAlign: 'center', maxWidth: 44, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{away}</span>
+                    </div>
+
+                    {/* Puntos */}
+                    <div style={{
+                      width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+                      background: ptBg, border: `1px solid ${ptColor}40`,
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <span style={{ fontSize: 16, fontWeight: 900, color: ptColor, lineHeight: 1 }}>{pts}</span>
+                      <span style={{ fontSize: 8, color: ptColor, fontWeight: 600, opacity: 0.8 }}>pts</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         )}
       </Modal>
     </div>
