@@ -868,7 +868,7 @@ const Dashboard = () => {
             loading={loading}
             className="dash-stat dash-prize dash-prize--accent"
             hoverable
-            onClick={() => navigate('/ranking')}
+            onClick={() => navigate('/bets/ranking')}
             style={{ cursor: 'pointer' }}
           >
             <div style={{ textAlign: 'center' }}>
