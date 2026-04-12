@@ -862,8 +862,8 @@ const Dashboard = () => {
 
       <Row gutter={[16, 16]}>
 
-        {/* Premio acumulado — primera posición, clickeable → Ranking */}
-        <Col xs={24} sm={6}>
+        {/* Fila 1: Premio Acumulado | Partidos de Hoy */}
+        <Col xs={12} sm={6}>
           <Card
             loading={loading}
             className="dash-stat dash-prize dash-prize--accent"
@@ -877,7 +877,7 @@ const Dashboard = () => {
                 Premio acumulado
               </div>
               <div style={{
-                fontSize: isMobile ? 22 : 32,
+                fontSize: isMobile ? 20 : 32,
                 fontWeight: 800,
                 lineHeight: 1.1,
                 background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
@@ -891,7 +891,18 @@ const Dashboard = () => {
           </Card>
         </Col>
 
-        <Col xs={24} sm={6}>
+        <Col xs={12} sm={6}>
+          <Card loading={loading} className="dash-stat" hoverable onClick={() => navigate('/matches/today')} style={{ cursor: 'pointer' }}>
+            <Statistic
+              title="Partidos de Hoy"
+              value={stats.todayMatchesCount}
+              prefix={<span className="sport-icon orange"><CalendarOutlined /></span>}
+            />
+          </Card>
+        </Col>
+
+        {/* Fila 2: Competencias | Equipos */}
+        <Col xs={12} sm={6}>
           <Card loading={loading} className="dash-stat" hoverable onClick={() => navigate('/competitions')} style={{ cursor: 'pointer' }}>
             <Statistic
               title="Competencias"
@@ -910,22 +921,12 @@ const Dashboard = () => {
           </Card>
         </Col>
 
-        <Col xs={24} sm={6}>
+        <Col xs={12} sm={6}>
           <Card loading={loading} className="dash-stat" hoverable onClick={() => navigate('/teams')} style={{ cursor: 'pointer' }}>
             <Statistic
               title="Equipos"
               value={stats.totalTeams}
               prefix={<span className="sport-icon green"><TeamOutlined /></span>}
-            />
-          </Card>
-        </Col>
-
-        <Col xs={24} sm={6}>
-          <Card loading={loading} className="dash-stat" hoverable onClick={() => navigate('/matches/today')} style={{ cursor: 'pointer' }}>
-            <Statistic
-              title="Partidos de Hoy"
-              value={stats.todayMatchesCount}
-              prefix={<span className="sport-icon orange"><CalendarOutlined /></span>}
             />
           </Card>
         </Col>
