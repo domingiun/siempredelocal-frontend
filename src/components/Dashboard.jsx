@@ -39,6 +39,7 @@ const Dashboard = () => {
     activeCompetitions: 0,
     totalTeams: 0,
     totalMatches: 0,
+    todayMatchesCount: 0,
     recentMatches: [],
     activeUsers: 0,
     bettingUsers: 0,
@@ -110,11 +111,19 @@ const Dashboard = () => {
         : 0;
       const accumulatedPrize = betdates.reduce((sum, bd) => sum + (bd.accumulated_prize || 0), 0);
 
+      // Partidos de hoy
+      let todayMatchesCount = 0;
+      try {
+        const todayRes = await api.get('/matches/today/upcoming');
+        todayMatchesCount = (todayRes?.data?.today || []).length;
+      } catch (_) {}
+
       setStats({
         totalCompetitions: competitions.length,
         activeCompetitions,
         totalTeams: teams.length,
         totalMatches: matches.length,
+        todayMatchesCount,
         recentMatches,
         activeUsers: 0,
         bettingUsers: financial.active_users_count || 0,
@@ -853,6 +862,35 @@ const Dashboard = () => {
 
       <Row gutter={[16, 16]}>
 
+        {/* Premio acumulado — primera posición, clickeable → Ranking */}
+        <Col xs={24} sm={6}>
+          <Card
+            loading={loading}
+            className="dash-stat dash-prize dash-prize--accent"
+            hoverable
+            onClick={() => navigate('/ranking')}
+            style={{ cursor: 'pointer' }}
+          >
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', color: '#94a3b8', marginBottom: 4 }}>
+                <StarOutlined style={{ marginRight: 6, color: '#f59e0b' }} />
+                Premio acumulado
+              </div>
+              <div style={{
+                fontSize: isMobile ? 22 : 32,
+                fontWeight: 800,
+                lineHeight: 1.1,
+                background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}>
+                {(stats.accumulatedPrize || 0).toLocaleString('es-CO')}
+              </div>
+            </div>
+          </Card>
+        </Col>
+
         <Col xs={24} sm={6}>
           <Card loading={loading} className="dash-stat" hoverable onClick={() => navigate('/competitions')} style={{ cursor: 'pointer' }}>
             <Statistic
@@ -883,35 +921,12 @@ const Dashboard = () => {
         </Col>
 
         <Col xs={24} sm={6}>
-          <Card loading={loading} className="dash-stat" hoverable onClick={() => navigate('/matches')} style={{ cursor: 'pointer' }}>
+          <Card loading={loading} className="dash-stat" hoverable onClick={() => navigate('/matches/today')} style={{ cursor: 'pointer' }}>
             <Statistic
-              title="Partidos"
-              value={stats.totalMatches}
+              title="Partidos de Hoy"
+              value={stats.todayMatchesCount}
               prefix={<span className="sport-icon orange"><CalendarOutlined /></span>}
             />
-          </Card>
-        </Col>
-
-        {/* Premio acumulado: en móvil aparece 4to (después de Partidos); en desktop va en fila 2 */}
-        <Col xs={24} sm={6}>
-          <Card loading={loading} className="dash-stat dash-prize dash-prize--accent">
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: 1, textTransform: 'uppercase', color: '#94a3b8', marginBottom: 4 }}>
-                <StarOutlined style={{ marginRight: 6, color: '#f59e0b' }} />
-                Premio acumulado
-              </div>
-              <div style={{
-                fontSize: isMobile ? 22 : 32,
-                fontWeight: 800,
-                lineHeight: 1.1,
-                background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}>
-                {(stats.accumulatedPrize || 0).toLocaleString('es-CO')}
-              </div>
-            </div>
           </Card>
         </Col>
 
