@@ -754,7 +754,7 @@ const BetRanking = ({ betDateId }) => {
             columns={columns}
             dataSource={ranking}
             rowKey="bet_id"
-            pagination={{ pageSize: 20 }}
+            pagination={{ pageSize: 50 }}
             size="small"
             onRow={(record) => ({
               onClick: () => openBetPreview(record),
