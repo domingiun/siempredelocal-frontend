@@ -68,7 +68,7 @@ const Dashboard = () => {
       ] = await Promise.allSettled([
         competitionService.getCompetitions({ limit: 100 }),
         competitionService.getTeams(),
-        competitionService.getMatches({ limit: 20, order: 'desc' }), // solo 20 para recientes
+        competitionService.getMatches({ limit: 5, order: 'desc', status: 'Finalizado' }), // solo los 5 últimos finalizados
         betService.getBetDates(),
         betService.getBetStats(),
         betService.getFinancialSummary(30),
