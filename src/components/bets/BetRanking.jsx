@@ -671,7 +671,7 @@ const BetRanking = ({ betDateId }) => {
         </div>
       )}
 
-      {!isDateFinished && (
+      {!loading && selectedBetDateId && !isDateFinished && (
         <Card
           className="ranking-alert ranking-alert--info"
           style={{
