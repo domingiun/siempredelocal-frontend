@@ -494,11 +494,22 @@ const Dashboard = () => {
       key: 'total_prize',
       width: 110,
       align: 'right',
-      render: (value) => (
-        <span style={{ display: 'inline-block', width: '100%', textAlign: 'right', fontSize: '12px' }}>
-          ${Number(value || 0).toLocaleString()}
-        </span>
-      )
+      render: (value, record) => {
+        // Sin ganador (nadie apostó) o ganador sin puntos suficientes → el premio se acumula
+        if (record.winner === 'Sin ganador' || !record.qualifies) {
+          return (
+            <span style={{ fontSize: '12px', color: '#d97706', fontWeight: 600 }}>
+              Acumulado →
+            </span>
+          );
+        }
+        // Hay ganador con >= 13 pts → premio pagado
+        return (
+          <span style={{ display: 'inline-block', width: '100%', textAlign: 'right', fontSize: '12px', color: '#52c41a', fontWeight: 600 }}>
+            ${Number(value || 0).toLocaleString()}
+          </span>
+        );
+      }
     }
   ];
 
