@@ -148,10 +148,13 @@ const Dashboard = () => {
       const betdates = betdatesRes?.data || [];
 
       // Ranking de las últimas 3 fechas finalizadas (reducido de 5 a 3)
+      // Incluir 'closed' además de 'finished': el BetDate.status no siempre se
+      // actualiza a 'finished' automáticamente aunque todos los partidos terminen.
+      // El endpoint de ranking valida internamente si los partidos están finalizados.
       const finishedBetdates = betdates
-        .filter(bd => bd.status === 'finished')
+        .filter(bd => bd.status === 'finished' || bd.status === 'closed')
         .sort((a, b) => new Date(b.close_datetime || b.start_datetime || 0) - new Date(a.close_datetime || a.start_datetime || 0))
-        .slice(0, 3);
+        .slice(0, 5);
 
       const winners = await Promise.all(
         finishedBetdates.map(async (bd) => {
