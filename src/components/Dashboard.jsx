@@ -148,21 +148,20 @@ const Dashboard = () => {
       const betdates = betdatesRes?.data || [];
 
       // Ranking de las últimas 3 fechas finalizadas (reducido de 5 a 3)
-      // Incluir 'closed' además de 'finished': el BetDate.status no siempre se
-      // actualiza a 'finished' automáticamente aunque todos los partidos terminen.
-      // El endpoint de ranking valida internamente si los partidos están finalizados.
-      const finishedBetdates = betdates
+      // Candidatas: 'finished' y 'closed'. El backend valida internamente si
+      // todos los partidos terminaron (400 = aún en curso, 404 = sin pronósticos).
+      // Solo mostramos la fecha si el ranking responde 200 o 404.
+      const candidateBetdates = betdates
         .filter(bd => bd.status === 'finished' || bd.status === 'closed')
         .sort((a, b) => new Date(b.close_datetime || b.start_datetime || 0) - new Date(a.close_datetime || a.start_datetime || 0))
-        .slice(0, 5);
+        .slice(0, 8); // pedir más para compensar las que fallen con 400
 
-      const winners = await Promise.all(
-        finishedBetdates.map(async (bd) => {
+      const winnerResults = await Promise.all(
+        candidateBetdates.map(async (bd) => {
           try {
             const rankingRes = await betService.getRanking(bd.id, { silent404: true });
             const ranking = rankingRes?.data?.data?.ranking || [];
             const winner = ranking[0];
-            // Avatar: solo si hay ganador con user_id
             let winnerAvatarUrl = null;
             if (winner?.user_id) {
               try {
@@ -183,7 +182,11 @@ const Dashboard = () => {
                 ((bd.prize_cop || 0) + (bd.accumulated_prize || 0)),
               qualifies: rankingRes?.data?.data?.qualifies_for_prize ?? false,
             };
-          } catch (_) {
+          } catch (err) {
+            const httpStatus = err?.response?.status;
+            // 400 = partidos aún en curso → excluir de la lista
+            if (httpStatus === 400) return null;
+            // 404 = sin pronósticos → mostrar "Sin ganador"
             return {
               betdate_id: bd.id,
               betdate_name: bd.name,
@@ -197,6 +200,8 @@ const Dashboard = () => {
           }
         })
       );
+      // Filtrar las que retornaron null (400) y quedarnos con las últimas 5
+      const winners = winnerResults.filter(Boolean).slice(0, 5);
       setBetdateWinners(winners);
 
       // Partidos de la fecha más reciente
