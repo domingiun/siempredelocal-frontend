@@ -55,28 +55,37 @@ const Dashboard = () => {
   const fetchDashboardData = async () => {
     setLoading(true);
     try {
+      // ── Fase 1: todo en paralelo, la UI aparece tan pronto termine el más lento ──
       const [
         competitionsRes,
         teamsRes,
         matchesRes,
         betdatesRes,
         betStatsRes,
-        financialRes
+        financialRes,
+        todayRes,
+        systemRes,
       ] = await Promise.allSettled([
         competitionService.getCompetitions({ limit: 100 }),
         competitionService.getTeams(),
-        competitionService.getMatches({ limit: 100, order: 'desc' }),
+        competitionService.getMatches({ limit: 20, order: 'desc' }), // solo 20 para recientes
         betService.getBetDates(),
         betService.getBetStats(),
-        betService.getFinancialSummary(30)
+        betService.getFinancialSummary(30),
+        api.get('/matches/today/upcoming'),
+        api.get('/admin/system/stats'),
       ]);
 
       const competitions = competitionsRes.status === 'fulfilled' ? (competitionsRes.value.data || []) : [];
-      const teams = teamsRes.status === 'fulfilled' ? (teamsRes.value.data || []) : [];
-      const matches = matchesRes.status === 'fulfilled' ? (matchesRes.value.data || []) : [];
-      const betdates = betdatesRes.status === 'fulfilled' ? (betdatesRes.value.data || []) : [];
-      const betStats = betStatsRes.status === 'fulfilled' ? (betStatsRes.value.data || {}) : {};
-      const financial = financialRes.status === 'fulfilled' ? (financialRes.value.data || {}) : {};
+      const teams        = teamsRes.status === 'fulfilled' ? (teamsRes.value.data || []) : [];
+      const matches      = matchesRes.status === 'fulfilled' ? (matchesRes.value.data || []) : [];
+      const betdates     = betdatesRes.status === 'fulfilled' ? (betdatesRes.value.data || []) : [];
+      const betStats     = betStatsRes.status === 'fulfilled' ? (betStatsRes.value.data || {}) : {};
+      const financial    = financialRes.status === 'fulfilled' ? (financialRes.value.data || {}) : {};
+      const todayMatches = todayRes.status === 'fulfilled' ? (todayRes.value?.data?.today || []) : [];
+      const activeUsers  = systemRes.status === 'fulfilled'
+        ? (systemRes.value?.data?.database?.active_users ?? 0)
+        : 0;
 
       const getMatchTime = (match) => {
         const raw = match?.updated_at || match?.match_date || match?.date || match?.start_datetime || match?.created_at;
@@ -84,13 +93,11 @@ const Dashboard = () => {
         return Number.isFinite(time) ? time : 0;
       };
 
-      const finishedMatches = matches.filter(match => {
-        const statusLower = String(match?.status || '').toLowerCase();
-        return statusLower.includes('finalizado') || statusLower === 'finished';
-      });
-
-      const recentMatches = finishedMatches
-        .slice()
+      const recentMatches = matches
+        .filter(m => {
+          const s = String(m?.status || '').toLowerCase();
+          return s.includes('finalizado') || s === 'finished';
+        })
         .sort((a, b) => getMatchTime(b) - getMatchTime(a))
         .slice(0, 5);
 
@@ -111,44 +118,40 @@ const Dashboard = () => {
         : 0;
       const accumulatedPrize = betdates.reduce((sum, bd) => sum + (bd.accumulated_prize || 0), 0);
 
-      // Partidos de hoy
-      let todayMatchesCount = 0;
-      try {
-        const todayRes = await api.get('/matches/today/upcoming');
-        todayMatchesCount = (todayRes?.data?.today || []).length;
-      } catch (_) {}
-
+      // ── Render inmediato con datos básicos ──────────────────────────────────
       setStats({
         totalCompetitions: competitions.length,
         activeCompetitions,
         totalTeams: teams.length,
         totalMatches: matches.length,
-        todayMatchesCount,
+        todayMatchesCount: todayMatches.length,
         recentMatches,
-        activeUsers: 0,
+        activeUsers,
         bettingUsers: financial.active_users_count || 0,
         lastActivePrize,
-        accumulatedPrize: betStats.total_prize_pool ?? accumulatedPrize
+        accumulatedPrize: betStats.total_prize_pool ?? accumulatedPrize,
       });
 
-      try {
-        const systemStatsRes = await api.get('/admin/system/stats');
-        const activeUsers = systemStatsRes?.data?.database?.active_users ?? 0;
-        setStats(prev => ({ ...prev, activeUsers }));
-      } catch (error) {
-        try {
-          const usersRes = await api.get('/users/');
-          const users = usersRes?.data || [];
-          setStats(prev => ({ ...prev, activeUsers: users.length }));
-        } catch (fallbackError) {
-          setStats(prev => ({ ...prev, activeUsers: 0 }));
-        }
-      }
+    } catch (error) {
+      console.error('Error cargando dashboard (fase 1):', error);
+    } finally {
+      setLoading(false);
+    }
 
+    // ── Fase 2: datos pesados en segundo plano (no bloquean el render) ────────
+    fetchSecondaryData();
+  };
+
+  const fetchSecondaryData = async () => {
+    try {
+      const betdatesRes = await betService.getBetDates();
+      const betdates = betdatesRes?.data || [];
+
+      // Ranking de las últimas 3 fechas finalizadas (reducido de 5 a 3)
       const finishedBetdates = betdates
         .filter(bd => bd.status === 'finished')
         .sort((a, b) => new Date(b.close_datetime || b.start_datetime || 0) - new Date(a.close_datetime || a.start_datetime || 0))
-        .slice(0, 5);
+        .slice(0, 3);
 
       const winners = await Promise.all(
         finishedBetdates.map(async (bd) => {
@@ -156,14 +159,13 @@ const Dashboard = () => {
             const rankingRes = await betService.getRanking(bd.id, { silent404: true });
             const ranking = rankingRes?.data?.data?.ranking || [];
             const winner = ranking[0];
+            // Avatar: solo si hay ganador con user_id
             let winnerAvatarUrl = null;
             if (winner?.user_id) {
               try {
                 const userRes = await userService.getUserById(winner.user_id);
                 winnerAvatarUrl = userRes?.data?.avatar_url || null;
-              } catch (avatarError) {
-                winnerAvatarUrl = null;
-              }
+              } catch (_) {}
             }
             return {
               betdate_id: bd.id,
@@ -176,70 +178,48 @@ const Dashboard = () => {
                 rankingRes?.data?.data?.prize_paid_total ??
                 rankingRes?.data?.data?.total_prize ??
                 ((bd.prize_cop || 0) + (bd.accumulated_prize || 0)),
-              qualifies: rankingRes?.data?.data?.qualifies_for_prize ?? false
+              qualifies: rankingRes?.data?.data?.qualifies_for_prize ?? false,
             };
-          } catch (e) {
+          } catch (_) {
             return {
               betdate_id: bd.id,
               betdate_name: bd.name,
-              winner: 'Sin ganador premio acumulado',
+              winner: 'Sin ganador',
               winner_user_id: null,
               winner_avatar_url: null,
               points: null,
               total_prize: (bd.prize_cop || 0) + (bd.accumulated_prize || 0),
-              qualifies: false
+              qualifies: false,
             };
           }
         })
       );
       setBetdateWinners(winners);
 
-      const betdatesForMatches = betdates
+      // Partidos de la fecha más reciente
+      const latestBetdate = betdates
         .slice()
-        .sort((a, b) => new Date(b.start_datetime || b.close_datetime || 0) - new Date(a.start_datetime || a.close_datetime || 0))
-        .slice(0, 1);
+        .sort((a, b) => new Date(b.start_datetime || b.close_datetime || 0) - new Date(a.start_datetime || a.close_datetime || 0))[0];
 
-      const betdateMatchesData = await Promise.all(
-        betdatesForMatches.map(async (bd) => {
-          try {
-            const detailsRes = await betService.getBetDateDetails(bd.id);
-            const details = detailsRes?.data || {};
-            const matchesSorted = (details.matches || [])
-              .slice()
-              .sort((a, b) => new Date(a.match_date || 0) - new Date(b.match_date || 0));
-
-            const matchesWithScores = await Promise.all(
-              matchesSorted.map(async (m) => {
-                const statusLower = String(m.status || '').toLowerCase();
-                const needsScore =
-                  (statusLower.includes('finalizado') || statusLower === 'finished' || statusLower.includes('curso')) &&
-                  extractScores(m).hasScore === false;
-                if (!needsScore) return m;
-                try {
-                  const matchRes = await competitionService.getMatch(m.id);
-                  return { ...m, ...matchRes.data };
-                } catch (err) {
-                  return m;
-                }
-              })
-            );
-            return {
-              betdate_id: bd.id,
-              betdate_name: bd.name,
-              status: bd.status,
-              matches: matchesWithScores
-            };
-          } catch (e) {
-            return { betdate_id: bd.id, betdate_name: bd.name, status: bd.status, matches: [] };
-          }
-        })
-      );
-      setBetdateMatches(betdateMatchesData);
+      if (latestBetdate) {
+        try {
+          const detailsRes = await betService.getBetDateDetails(latestBetdate.id);
+          const details = detailsRes?.data || {};
+          const matchesSorted = (details.matches || [])
+            .slice()
+            .sort((a, b) => new Date(a.match_date || 0) - new Date(b.match_date || 0));
+          // Los matches ya vienen con scores desde getBetDateDetails — no hacer N+1
+          setBetdateMatches([{
+            betdate_id: latestBetdate.id,
+            betdate_name: latestBetdate.name,
+            status: latestBetdate.status,
+            matches: matchesSorted,
+          }]);
+        } catch (_) {}
+      }
 
     } catch (error) {
-      console.error('Error cargando dashboard:', error);
-    } finally {
-      setLoading(false);
+      console.error('Error cargando dashboard (fase 2):', error);
     }
   };
 
