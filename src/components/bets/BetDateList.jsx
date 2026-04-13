@@ -271,6 +271,7 @@ const BetDateList = () => {
 
   const BetDateCard = ({ betDate }) => {
     const isOpen = betDate.uiStatus === 'open';
+    const isFinished = betDate.uiStatus === 'finished' || betDate.status === 'finished';
     const timeRemaining = calculateTimeRemaining(betDate);
     const canBet = isOpen && hasEnoughCredits();
     const prize =
@@ -278,6 +279,8 @@ const BetDateList = () => {
       ((betDate.prize_PTS || 0) + (betDate.accumulated_prize || 0)) ||
       betDate.prize_cop ||
       0;
+    // Dinero sin distribuir en fechas finalizadas
+    const unclaimedMoney = (betDate.prize_cop || 0) + (betDate.accumulated_prize || 0);
 
     return (
       <Card
@@ -303,10 +306,22 @@ const BetDateList = () => {
 
         {/* Chips de información: premio · pronósticos · tiempo */}
         <div style={{ display: 'flex', gap: 16, marginBottom: 10, flexWrap: 'wrap', alignItems: 'center' }}>
-          <span style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#52c41a', fontWeight: 700, fontSize: 14 }}>
-            <TrophyOutlined />
-            ${prize.toLocaleString()}
-          </span>
+          {isFinished && unclaimedMoney > 0 ? (
+            <span style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#d97706', fontWeight: 700, fontSize: 14 }}>
+              <TrophyOutlined />
+              Acumulado: ${unclaimedMoney.toLocaleString()} →
+            </span>
+          ) : isFinished ? (
+            <span style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#8c8c8c', fontSize: 14 }}>
+              <TrophyOutlined />
+              Premio entregado
+            </span>
+          ) : (
+            <span style={{ display: 'flex', alignItems: 'center', gap: 5, color: '#52c41a', fontWeight: 700, fontSize: 14 }}>
+              <TrophyOutlined />
+              ${prize.toLocaleString()}
+            </span>
+          )}
           <span style={{ display: 'flex', alignItems: 'center', gap: 5, color: isDark ? '#94a3b8' : '#64748b', fontSize: 13 }}>
             <TeamOutlined />
             {betDate.bet_count || betDate.total_bets || 0} pronósticos
@@ -323,8 +338,8 @@ const BetDateList = () => {
           {betDate.matches?.length || 0} partidos · 1 crédito · Mínimo 13 pts para ganar
         </Text>
 
-        {/* Tag de acumulado si existe */}
-        {betDate.accumulated_prize > 0 && (
+        {/* Tag de acumulado solo en fechas abiertas/cerradas (fechas finalizadas ya lo muestran en la línea del premio) */}
+        {!isFinished && betDate.accumulated_prize > 0 && (
           <Tag
             color="gold"
             style={{
