@@ -348,7 +348,7 @@ const BetRanking = ({ betDateId }) => {
           <Badge
             count={points}
             style={{
-              backgroundColor: isWinner ? '#d97706' : points >= 8 ? '#52c41a' : '#1890ff',
+              backgroundColor: isWinner ? '#d97706' : points >= 13 ? '#52c41a' : '#1890ff',
               fontSize: '13px',
             }}
           />
