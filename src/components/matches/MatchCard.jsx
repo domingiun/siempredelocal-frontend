@@ -178,12 +178,19 @@ const MatchCard = ({ match, roundName, size = 'default', showActions = true }) =
       {/* Encabezado con información de jornada */}
       <div className="match-header">
         <div style={{ display: 'flex', alignItems: 'left', gap: 8 }}>
-          <Tag
-            color={getStatusColor(match.status)}
-            style={{ fontWeight: 700, letterSpacing: '0.02em' }}
-          >
+          <span style={{
+            display: 'inline-block',
+            padding: '2px 8px',
+            borderRadius: 4,
+            fontSize: 12,
+            fontWeight: 700,
+            letterSpacing: '0.03em',
+            color: '#fff',
+            background: getStatusColor(match.status),
+            lineHeight: '20px',
+          }}>
             {STATUS_MAP[match.status] || match.status}
-          </Tag>
+          </span>
           
           {/* Badge de jornada */}
           {displayRoundName && (
