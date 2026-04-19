@@ -179,13 +179,8 @@ const MatchCard = ({ match, roundName, size = 'default', showActions = true }) =
       <div className="match-header">
         <div style={{ display: 'flex', alignItems: 'left', gap: 8 }}>
           <Tag
-            style={{
-              backgroundColor: getStatusColor(match.status),
-              borderColor: getStatusColor(match.status),
-              color: '#fff',
-              fontWeight: 600,
-              letterSpacing: '0.02em',
-            }}
+            color={getStatusColor(match.status)}
+            style={{ fontWeight: 700, letterSpacing: '0.02em' }}
           >
             {STATUS_MAP[match.status] || match.status}
           </Tag>
