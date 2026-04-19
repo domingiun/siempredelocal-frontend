@@ -41,6 +41,7 @@ import MatchDetail from './components/matches/MatchDetail';
 import CreateMatchPage from './pages/matches/CreateMatchPage';
 import EditMatchPage from './pages/matches/EditMatchPage';
 import MatchesTodayPage from './pages/matches/MatchesTodayPage';
+import MatchManagementPage from './pages/matches/MatchManagementPage';
 
 // Páginas de Jornadas
 import RoundManagementPage from './pages/rounds/RoundManagementPage';
@@ -190,13 +191,12 @@ function App() {
                     <Route path="/matches" element={<MatchesPage />} />
                     <Route path="/matches/today" element={<MatchesTodayPage />} />
                     <Route path="/matches/new" element={<CreateMatchPage />} />
+                    <Route path="/matches/calendar" element={<CalendarPage />} />
+                    <Route path="/matches/management" element={<MatchManagementPage />} />
                     <Route path="/matches/edit/:id" element={<EditMatchPage />} />
                     <Route path="/matches/:id" element={<MatchDetail />} />
 
                     {/* Reportes (solo admin) — gestionados en el bloque AdminRoute de abajo */}
-
-                    {/* Calendario */}
-                    <Route path="/matches/calendar" element={<CalendarPage />} />
                     
                     {/* Jornadas */}
                     <Route path="/rounds/management" element={<RoundManagementPage />} />
