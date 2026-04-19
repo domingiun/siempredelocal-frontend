@@ -13,6 +13,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { useWallet } from '../../context/WalletContext';
 import { useNavigate } from 'react-router-dom';
+import betService from '../../services/betService';
 import './Header.css';
 
 const { Header: AntHeader } = Layout;
@@ -197,7 +198,21 @@ const AppHeader = ({ collapsed, setCollapsed }) => {
           <Button
             type="text"
             icon={<FireOutlined />}
-            onClick={() => navigate('/bets')}
+            onClick={async () => {
+              try {
+                const res = await betService.getBetDates();
+                const dates = res?.data || [];
+                const sorted = dates.sort((a, b) =>
+                  new Date(b.start_datetime || b.close_datetime || 0) -
+                  new Date(a.start_datetime || a.close_datetime || 0)
+                );
+                const target = sorted.find(d => d.status === 'open') || sorted[0];
+                if (target) navigate(`/bets/${target.id}/place`);
+                else navigate('/bets');
+              } catch {
+                navigate('/bets');
+              }
+            }}
             style={{ color: '#ff4d4f' }}
           >
             <span className="header-bets-text">

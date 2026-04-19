@@ -125,6 +125,11 @@ const Sidebar = ({ collapsed, onCollapse, isMobile }) => {
             label: 'Ranking',
           },
           {
+            key: '/bets/community',
+            icon: <TeamOutlined />,
+            label: 'Ver Pronósticos',
+          },
+          {
             key: '/wallet',
             icon: <WalletOutlined />,
             label: 'Mi Cuenta',

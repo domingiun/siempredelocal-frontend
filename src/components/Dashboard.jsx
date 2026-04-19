@@ -7,7 +7,8 @@ import {
 import {
   TrophyOutlined, TeamOutlined, CalendarOutlined,
   EyeOutlined, FireOutlined, ThunderboltOutlined,
-  RocketOutlined, CrownOutlined, StarOutlined, WalletOutlined
+  RocketOutlined, CrownOutlined, StarOutlined, WalletOutlined,
+  HistoryOutlined, UsergroupAddOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import competitionService from '../services/competitionService';
@@ -820,20 +821,19 @@ const Dashboard = () => {
 
       {/* ── Accesos rápidos ── */}
       <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
-        <Col xs={12} sm={8} md={6}>
+        <Col xs={12} sm={6} md={6}>
           <Button
             type="primary"
             icon={<FireOutlined />}
             size="large"
             block
             onClick={() => {
-              // Última fecha disponible (open primero, si no la más reciente)
               const sorted = [...betdates].sort((a, b) =>
                 new Date(b.start_datetime || b.close_datetime || 0) -
                 new Date(a.start_datetime || a.close_datetime || 0)
               );
               const target = sorted.find(d => d.status === 'open') || sorted[0];
-              if (target) navigate(`/bets/${target.id}`);
+              if (target) navigate(`/bets/${target.id}/place`);
               else navigate('/bets');
             }}
             style={{ fontWeight: 700, backgroundColor: '#0958d9', borderColor: '#0958d9' }}
@@ -841,7 +841,7 @@ const Dashboard = () => {
             Hacer Pronósticos
           </Button>
         </Col>
-        <Col xs={12} sm={8} md={6}>
+        <Col xs={12} sm={6} md={6}>
           <Button
             icon={<WalletOutlined />}
             size="large"
@@ -855,6 +855,38 @@ const Dashboard = () => {
             }}
           >
             Recargar Créditos
+          </Button>
+        </Col>
+        <Col xs={12} sm={6} md={6}>
+          <Button
+            icon={<HistoryOutlined />}
+            size="large"
+            block
+            onClick={() => navigate('/active-bets')}
+            style={{
+              fontWeight: 700,
+              backgroundColor: isDark ? '#0f1824' : '#fff',
+              borderColor: '#1890ff',
+              color: '#1890ff'
+            }}
+          >
+            Mis Pronósticos
+          </Button>
+        </Col>
+        <Col xs={12} sm={6} md={6}>
+          <Button
+            icon={<UsergroupAddOutlined />}
+            size="large"
+            block
+            onClick={() => navigate('/bets/community')}
+            style={{
+              fontWeight: 700,
+              backgroundColor: isDark ? '#0f1824' : '#fff',
+              borderColor: '#7c3aed',
+              color: '#7c3aed'
+            }}
+          >
+            Ver Pronósticos
           </Button>
         </Col>
       </Row>

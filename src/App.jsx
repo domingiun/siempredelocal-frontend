@@ -67,6 +67,7 @@ import BetPage from './pages/bets/BetPage';
 import BetDateDetail from './pages/bets/BetDateDetail';
 import ActiveBets from './pages/bets/ActiveBets';
 import BetRankingPage from './pages/bets/BetRankingPage';
+import CommunityPredictionsPage from './pages/bets/CommunityPredictionsPage';
 
 // Páginas de Mi Cuenta
 import WalletPage from './pages/wallet/WalletPage';
@@ -159,6 +160,7 @@ function App() {
                     {/* Pronósticos */}
                     <Route path="/bets" element={<BetPage />} />
                     <Route path="/bets/ranking" element={<BetRankingPage />} />
+                    <Route path="/bets/community" element={<CommunityPredictionsPage />} />
                     <Route path="/bets/:id" element={<BetDateDetail />} />
                     <Route path="/bets/:id/place" element={<BetDateDetail />} />
                     <Route path="/active-bets" element={<ActiveBets />} />

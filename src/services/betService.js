@@ -434,6 +434,16 @@ class BetService {
       throw error;
     }
   }
+
+  async getCommunityPredictions(betDateId) {
+    try {
+      const response = await api.get(`/bet-integration/betdate/${betDateId}/community`);
+      return response;
+    } catch (error) {
+      console.error('❌ Error obteniendo pronósticos de la comunidad:', error);
+      throw error;
+    }
+  }
 }
 
 export default new BetService();
