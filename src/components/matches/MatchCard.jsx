@@ -114,15 +114,15 @@ const MatchCard = ({ match, roundName, size = 'default', showActions = true }) =
     return parsed ? formatDateTimeShort(parsed) : formatDateTimeShort(date);
   };
 
-  const STATUS_COLOR = {
-    scheduled:   { bg: '#1677ff', border: '#1677ff' }, // azul — programado
-    in_progress: { bg: '#f59e0b', border: '#f59e0b' }, // ámbar — en curso
-    finished:    { bg: '#16a34a', border: '#16a34a' }, // verde — finalizado
-    cancelled:   { bg: '#dc2626', border: '#dc2626' }, // rojo — cancelado
-    postponed:   { bg: '#7c3aed', border: '#7c3aed' }, // morado — aplazado
+  const getStatusColor = (status) => {
+    const s = String(status || '').toLowerCase();
+    if (s === 'scheduled'   || s.includes('programado'))              return '#1677ff';
+    if (s === 'in_progress' || s.includes('en curso') || s.includes('en_curso')) return '#f59e0b';
+    if (s === 'finished'    || s.includes('finalizado'))              return '#16a34a';
+    if (s === 'cancelled'   || s.includes('cancelado'))               return '#dc2626';
+    if (s === 'postponed'   || s.includes('aplazado'))                return '#7c3aed';
+    return '#6b7280';
   };
-
-  const getStatusColor = (status) => STATUS_COLOR[status]?.bg || '#6b7280';
 
   const renderTeam = (team) => (
     <div className="team-container">
