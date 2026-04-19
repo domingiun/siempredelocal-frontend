@@ -114,16 +114,15 @@ const MatchCard = ({ match, roundName, size = 'default', showActions = true }) =
     return parsed ? formatDateTimeShort(parsed) : formatDateTimeShort(date);
   };
 
-  const getStatusColor = (status) => {
-    switch(status) {
-      case 'scheduled': return 'blue';     // Programado → azul
-      case 'finished': return 'green';     // Finalizado → verde
-      case 'in_progress': return 'orange'; // En curso → naranja
-      case 'cancelled': return 'red';      // Cancelado → rojo
-      case 'postponed': return 'yellow';   // Aplazado → amarillo
-      default: return 'default';
-    }
+  const STATUS_COLOR = {
+    scheduled:   { bg: '#1677ff', border: '#1677ff' }, // azul — programado
+    in_progress: { bg: '#f59e0b', border: '#f59e0b' }, // ámbar — en curso
+    finished:    { bg: '#16a34a', border: '#16a34a' }, // verde — finalizado
+    cancelled:   { bg: '#dc2626', border: '#dc2626' }, // rojo — cancelado
+    postponed:   { bg: '#7c3aed', border: '#7c3aed' }, // morado — aplazado
   };
+
+  const getStatusColor = (status) => STATUS_COLOR[status]?.bg || '#6b7280';
 
   const renderTeam = (team) => (
     <div className="team-container">
@@ -179,7 +178,15 @@ const MatchCard = ({ match, roundName, size = 'default', showActions = true }) =
       {/* Encabezado con información de jornada */}
       <div className="match-header">
         <div style={{ display: 'flex', alignItems: 'left', gap: 8 }}>
-          <Tag color={getStatusColor(match.status)}>
+          <Tag
+            style={{
+              backgroundColor: getStatusColor(match.status),
+              borderColor: getStatusColor(match.status),
+              color: '#fff',
+              fontWeight: 600,
+              letterSpacing: '0.02em',
+            }}
+          >
             {STATUS_MAP[match.status] || match.status}
           </Tag>
           
@@ -203,15 +210,15 @@ const MatchCard = ({ match, roundName, size = 'default', showActions = true }) =
 
       {/* Información adicional de jornada si está disponible */}
       {displayRoundName && (
-        <div className="round-info" style={{ 
-          marginBottom: 8, 
-          padding: '6px 12px', 
-          backgroundColor: match.round_is_completed ? '#f6ffed' : '#f0f9ff', 
+        <div className="round-info" style={{
+          marginBottom: 8,
+          padding: '6px 12px',
+          backgroundColor: 'rgba(22, 119, 255, 0.08)',
           borderRadius: 4,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          border: `1px solid ${match.round_is_completed ? '#b7eb8f' : '#d0e9ff'}`
+          border: `1px solid rgba(22, 119, 255, 0.2)`,
         }}>
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <TrophyOutlined style={{ marginRight: 6, color: '#1890ff' }} />
@@ -276,12 +283,12 @@ const MatchCard = ({ match, roundName, size = 'default', showActions = true }) =
 
       {/* Competencia (si está disponible) */}
       {match.competition_name && match.competition_name !== 'Sin competencia' && (
-        <div className="competition-info" style={{ 
-          marginTop: 8, 
+        <div className="competition-info" style={{
+          marginTop: 8,
           textAlign: 'center',
           padding: '4px 8px',
-          backgroundColor: '#f6ffed',
-          borderRadius: 4
+          backgroundColor: 'rgba(22, 119, 255, 0.06)',
+          borderRadius: 4,
         }}>
           <Text type="secondary" style={{ fontSize: '0.85em' }}>
             {match.competition_name}
