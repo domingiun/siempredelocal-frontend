@@ -134,10 +134,18 @@ const Register = () => {
                 label="Contraseña"
                 rules={[
                   { required: true, message: 'Ingresa una contraseña' },
-                  { min: 6, message: 'Mínimo 6 caracteres' },
+                  { min: 8, message: 'Mínimo 8 caracteres' },
+                  {
+                    validator: (_, value) => {
+                      if (!value) return Promise.resolve();
+                      if (!/\d/.test(value)) return Promise.reject('Debe incluir al menos un número');
+                      if (!/[a-zA-Z]/.test(value)) return Promise.reject('Debe incluir al menos una letra');
+                      return Promise.resolve();
+                    }
+                  }
                 ]}
               >
-                <Input.Password prefix={<LockOutlined />} placeholder="Mínimo 6 caracteres" autoComplete="new-password" />
+                <Input.Password prefix={<LockOutlined />} placeholder="Mínimo 8 caracteres (letras y números)" autoComplete="new-password" />
               </Form.Item>
             </Col>
             <Col xs={24} sm={12}>
