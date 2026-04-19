@@ -325,17 +325,14 @@ const MatchesPage = () => {
   };
 
   const getStatusColor = (status) => {
-    if (!status) return 'default';
-    
-    const statusLower = String(status).toLowerCase();
-    
-    if (statusLower.includes('finalizado')) return 'green';
-    if (statusLower.includes('programado')) return 'blue';
-    if (statusLower.includes('en curso') || statusLower.includes('en_curso')) return 'orange';
-    if (statusLower.includes('aplazado')) return 'yellow';
-    if (statusLower.includes('cancelado')) return 'red';
-    
-    return 'default';
+    if (!status) return '#6b7280';
+    const s = String(status).toLowerCase();
+    if (s.includes('finalizado') || s === 'finished')  return '#16a34a';
+    if (s.includes('programado') || s === 'scheduled') return '#1677ff';
+    if (s.includes('en curso')   || s === 'in_progress') return '#f59e0b';
+    if (s.includes('aplazado')   || s === 'postponed') return '#7c3aed';
+    if (s.includes('cancelado')  || s === 'cancelled') return '#dc2626';
+    return '#6b7280';
   };
 
   const handleClearFilters = () => {
@@ -470,9 +467,18 @@ const MatchesPage = () => {
       dataIndex: 'status',
       key: 'status',
       render: (status) => (
-        <Tag color={getStatusColor(status)}>
+        <span style={{
+          display: 'inline-block',
+          padding: '2px 8px',
+          borderRadius: 4,
+          fontSize: 12,
+          fontWeight: 700,
+          color: '#fff',
+          background: getStatusColor(status),
+          lineHeight: '20px',
+        }}>
           {status}
-        </Tag>
+        </span>
       ),
       width: 120,
     },
