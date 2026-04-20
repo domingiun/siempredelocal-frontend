@@ -14,7 +14,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useWallet } from '../../context/WalletContext';
 import { useTheme } from '../../context/ThemeContext';
 import betService from '../../services/betService';
-import matchService from '../../services/matchService';
 import { 
   validatePredictions, 
   calculateTimeRemaining 
@@ -56,33 +55,10 @@ const PlaceBetForm = () => {
       
       setBetDate(data);
       
-      // Usar los matches que vienen en la respuesta
+      // Usar los matches que vienen en la respuesta (logos ya incluidos)
       const matchDetails = data.matches || [];
-      
-      console.log('⚽ Partidos recibidos:', matchDetails.length, matchDetails);
 
-      // Obtener logos de equipos por match_id
-      const logosByMatchId = {};
-      await Promise.all(
-        matchDetails.map(async (match) => {
-          try {
-            const res = await matchService.getById(match.id);
-            const matchData = res.data || {};
-            logosByMatchId[match.id] = {
-              home_team_logo: matchData.home_team?.logo_url || null,
-              away_team_logo: matchData.away_team?.logo_url || null
-            };
-          } catch (error) {
-            logosByMatchId[match.id] = {
-              home_team_logo: null,
-              away_team_logo: null
-            };
-          }
-        })
-      );
-      
-      // Formatear los datos para el componente
-      const formattedMatches = matchDetails.map((match, index) => ({
+      const formattedMatches = matchDetails.map((match) => ({
         id: match.id,
         match_id: match.id,
         home_team_name: match.home_team,
@@ -91,8 +67,8 @@ const PlaceBetForm = () => {
         stadium: match.stadium,
         competition_name: match.competition,
         status: match.status,
-        home_team_logo: logosByMatchId[match.id]?.home_team_logo || null,
-        away_team_logo: logosByMatchId[match.id]?.away_team_logo || null
+        home_team_logo: match.home_team_logo || null,
+        away_team_logo: match.away_team_logo || null,
       }));
       const sortedMatches = [...formattedMatches].sort((a, b) => {
         const aTime = a.match_date ? new Date(a.match_date).getTime() : Number.POSITIVE_INFINITY;
