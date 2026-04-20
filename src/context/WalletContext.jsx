@@ -279,7 +279,6 @@ export const WalletProvider = ({ children }) => {
         
         setTransactions(prev => [newTransaction, ...prev]);
         
-        message.success('¡Pronósticos realizados con éxito!');
         return { success: true, data: response.data };
       }
     } catch (error) {

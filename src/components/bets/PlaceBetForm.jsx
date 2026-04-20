@@ -3,12 +3,12 @@ import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import {
   Card, Row, Col, Typography, Button,
   InputNumber, Alert,
-  message, Spin, Divider, Tag,
+  message, notification, Spin, Divider, Tag,
   Modal, Grid
 } from 'antd';
 import {
   FireOutlined, TeamOutlined, CheckCircleOutlined,
-  ClockCircleOutlined, TrophyOutlined
+  ClockCircleOutlined, TrophyOutlined, StarOutlined
 } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useWallet } from '../../context/WalletContext';
@@ -205,7 +205,36 @@ const PlaceBetForm = () => {
         onOk: async () => {
           const result = await placeBet(id, predictionArray);
           if (result.success) {
-            message.success('¡Pronósticos realizados con éxito!');
+            const creditsLeft = result.data?.credits_remaining ?? (wallet?.credits - 1);
+            notification.success({
+              message: (
+                <span style={{ fontSize: 16, fontWeight: 700, color: '#15803d' }}>
+                  ¡Pronósticos Enviados!
+                </span>
+              ),
+              description: (
+                <div style={{ marginTop: 4 }}>
+                  <div style={{ marginBottom: 6, color: '#374151' }}>
+                    Tus predicciones han sido registradas correctamente.
+                  </div>
+                  <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                    <Tag color="green" icon={<CheckCircleOutlined />}>
+                      10 pronósticos guardados
+                    </Tag>
+                    <Tag color="blue" icon={<StarOutlined />}>
+                      {creditsLeft} crédito{creditsLeft !== 1 ? 's' : ''} restante{creditsLeft !== 1 ? 's' : ''}
+                    </Tag>
+                  </div>
+                </div>
+              ),
+              icon: <TrophyOutlined style={{ color: '#16a34a', fontSize: 24 }} />,
+              duration: 6,
+              placement: 'top',
+              style: {
+                borderLeft: '4px solid #16a34a',
+                borderRadius: 8,
+              },
+            });
             navigate('/active-bets');
           }
         },
