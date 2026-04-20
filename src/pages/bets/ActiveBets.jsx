@@ -5,7 +5,7 @@ import { FireOutlined, TrophyOutlined, CalendarOutlined, RightOutlined } from '@
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import betService from '../../services/betService';
-import matchService from '../../services/matchService';
+import api from '../../services/api';
 import { calculatePredictionPoints } from '../../utils/betCalculations';
 
 const { Title, Text } = Typography;
@@ -141,35 +141,12 @@ const ActiveBets = () => {
   const fetchUserBets = async () => {
     setLoading(true);
     try {
-      const response = await betService.getUserBets(user.id);
+      const response = await api.get('/bet-integration/me/bets');
       const rawBets = response.data || [];
-      const betDateIds = Array.from(new Set(rawBets.map(b => b.bet_date_id)));
-
-      const betDateNameMap = {};
-      const betDateStatusMap = {};
-      await Promise.all(betDateIds.map(async (id) => {
-        try {
-          const res = await betService.getBetDateDetails(id);
-          betDateNameMap[id] = res.data?.name || `Fecha #${id}`;
-          betDateStatusMap[id] = deriveBetDateStatus(res.data);
-        } catch {
-          betDateNameMap[id] = `Fecha #${id}`;
-          betDateStatusMap[id] = '';
-        }
-      }));
-
-      const matchIds = Array.from(new Set(
-        rawBets.flatMap(b => (b.predictions || []).map(p => p.match_id))
-      ));
-      const matchMap = {};
-      await Promise.all(matchIds.map(async (id) => {
-        try { matchMap[id] = (await matchService.getById(id)).data; }
-        catch { matchMap[id] = null; }
-      }));
 
       const enriched = rawBets.map(bet => {
         const predictions = (bet.predictions || []).map(pred => {
-          const match = matchMap[pred.match_id];
+          const match = pred.match;
           const status = match?.status ? String(match.status).toLowerCase() : '';
           const isFinished = status === 'finalizado' || status === 'finished';
           const hasResult = isFinished && match && match.home_score !== null && match.away_score !== null;
@@ -178,13 +155,11 @@ const ActiveBets = () => {
                 { home_score: pred.predicted_home_score, away_score: pred.predicted_away_score },
                 { home_score: match.home_score, away_score: match.away_score }
               )
-            : 0;
+            : pred.points || 0;
           return { ...pred, match, status, isFinished, hasResult, points };
         });
         return {
           ...bet,
-          bet_date_name: betDateNameMap[bet.bet_date_id] || bet.bet_date_name,
-          bet_date_status: betDateStatusMap[bet.bet_date_id] || bet.bet_date_status,
           predictions,
           totalPoints: predictions.reduce((s, p) => s + (p.points || 0), 0),
         };
