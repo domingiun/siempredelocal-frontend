@@ -220,11 +220,11 @@ const CommunityPredictionsPage = () => {
                   key: 'match',
                   render: (_, row) => (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      {row.home_logo && <img src={row.home_logo} alt="" style={{ width: 18, height: 18, objectFit: 'contain' }} />}
+                      {row.home_logo && <img src={getAvatarSrc(row.home_logo)} alt="" style={{ width: 18, height: 18, objectFit: 'contain' }} />}
                       <Text style={{ fontSize: 12, color: textColor }}>{row.home_team}</Text>
                       <Text style={{ color: subtleColor, fontSize: 11 }}>vs</Text>
                       <Text style={{ fontSize: 12, color: textColor }}>{row.away_team}</Text>
-                      {row.away_logo && <img src={row.away_logo} alt="" style={{ width: 18, height: 18, objectFit: 'contain' }} />}
+                      {row.away_logo && <img src={getAvatarSrc(row.away_logo)} alt="" style={{ width: 18, height: 18, objectFit: 'contain' }} />}
                     </div>
                   ),
                   responsive: ['md'],
