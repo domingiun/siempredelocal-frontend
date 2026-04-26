@@ -1,9 +1,10 @@
 // frontend/src/pages/admin/bets/BetAdminPage.jsx
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import {
   Card, Alert, Table, Button, Space, Typography,
-  Tag, Modal, Input, InputNumber, Form, message, Divider
+  Tag, Modal, Input, InputNumber, Form, message, Divider, Badge
 } from 'antd';
+import { CheckCircleOutlined, ClockCircleOutlined, TrophyOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useAuth } from '../../../context/AuthContext';
 import api from '../../../services/api';
 import './BetAdminPage.css';
@@ -17,6 +18,11 @@ const BetAdminPage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [form] = Form.useForm();
 
+  // Gestión de fechas
+  const [betDates, setBetDates] = useState([]);
+  const [loadingDates, setLoadingDates] = useState(false);
+  const [finalizingId, setFinalizingId] = useState(null);
+
   if (user?.role !== 'admin') {
     return (
       <div style={{ padding: '24px' }}>
@@ -29,6 +35,57 @@ const BetAdminPage = () => {
       </div>
     );
   }
+
+  const fetchBetDates = useCallback(async () => {
+    setLoadingDates(true);
+    try {
+      const res = await api.get('/betdates/', { params: { limit: 50 } });
+      const all = res.data?.betdates || res.data || [];
+      // Ordenar: cerradas primero, luego por id desc
+      all.sort((a, b) => {
+        if (a.status === 'closed' && b.status !== 'closed') return -1;
+        if (b.status === 'closed' && a.status !== 'closed') return 1;
+        return b.id - a.id;
+      });
+      setBetDates(all);
+    } catch {
+      message.error('No se pudieron cargar las fechas');
+    } finally {
+      setLoadingDates(false);
+    }
+  }, []);
+
+  const handleFinalize = (betDate) => {
+    Modal.confirm({
+      title: `Finalizar ${betDate.name}`,
+      content: (
+        <div>
+          <p>Esto calculará los puntos de todos los participantes y entregará o acumulará el premio.</p>
+          <p><strong>Esta acción no se puede deshacer.</strong></p>
+        </div>
+      ),
+      okText: 'Finalizar fecha',
+      okType: 'primary',
+      cancelText: 'Cancelar',
+      onOk: async () => {
+        setFinalizingId(betDate.id);
+        try {
+          const res = await api.post(`/bet-integration/finalize/${betDate.id}`, {
+            distribute_prize: true,
+            force: false,
+            notify_users: false,
+          });
+          message.success(res.data?.message || `${betDate.name} finalizada correctamente`);
+          fetchBetDates();
+        } catch (err) {
+          const detail = err?.response?.data?.detail || 'Error al finalizar';
+          message.error(detail);
+        } finally {
+          setFinalizingId(null);
+        }
+      },
+    });
+  };
 
   const fetchPending = async () => {
     setLoading(true);
@@ -59,7 +116,8 @@ const BetAdminPage = () => {
   useEffect(() => {
     fetchPending();
     fetchPendingRequests();
-  }, []);
+    fetchBetDates();
+  }, [fetchBetDates]);
 
   const handleApprove = (transactionId) => {
     Modal.confirm({
@@ -434,6 +492,79 @@ const BetAdminPage = () => {
         >
           Actualizar
         </Button>
+      </Card>
+
+      {/* ── Gestión de Fechas de Pronósticos ── */}
+      <Card
+        title={
+          <Space>
+            <TrophyOutlined style={{ color: '#faad14' }} />
+            <span>Gestión de Fechas de Pronósticos</span>
+            <Badge count={betDates.filter(b => b.status === 'closed').length} style={{ backgroundColor: '#faad14' }} />
+          </Space>
+        }
+        extra={<Button icon={<ReloadOutlined />} onClick={fetchBetDates} loading={loadingDates} size="small">Actualizar</Button>}
+        style={{ marginBottom: 16 }}
+      >
+        <Table
+          rowKey="id"
+          loading={loadingDates}
+          dataSource={betDates}
+          pagination={{ pageSize: 10 }}
+          locale={{ emptyText: 'No hay fechas' }}
+          columns={[
+            {
+              title: 'ID', dataIndex: 'id', width: 60,
+            },
+            {
+              title: 'Nombre', dataIndex: 'name', render: (v) => <strong>{v}</strong>,
+            },
+            {
+              title: 'Estado',
+              dataIndex: 'status',
+              width: 130,
+              render: (s) => {
+                const map = {
+                  open:     { color: 'green',  label: 'Abierta'    },
+                  closed:   { color: 'orange', label: 'Cerrada'    },
+                  finished: { color: 'blue',   label: 'Finalizada' },
+                  cancelled:{ color: 'red',    label: 'Cancelada'  },
+                };
+                const { color, label } = map[s] || { color: 'default', label: s };
+                return <Tag color={color}>{label}</Tag>;
+              },
+            },
+            {
+              title: 'Premio acumulado',
+              width: 160,
+              render: (_, r) => `$${((r.prize_cop || 0) + (r.accumulated_prize || 0)).toLocaleString()} COP`,
+            },
+            {
+              title: 'Acción',
+              width: 160,
+              render: (_, record) => {
+                if (record.status === 'finished') {
+                  return <Tag icon={<CheckCircleOutlined />} color="blue">Ya finalizada</Tag>;
+                }
+                if (record.status === 'closed') {
+                  return (
+                    <Button
+                      type="primary"
+                      size="small"
+                      icon={<TrophyOutlined />}
+                      loading={finalizingId === record.id}
+                      onClick={() => handleFinalize(record)}
+                      style={{ backgroundColor: '#d46b08', borderColor: '#d46b08' }}
+                    >
+                      Finalizar
+                    </Button>
+                  );
+                }
+                return <Tag icon={<ClockCircleOutlined />} color="default">{record.status}</Tag>;
+              },
+            },
+          ]}
+        />
       </Card>
 
       <Card title="Agregar créditos manualmente">
