@@ -1,7 +1,8 @@
 // frontend/src/pages/bets/ActiveBets.jsx
 import React, { useMemo, useState, useEffect } from 'react';
-import { Typography, Spin, Alert, Grid } from 'antd';
-import { FireOutlined, TrophyOutlined, CalendarOutlined, RightOutlined } from '@ant-design/icons';
+import { Typography, Spin, Alert, Grid, Button } from 'antd';
+import { FireOutlined, TrophyOutlined, CalendarOutlined, RightOutlined, EditOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import betService from '../../services/betService';
@@ -115,6 +116,7 @@ const AccordionItem = ({ header, children, card }) => {
 const ActiveBets = () => {
   const { user } = useAuth();
   const { mode } = useTheme();
+  const navigate = useNavigate();
   const isDark = mode === 'dark';
   const screens = Grid.useBreakpoint();
   const isDesktop = screens.md;
@@ -291,12 +293,26 @@ const ActiveBets = () => {
                 key={group.bet_date_id}
                 card={card}
                 header={
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', width: '100%' }}>
                     <Text strong style={{ fontSize: isDesktop ? 14 : 13, color: isDark ? '#e6edf3' : undefined }}>
                       {group.bet_date_name}
                     </Text>
                     <Pill s={{ bg: isDark ? 'rgba(22,119,255,.15)' : '#e6f4ff', border: isDark ? 'rgba(22,119,255,.3)' : '#91caff', text: isDark ? '#60a5fa' : '#0958d9', label: `${group.totalBets} pronósticos` }} />
                     {group.bet_date_status && <Pill s={statusStyle} />}
+                    {(group.bet_date_status === 'open' || group.bet_date_status === 'abierta') && (
+                      <Button
+                        type="primary"
+                        size="small"
+                        icon={<EditOutlined />}
+                        style={{ marginLeft: 'auto', background: '#22c55e', borderColor: '#22c55e', fontSize: 12 }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/bets/${group.bet_date_id}/place`);
+                        }}
+                      >
+                        Hacer pronóstico
+                      </Button>
+                    )}
                   </div>
                 }
               >
