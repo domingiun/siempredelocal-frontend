@@ -267,12 +267,11 @@ export default function PollaLandingPage() {
             <div>
               <p>
                 Premio mínimo garantizado: <strong>$1,000,000 COP</strong>.<br />
-                A partir del participante 33, el pozo crece <strong>$32,000 COP</strong> por cada nuevo inscrito.<br />
-                Premio actual estimado: <strong>{formatCOP(prize)}</strong>
+                ¡Entre más participantes, mayor será el pozo! Cada inscripción suma al acumulado — el premio crece sin límite.<br />
+                Premio actual: <strong>{formatCOP(prize)}</strong>
               </p>
               <p className="polla-prize-note">
-                El 80% del total recaudado va al ganador. El 20% a la plataforma.<br />
-                Si hay empate en puntos, el premio se divide en partes iguales.
+                Si hay empate en puntos, el premio se divide en partes iguales entre los líderes.
               </p>
             </div>
           </div>
