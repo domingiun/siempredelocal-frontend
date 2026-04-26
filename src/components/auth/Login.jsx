@@ -1,6 +1,6 @@
 // frontend/src/components/auth/Login.jsx
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Form, Input, Button, Alert } from 'antd';
 import { UserOutlined, LockOutlined, LoginOutlined, UserAddOutlined, HomeOutlined } from '@ant-design/icons';
@@ -11,8 +11,10 @@ const Login = () => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState('');
-  const { login }  = useAuth();
-  const navigate   = useNavigate();
+  const { login }       = useAuth();
+  const navigate        = useNavigate();
+  const [searchParams]  = useSearchParams();
+  const redirectTo      = searchParams.get('redirect') || '/dashboard';
 
   const onFinish = async (values) => {
     setError('');
@@ -21,7 +23,7 @@ const Login = () => {
     setLoading(false);
 
     if (result.success) {
-      navigate('/dashboard');
+      navigate(redirectTo);
     } else {
       let msg = result.error;
       if (msg && typeof msg === 'object') {

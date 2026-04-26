@@ -59,7 +59,7 @@ export default function PollaLandingPage() {
 
   const handleJoin = async () => {
     if (!user) {
-      navigate('/login');
+      navigate('/login?redirect=/mundial');
       return;
     }
     if (!polla) return;
