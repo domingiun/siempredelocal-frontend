@@ -28,8 +28,9 @@ const TeamForm = () => {
   const [logoPreview, setLogoPreview] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
   const [countries] = useState([
-  // CONMEBOL (Sudamérica) - 6 clasificados
+  // CONMEBOL (Sudamérica)
   'Argentina', 'Brasil', 'Uruguay', 'Colombia', 'Ecuador', 'Paraguay',
+  'Perú', 'Venezuela', 'Bolivia', 'Chile',
 
   // CONCACAF (Norteamérica) - 3 anfitriones + 3 clasificados
   'Estados Unidos', 'México', 'Canadá',  // anfitriones
