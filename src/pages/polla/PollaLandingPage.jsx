@@ -155,7 +155,7 @@ export default function PollaLandingPage() {
               Inscribirme — {polla?.entry_credits || 8} créditos
             </Button>
           ) : (
-            <Button size="large" className="polla-cta-btn" disabled>
+            <Button size="large" className="polla-cta-btn polla-cta-btn--closed" disabled>
               {polla?.status === 'upcoming' ? 'Próximamente' : 'Inscripciones cerradas'}
             </Button>
           )}
@@ -176,7 +176,7 @@ export default function PollaLandingPage() {
             <div className="polla-step">
               <div className="polla-step-num">1</div>
               <h3>Inscríbete</h3>
-              <p>Paga una sola vez con 8 créditos ($40,000 COP). El 80% va al premio.</p>
+              <p>Paga una sola vez con 8 créditos ($40,000 COP) y queda inscrito por todo el torneo.</p>
             </div>
             <div className="polla-step">
               <div className="polla-step-num">2</div>
@@ -197,34 +197,60 @@ export default function PollaLandingPage() {
         </div>
       </section>
 
-      {/* Fases y puntos */}
+      {/* Sistema de puntuación */}
       <section className="polla-phases">
         <div className="polla-section-inner">
           <h2 className="polla-section-title">Sistema de puntuación</h2>
-          <div className="polla-phases-grid">
-            {Object.entries(phaseLabels).map(([key, label]) => (
-              <div key={key} className="polla-phase-card">
-                <div className="polla-phase-name">{label}</div>
-                <div className="polla-phase-pts">{phasePoints[key]}</div>
+
+          {/* Tabla de fases */}
+          <div className="polla-score-table">
+            <div className="polla-score-header">
+              <span>Fase</span>
+              <span>Tipo de predicción</span>
+              <span>Puntos</span>
+            </div>
+            {[
+              { fase: 'Fase de Grupos', matches: '72 partidos', tipo: 'Local · Empate · Visitante (L/E/V)', pts: 1, color: '#3b82f6' },
+              { fase: 'Ronda de 32', matches: '16 partidos', tipo: '¿Quién avanza?', pts: 2, color: '#8b5cf6' },
+              { fase: 'Octavos de Final', matches: '8 partidos', tipo: '¿Quién avanza?', pts: 2, color: '#8b5cf6' },
+              { fase: 'Cuartos de Final', matches: '4 partidos', tipo: '¿Quién avanza?', pts: 3, color: '#f59e0b' },
+              { fase: 'Semifinales', matches: '2 partidos', tipo: '¿Quién avanza?', pts: 3, color: '#f59e0b' },
+              { fase: 'Final + 3er puesto', matches: '2 partidos', tipo: '¿Quién avanza?', pts: 3, color: '#22c55e' },
+            ].map((row, i) => (
+              <div key={i} className="polla-score-row">
+                <div className="polla-score-fase">
+                  <span className="polla-score-dot" style={{ background: row.color }} />
+                  <div>
+                    <div className="polla-score-fase-name">{row.fase}</div>
+                    <div className="polla-score-matches">{row.matches}</div>
+                  </div>
+                </div>
+                <div className="polla-score-tipo">{row.tipo}</div>
+                <div className="polla-score-pts" style={{ color: row.color }}>
+                  +{row.pts} pt{row.pts > 1 ? 's' : ''}
+                </div>
               </div>
             ))}
           </div>
 
+          {/* Bonificaciones */}
           <div className="polla-bonuses">
             <h3>Bonificaciones por fase</h3>
             <div className="polla-bonus-list">
               <div className="polla-bonus-item">
                 <ThunderboltOutlined className="polla-bonus-icon" />
                 <div>
-                  <strong>Racha</strong>
-                  <p>3 aciertos consecutivos en la misma fase → +1 punto (una vez por fase)</p>
+                  <strong>Racha de aciertos</strong>
+                  <p>Si aciertas 3 predicciones seguidas en la misma fase → <span className="polla-bonus-highlight">+1 punto</span> (una sola vez por fase, se reinicia si fallas)</p>
                 </div>
               </div>
               <div className="polla-bonus-item">
                 <StarOutlined className="polla-bonus-icon" />
                 <div>
-                  <strong>Más aciertos</strong>
-                  <p>Quién acierte más en la fase de grupos o R32 → +5 pts · Octavos en adelante → +3 pts</p>
+                  <strong>Mejor de la fase</strong>
+                  <p>Quien más aciertos tenga en Grupos o Ronda 32 → <span className="polla-bonus-highlight">+5 puntos</span><br />
+                  En Octavos en adelante → <span className="polla-bonus-highlight">+3 puntos</span><br />
+                  Si hay empate, todos los empatados reciben la bonificación.</p>
                 </div>
               </div>
             </div>
