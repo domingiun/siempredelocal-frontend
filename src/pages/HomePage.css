@@ -205,6 +205,63 @@
   border-color: rgba(255,255,255,.4) !important;
 }
 
+/* Polla Mundial CTA */
+.hp__polla-cta {
+  margin-top: 20px;
+}
+
+.hp__polla-btn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(34,197,94,0.08);
+  border: 1px solid rgba(34,197,94,0.3);
+  border-radius: 14px;
+  padding: 14px 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+  text-align: left;
+  color: inherit;
+}
+
+.hp__polla-btn:hover {
+  background: rgba(34,197,94,0.14);
+  border-color: rgba(34,197,94,0.5);
+  transform: translateY(-1px);
+}
+
+.hp__polla-emoji {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.hp__polla-text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.hp__polla-label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #22c55e;
+}
+
+.hp__polla-sub {
+  font-size: 0.78rem;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.hp__polla-arrow {
+  font-size: 1.1rem;
+  color: #22c55e;
+  flex-shrink: 0;
+}
+
 /* ══════════════════════════════════════
    CONTENIDO — ARTÍCULOS
 ══════════════════════════════════════ */

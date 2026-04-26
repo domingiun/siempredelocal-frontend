@@ -1,0 +1,296 @@
+/* PollaPredictionsPage.css */
+
+.polla-predict {
+  background: #060d18;
+  min-height: 100vh;
+  padding: 24px 20px 60px;
+  max-width: 680px;
+  margin: 0 auto;
+  color: #e2e8f0;
+}
+
+.polla-predict-loading,
+.polla-predict-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 70vh;
+  gap: 16px;
+  color: #94a3b8;
+  background: #060d18;
+  text-align: center;
+}
+
+.polla-predict-empty h2 { color: #f1f5f9; }
+.polla-predict-empty p  { color: #64748b; }
+
+/* Header */
+.polla-predict-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.polla-predict-progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.polla-predict-progress-label {
+  font-size: 0.85rem;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+/* Dots nav */
+.polla-predict-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 28px;
+  justify-content: center;
+}
+
+.polla-predict-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.05);
+  cursor: pointer;
+  transition: all 0.15s;
+  padding: 0;
+}
+
+.polla-predict-dot.active {
+  border-color: #22c55e;
+  background: #22c55e;
+  transform: scale(1.3);
+}
+
+.polla-predict-dot.saved {
+  background: #16a34a;
+  border-color: #16a34a;
+}
+
+.polla-predict-dot.local {
+  background: rgba(34,197,94,0.3);
+  border-color: rgba(34,197,94,0.5);
+}
+
+/* Match card */
+.polla-match-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px;
+  padding: 28px 24px;
+  margin-bottom: 20px;
+}
+
+.polla-card-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.polla-card-num {
+  margin-left: auto;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.polla-countdown {
+  font-size: 0.85rem;
+  color: #f59e0b;
+  font-weight: 600;
+}
+
+.polla-countdown.closed { color: #ef4444; }
+
+/* Equipos */
+.polla-card-teams {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.polla-card-team {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.polla-card-team.away {
+  flex-direction: row-reverse;
+  text-align: right;
+}
+
+.polla-team-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.polla-team-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+.polla-card-vs {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #475569;
+  flex-shrink: 0;
+}
+
+.polla-card-date {
+  text-align: center;
+  font-size: 0.82rem;
+  color: #64748b;
+  margin-bottom: 28px;
+}
+
+/* Opciones L/E/V */
+.polla-card-options { margin-bottom: 20px; }
+
+.polla-lev-options {
+  display: flex;
+  gap: 12px;
+}
+
+.polla-lev-btn {
+  flex: 1;
+  background: rgba(255,255,255,0.04);
+  border: 2px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 16px 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: #94a3b8;
+}
+
+.polla-lev-btn:hover {
+  background: rgba(255,255,255,0.07);
+}
+
+.polla-lev-btn.selected {
+  background: rgba(255,255,255,0.08);
+}
+
+.polla-lev-key {
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.polla-lev-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* Opciones eliminatorias */
+.polla-winner-label {
+  text-align: center;
+  color: #94a3b8;
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+}
+
+.polla-winner-btns {
+  display: flex;
+  gap: 16px;
+}
+
+.polla-winner-btn {
+  flex: 1;
+  background: rgba(255,255,255,0.04);
+  border: 2px solid rgba(255,255,255,0.1);
+  border-radius: 14px;
+  padding: 20px 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: #cbd5e1;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.polla-winner-btn:hover {
+  background: rgba(255,255,255,0.07);
+}
+
+.polla-winner-btn.selected {
+  border-color: #22c55e;
+  background: rgba(34,197,94,0.1);
+  color: #22c55e;
+}
+
+.polla-winner-logo {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+}
+
+/* Guardado */
+.polla-card-saved {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #22c55e;
+  font-size: 0.85rem;
+  margin-bottom: 16px;
+}
+
+/* Acciones */
+.polla-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.polla-save-btn {
+  background: linear-gradient(135deg, #22c55e, #16a34a) !important;
+  border: none !important;
+  font-weight: 700 !important;
+  flex: 1;
+}
+
+/* Done banner */
+.polla-predict-done {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: rgba(34,197,94,0.1);
+  border: 1px solid rgba(34,197,94,0.3);
+  border-radius: 12px;
+  padding: 16px 24px;
+  color: #22c55e;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+@media (max-width: 480px) {
+  .polla-lev-options { gap: 8px; }
+  .polla-winner-btns { gap: 10px; }
+  .polla-team-name { font-size: 0.85rem; }
+  .polla-team-logo { width: 36px; height: 36px; }
+}

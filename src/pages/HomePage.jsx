@@ -222,6 +222,21 @@ const HomePage = () => {
               Crear cuenta gratis
             </Button>
           </div>
+
+          {/* Polla Mundial CTA */}
+          <div className="hp__polla-cta">
+            <button
+              className="hp__polla-btn"
+              onClick={() => navigate('/mundial')}
+            >
+              <span className="hp__polla-emoji">⚽</span>
+              <span className="hp__polla-text">
+                <span className="hp__polla-label">Polla Mundial 2026</span>
+                <span className="hp__polla-sub">Predice los 104 partidos · Premio desde $1.000.000</span>
+              </span>
+              <span className="hp__polla-arrow">→</span>
+            </button>
+          </div>
         </div>
       </header>
 

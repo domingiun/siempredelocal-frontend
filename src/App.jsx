@@ -86,6 +86,11 @@ import CreateBetDatePage from './pages/admin/bets/CreateBetDatePage';
 import ArticlePage from './pages/articles/ArticlePage';
 import AdminArticlesPage from './pages/admin/articles/AdminArticlesPage';
 
+// Polla Mundial
+import PollaLandingPage from './pages/polla/PollaLandingPage';
+import PollaDashboardPage from './pages/polla/PollaDashboardPage';
+import PollaPredictionsPage from './pages/polla/PollaPredictionsPage';
+
 // Componentes comunes
 import PrivateRoute from './components/common/PrivateRoute';
 import AdminRoute from './components/common/AdminRoute';
@@ -143,6 +148,8 @@ function App() {
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/help/security" element={<SecurityPolicyPage />} />
                 <Route path="/articles/:id" element={<ArticlePage />} />
+                {/* Polla Mundial — landing pública */}
+                <Route path="/mundial" element={<PollaLandingPage />} />
                 
                 {/* Rutas protegidas */}
                 <Route element={<PrivateRoute />}>
@@ -157,6 +164,10 @@ function App() {
                     {/* SISTEMA DE APUESTAS - ¡NUEVAS RUTAS! */}
                     {/* =========================================== */}
                     
+                    {/* Polla Mundial — páginas autenticadas */}
+                    <Route path="/mundial/dashboard" element={<PollaDashboardPage />} />
+                    <Route path="/mundial/predict" element={<PollaPredictionsPage />} />
+
                     {/* Pronósticos */}
                     <Route path="/bets" element={<BetPage />} />
                     <Route path="/bets/ranking" element={<BetRankingPage />} />
