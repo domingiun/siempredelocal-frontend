@@ -16,6 +16,7 @@ import CompetitionMatches from './CompetitionMatches';
 import CompetitionRounds from './CompetitionRounds';
 import CompetitionStandings from './CompetitionStandings';
 import CompetitionStats from './CompetitionStats';
+import CompetitionGroups from './CompetitionGroups';
 
 /* ─── helpers ─── */
 const STATUS = {
@@ -39,12 +40,12 @@ const Pill = ({ children, color = '#1677ff' }) => (
   }}>{children}</span>
 );
 
-const TABS = [
-  { key: 'overview',   label: 'Resumen',            icon: <EyeOutlined />       },
-  { key: 'teams',      label: 'Equipos',             icon: <TeamOutlined />      },
-  { key: 'matches',    label: 'Partidos',            icon: <CalendarOutlined />  },
-  { key: 'standings',  label: 'Tabla',               icon: <TableOutlined />     },
-  { key: 'rounds',     label: 'Jornadas',            icon: <CalendarOutlined />  },
+const BASE_TABS = [
+  { key: 'overview',   label: 'Resumen',   icon: <EyeOutlined />      },
+  { key: 'teams',      label: 'Equipos',   icon: <TeamOutlined />     },
+  { key: 'matches',    label: 'Partidos',  icon: <CalendarOutlined /> },
+  { key: 'standings',  label: 'Tabla',     icon: <TableOutlined />    },
+  { key: 'rounds',     label: 'Jornadas',  icon: <CalendarOutlined /> },
 ];
 
 /* ─── componente principal ─── */
@@ -101,12 +102,19 @@ const CompetitionDashboard = () => {
     ? (competition.logo_url.startsWith('http') ? competition.logo_url : `${apiBase}${competition.logo_url}`)
     : null;
 
+  const hasGroups = (competition?.groups || 0) > 0;
+  const TABS = [
+    ...BASE_TABS,
+    ...(hasGroups ? [{ key: 'groups', label: 'Grupos', icon: <TrophyOutlined /> }] : []),
+  ];
+
   const tabContent = {
     overview:  <CompetitionStats competition={competition} stats={stats} />,
     teams:     <CompetitionTeams competitionId={id} teams={competition?.teams || []} />,
     matches:   <CompetitionMatches competitionId={id} competitionName={competition?.name} />,
     standings: <CompetitionStandings competitionId={id} competitionType={competition?.competition_type} />,
     rounds:    <CompetitionRounds competitionId={id} />,
+    groups:    <CompetitionGroups competitionId={id} competition={competition} />,
   };
 
   return (

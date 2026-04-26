@@ -119,6 +119,10 @@ class CompetitionService {
     }
   }
 
+  async assignGroups(competitionId, assignments) {
+    return api.patch(`/competitions/${competitionId}/assign-groups`, assignments);
+  }
+
   async generateSchedule(id) {
     return competitionsAPI.generateSchedule(id);
   }
