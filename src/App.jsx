@@ -90,6 +90,7 @@ import AdminArticlesPage from './pages/admin/articles/AdminArticlesPage';
 import PollaLandingPage from './pages/polla/PollaLandingPage';
 import PollaDashboardPage from './pages/polla/PollaDashboardPage';
 import PollaPredictionsPage from './pages/polla/PollaPredictionsPage';
+import PollaAdminPage from './pages/admin/polla/PollaAdminPage';
 
 // Componentes comunes
 import PrivateRoute from './components/common/PrivateRoute';
@@ -230,6 +231,8 @@ function App() {
                     <Route path="/admin/bets" element={<BetAdminPage />} />
                     <Route path="/admin/create-betdate" element={<CreateBetDatePage />} />
                     <Route path="/admin/bets/:id" element={<BetAdminPage />} />
+                    {/* Polla Mundial admin */}
+                    <Route path="/admin/mundial" element={<PollaAdminPage />} />
                     {/* Artículos del homepage */}
                     <Route path="/admin/articles" element={<AdminArticlesPage />} />
                     {/* Usuarios y sistema */}
