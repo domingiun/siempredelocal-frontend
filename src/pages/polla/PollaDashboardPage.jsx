@@ -2,8 +2,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Table, Tag, Progress, Button, Spin, Avatar, Tabs,
+  Table, Tag, Progress, Button, Spin, Avatar, Tabs, Grid,
 } from 'antd';
+
+const { useBreakpoint } = Grid;
 import {
   TrophyOutlined, EditOutlined, UserOutlined, StarOutlined,
   ThunderboltOutlined, TeamOutlined, CalendarOutlined,
@@ -42,6 +44,8 @@ const formatCOP = (n) =>
 export default function PollaDashboardPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const screens = useBreakpoint();
+  const isMobile = !screens.sm;
 
   const [polla, setPolla]           = useState(null);
   const [myStatus, setMyStatus]     = useState(null);
@@ -228,10 +232,11 @@ export default function PollaDashboardPage() {
       <Tabs
         defaultActiveKey="leaderboard"
         className="polla-db-tabs"
+        size={isMobile ? 'small' : 'middle'}
         items={[
           {
             key: 'leaderboard',
-            label: `Tabla de posiciones`,
+            label: isMobile ? '🏆 Ranking' : 'Tabla de posiciones',
             children: (
               <Table
                 dataSource={polla.leaderboard}
@@ -247,7 +252,7 @@ export default function PollaDashboardPage() {
           },
           {
             key: 'phases',
-            label: 'Progreso por fase',
+            label: isMobile ? '📊 Fases' : 'Progreso por fase',
             children: (
               <div className="polla-phases-progress">
                 {PHASE_ORDER.map((phase) => {
@@ -278,7 +283,7 @@ export default function PollaDashboardPage() {
           },
           {
             key: 'predictions',
-            label: `Mis predicciones (${myStatus?.predictions_submitted || 0})`,
+            label: isMobile ? `⚽ Mis picks (${myStatus?.predictions_submitted || 0})` : `Mis predicciones (${myStatus?.predictions_submitted || 0})`,
             children: <MyPredictionsTab pollaId={pollaId} />,
           },
         ]}
@@ -290,6 +295,8 @@ export default function PollaDashboardPage() {
 function MyPredictionsTab({ pollaId }) {
   const [predictions, setPredictions] = useState([]);
   const [loading, setLoading]         = useState(true);
+  const screens = useBreakpoint();
+  const isMobile = !screens.sm;
 
   useEffect(() => {
     if (!pollaId) return;
@@ -302,6 +309,7 @@ function MyPredictionsTab({ pollaId }) {
   if (loading) return <div style={{ padding: 40, textAlign: 'center' }}><Spin /></div>;
 
   const RESULT_LABELS = { L: 'Local', E: 'Empate', V: 'Visitante' };
+  const RESULT_SHORT  = { L: 'L', E: 'E', V: 'V' };
 
   const cols = [
     {
@@ -310,9 +318,9 @@ function MyPredictionsTab({ pollaId }) {
         <div>
           <div className="polla-match-row">
             {row.match?.home_logo && <img src={row.match.home_logo} className="polla-mini-logo" alt="" />}
-            <span>{row.match?.home_team}</span>
+            <span style={{ fontSize: isMobile ? '0.78rem' : '0.875rem' }}>{row.match?.home_team}</span>
             <span className="polla-vs">vs</span>
-            <span>{row.match?.away_team}</span>
+            <span style={{ fontSize: isMobile ? '0.78rem' : '0.875rem' }}>{row.match?.away_team}</span>
             {row.match?.away_logo && <img src={row.match.away_logo} className="polla-mini-logo" alt="" />}
           </div>
           <div className="polla-match-date">
@@ -324,26 +332,20 @@ function MyPredictionsTab({ pollaId }) {
       ),
     },
     {
-      title: 'Fase',
-      dataIndex: 'phase',
-      width: 120,
-      render: (v) => <Tag style={{ fontSize: '0.75rem' }}>{PHASE_LABELS[v] || v}</Tag>,
-    },
-    {
-      title: 'Mi predicción',
-      width: 130,
+      title: 'Pick',
+      width: isMobile ? 50 : 130,
       render: (_, row) => {
         if (row.prediction_result) {
           return (
-            <Tag color="blue" style={{ fontSize: '0.75rem' }}>
-              {RESULT_LABELS[row.prediction_result] || row.prediction_result}
+            <Tag color="blue" style={{ fontSize: '0.72rem', padding: '0 4px' }}>
+              {isMobile ? RESULT_SHORT[row.prediction_result] : (RESULT_LABELS[row.prediction_result] || row.prediction_result)}
             </Tag>
           );
         }
-        return <span style={{ color: '#94a3b8' }}>{row.predicted_winner_name || '—'}</span>;
+        return <span style={{ color: '#94a3b8', fontSize: '0.78rem' }}>{row.predicted_winner_name?.split(' ')[0] || '—'}</span>;
       },
     },
-    {
+    ...(!isMobile ? [{
       title: 'Resultado',
       width: 120,
       render: (_, row) => {
@@ -353,20 +355,20 @@ function MyPredictionsTab({ pollaId }) {
         }
         if (row.phase === 'groups') {
           const r = m.home_score > m.away_score ? 'L' : m.away_score > m.home_score ? 'V' : 'E';
-          return <span>{m.home_score}–{m.away_score} <span style={{ color: '#64748b' }}>({RESULT_LABELS[r]})</span></span>;
+          return <span style={{ fontSize: '0.8rem' }}>{m.home_score}–{m.away_score} <span style={{ color: '#64748b' }}>({RESULT_LABELS[r]})</span></span>;
         }
-        return <span style={{ color: '#94a3b8' }}>{m.home_score}–{m.away_score}</span>;
+        return <span style={{ color: '#94a3b8', fontSize: '0.8rem' }}>{m.home_score}–{m.away_score}</span>;
       },
-    },
+    }] : []),
     {
       title: 'Pts',
       dataIndex: 'points',
       align: 'right',
-      width: 70,
+      width: 50,
       render: (pts, row) => {
         if (row.is_correct === null) return <span style={{ color: '#475569' }}>—</span>;
         return (
-          <Tag color={row.is_correct ? 'green' : 'red'} style={{ fontSize: '0.8rem' }}>
+          <Tag color={row.is_correct ? 'green' : 'red'} style={{ fontSize: '0.78rem', padding: '0 4px' }}>
             {row.is_correct ? `+${pts}` : '0'}
           </Tag>
         );

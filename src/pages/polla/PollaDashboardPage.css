@@ -173,6 +173,7 @@
 .polla-db-tabs .ant-tabs-tab {
   color: #64748b !important;
   font-weight: 500;
+  font-size: 0.82rem;
 }
 
 .polla-db-tabs .ant-tabs-tab-active .ant-tabs-tab-btn {
@@ -185,6 +186,15 @@
 
 .polla-db-tabs .ant-tabs-nav::before {
   border-bottom-color: rgba(255,255,255,0.07);
+}
+
+/* Allow tabs to scroll on very small screens */
+.polla-db-tabs .ant-tabs-nav-wrap {
+  overflow: auto !important;
+}
+
+.polla-db-tabs .ant-tabs-nav-list {
+  flex-shrink: 0;
 }
 
 /* ── Leaderboard table ────────────────────────────────────────────────── */
