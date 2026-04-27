@@ -891,6 +891,27 @@ const Dashboard = () => {
         </Col>
       </Row>
 
+      {/* ── Polla Mundial ── */}
+      <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
+        <Col xs={24}>
+          <Button
+            size="large"
+            block
+            onClick={() => navigate('/mundial/dashboard')}
+            style={{
+              fontWeight: 700,
+              background: 'linear-gradient(135deg, #16a34a, #22c55e)',
+              borderColor: '#22c55e',
+              color: '#fff',
+              height: 48,
+              fontSize: '1rem',
+            }}
+          >
+            ⚽ Polla Mundial 2026 — Ver mi dashboard
+          </Button>
+        </Col>
+      </Row>
+
       <Row gutter={[16, 16]}>
 
         {/* Fila 1: Premio Acumulado | Partidos de Hoy */}
