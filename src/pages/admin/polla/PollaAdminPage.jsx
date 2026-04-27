@@ -546,7 +546,7 @@ function AddMatchesTab({
         columns={cols}
         loading={loadingMatches}
         size="small"
-        pagination={{ pageSize: 20, showSizeChanger: false }}
+        pagination={{ pageSize: 200, showSizeChanger: false, hideOnSinglePage: true }}
         rowSelection={{
           selectedRowKeys,
           onChange: onSelectChange,
