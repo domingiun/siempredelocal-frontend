@@ -1,0 +1,378 @@
+/* frontend/src/pages/admin/polla/PollaAdminPage.css */
+
+.polla-admin {
+  padding: 24px;
+  max-width: 1140px;
+  margin: 0 auto;
+  min-height: 100vh;
+}
+
+/* ── Hero header ──────────────────────────────────────────────────────── */
+
+.polla-admin__hero {
+  background: linear-gradient(135deg, #0c1a2e 0%, #0f2a1a 100%);
+  border: 1px solid rgba(34, 197, 94, 0.15);
+  border-radius: 16px;
+  padding: 28px 32px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.polla-admin__hero::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(34, 197, 94, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.polla-admin__hero-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.polla-admin__title-block h1 {
+  margin: 0 0 8px;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #e6edf3;
+  line-height: 1.2;
+}
+
+.polla-admin__title-block p {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.875rem;
+}
+
+.polla-admin__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid;
+}
+
+.polla-admin__status--upcoming  { background: rgba(100,116,139,0.15); border-color: #475569; color: #94a3b8; }
+.polla-admin__status--open      { background: rgba(34,197,94,0.12);   border-color: rgba(34,197,94,0.4); color: #22c55e; }
+.polla-admin__status--in_progress { background: rgba(59,130,246,0.12); border-color: rgba(59,130,246,0.4); color: #60a5fa; }
+.polla-admin__status--finished  { background: rgba(139,92,246,0.12);  border-color: rgba(139,92,246,0.4); color: #a78bfa; }
+.polla-admin__status--cancelled { background: rgba(239,68,68,0.12);   border-color: rgba(239,68,68,0.4); color: #f87171; }
+
+/* ── Stat cards ───────────────────────────────────────────────────────── */
+
+.polla-admin__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.polla-admin__stat {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: border-color 0.2s;
+}
+
+.polla-admin__stat:hover {
+  border-color: rgba(34, 197, 94, 0.2);
+}
+
+.polla-admin__stat-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.polla-admin__stat-icon--green  { background: rgba(34,197,94,0.12); color: #22c55e; }
+.polla-admin__stat-icon--blue   { background: rgba(59,130,246,0.12); color: #60a5fa; }
+.polla-admin__stat-icon--gold   { background: rgba(245,158,11,0.12); color: #fbbf24; }
+.polla-admin__stat-icon--purple { background: rgba(139,92,246,0.12); color: #a78bfa; }
+
+.polla-admin__stat-val {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #e6edf3;
+  line-height: 1.1;
+}
+
+.polla-admin__stat-lbl {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+/* ── Tabs panel ───────────────────────────────────────────────────────── */
+
+.polla-admin__tabs .ant-tabs-nav {
+  margin-bottom: 0;
+}
+
+.polla-admin__tabs .ant-tabs-tab {
+  color: #64748b !important;
+  font-weight: 500;
+  padding: 10px 18px;
+  border-radius: 8px 8px 0 0;
+  transition: color 0.2s;
+}
+
+.polla-admin__tabs .ant-tabs-tab:hover {
+  color: #94a3b8 !important;
+}
+
+.polla-admin__tabs .ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #22c55e !important;
+}
+
+.polla-admin__tabs .ant-tabs-ink-bar {
+  background: #22c55e;
+}
+
+.polla-admin__tabs .ant-tabs-nav::before {
+  border-bottom-color: rgba(255, 255, 255, 0.07);
+}
+
+/* ── Glass card (shared) ──────────────────────────────────────────────── */
+
+.pa-card {
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid rgba(255, 255, 255, 0.07) !important;
+  border-radius: 0 12px 12px 12px !important;
+  margin-top: -1px;
+}
+
+.pa-card .ant-card-body {
+  padding: 24px;
+}
+
+/* ── Section label ────────────────────────────────────────────────────── */
+
+.pa-section-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #64748b;
+  margin-bottom: 14px;
+}
+
+/* ── Form styling ─────────────────────────────────────────────────────── */
+
+.pa-form .ant-form-item-label > label {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.pa-form .ant-form-item-extra {
+  color: #475569;
+  font-size: 0.75rem;
+}
+
+.pa-form .ant-input,
+.pa-form .ant-input-number,
+.pa-form .ant-input-number-input,
+.pa-form .ant-select-selector,
+.pa-form .ant-input-affix-wrapper,
+.pa-form .ant-input-textarea {
+  background: #0b1624 !important;
+  border-color: #1f2b3a !important;
+  color: #e6edf3 !important;
+}
+
+.pa-form .ant-input::placeholder,
+.pa-form .ant-input-number-input::placeholder {
+  color: #475569;
+}
+
+.pa-form .ant-input-number-handler-wrap {
+  background: #0c1a2e;
+  border-color: #1f2b3a;
+}
+
+.pa-form .ant-input-number-handler:hover {
+  background: #132033;
+}
+
+.pa-form .ant-select-arrow { color: #64748b; }
+
+.pa-form-save-btn {
+  background: linear-gradient(135deg, #16a34a, #22c55e) !important;
+  border: none !important;
+  color: #fff !important;
+  font-weight: 600;
+  height: 40px;
+  padding: 0 28px;
+  border-radius: 8px;
+}
+
+.pa-form-save-btn:hover {
+  opacity: 0.9;
+}
+
+/* ── Add matches tab ──────────────────────────────────────────────────── */
+
+.pa-comp-selector {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.pa-comp-count {
+  color: #475569;
+  font-size: 0.8rem;
+}
+
+.pa-bulk-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(34, 197, 94, 0.06);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.pa-bulk-bar-label {
+  font-weight: 600;
+  color: #22c55e;
+  font-size: 0.875rem;
+}
+
+/* ── Table styling ────────────────────────────────────────────────────── */
+
+.pa-table .ant-table {
+  background: transparent !important;
+  color: #e6edf3;
+}
+
+.pa-table .ant-table-thead > tr > th {
+  background: rgba(255,255,255,0.03) !important;
+  color: #64748b !important;
+  border-color: rgba(255,255,255,0.06) !important;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pa-table .ant-table-tbody > tr > td {
+  background: transparent !important;
+  color: #cbd5e1 !important;
+  border-color: rgba(255,255,255,0.04) !important;
+  font-size: 0.875rem;
+}
+
+.pa-table .ant-table-tbody > tr:hover > td {
+  background: rgba(255,255,255,0.04) !important;
+}
+
+.pa-table .ant-table-row-selected > td {
+  background: rgba(34,197,94,0.06) !important;
+}
+
+.pa-table .ant-checkbox-inner {
+  background: #0b1624;
+  border-color: #1f2b3a;
+}
+
+.pa-table .ant-table-placeholder {
+  background: transparent;
+  color: #475569;
+}
+
+.pa-table .ant-pagination {
+  color: #64748b;
+}
+
+.pa-table .ant-pagination-item {
+  background: rgba(255,255,255,0.03);
+  border-color: rgba(255,255,255,0.07);
+}
+
+.pa-table .ant-pagination-item a { color: #94a3b8; }
+.pa-table .ant-pagination-item-active { border-color: #22c55e !important; }
+.pa-table .ant-pagination-item-active a { color: #22c55e !important; }
+
+/* ── Phase filter pills ───────────────────────────────────────────────── */
+
+.pa-phase-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  align-items: center;
+}
+
+.pa-pill {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #94a3b8;
+  background: rgba(255,255,255,0.03);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.pa-pill:hover {
+  border-color: rgba(34,197,94,0.3);
+  color: #22c55e;
+}
+
+.pa-pill--active {
+  background: rgba(34,197,94,0.12);
+  border-color: rgba(34,197,94,0.4);
+  color: #22c55e;
+}
+
+/* ── Participants tab actions ─────────────────────────────────────────── */
+
+.pa-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+/* ── Row already in polla ─────────────────────────────────────────────── */
+
+.polla-admin-row-added td {
+  opacity: 0.5;
+}
+
+/* ── Empty / no-polla state ───────────────────────────────────────────── */
+
+.pa-empty {
+  padding: 48px 0;
+  text-align: center;
+  color: #475569;
+}
+
+.pa-empty p { margin-top: 8px; font-size: 0.875rem; }

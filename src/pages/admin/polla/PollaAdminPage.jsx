@@ -2,35 +2,36 @@
 import { useEffect, useState, useCallback } from 'react';
 import {
   Card, Tabs, Table, Button, Select, Tag, Modal, Form, Input,
-  InputNumber, message, Space, Spin, Badge, Tooltip, Switch,
-  Row, Col, Statistic, Checkbox,
+  InputNumber, message, Space, Spin, Badge, Tooltip,
+  Row, Col,
 } from 'antd';
 import {
   PlusOutlined, DeleteOutlined, TrophyOutlined, TeamOutlined,
   SettingOutlined, UnorderedListOutlined, ReloadOutlined,
-  CheckCircleOutlined, ClockCircleOutlined,
+  CheckCircleOutlined, ClockCircleOutlined, CalendarOutlined,
 } from '@ant-design/icons';
 import pollaService from '../../../services/pollaService';
 import { competitionsAPI, matchesAPI } from '../../../services/api';
+import './PollaAdminPage.css';
 
 const { Option } = Select;
 
 const PHASES = [
-  { value: 'groups', label: 'Fase de Grupos', color: 'blue', pts: 1 },
+  { value: 'groups', label: 'Fase de Grupos', color: 'blue',   pts: 1 },
   { value: 'r32',    label: 'Ronda de 32',    color: 'purple', pts: 2 },
   { value: 'r16',    label: 'Octavos',        color: 'purple', pts: 2 },
-  { value: 'qf',     label: 'Cuartos',        color: 'gold', pts: 3 },
-  { value: 'sf',     label: 'Semifinales',    color: 'gold', pts: 3 },
-  { value: 'third',  label: 'Tercer puesto',  color: 'green', pts: 3 },
-  { value: 'final',  label: 'Final',          color: 'green', pts: 3 },
+  { value: 'qf',     label: 'Cuartos',        color: 'gold',   pts: 3 },
+  { value: 'sf',     label: 'Semifinales',    color: 'gold',   pts: 3 },
+  { value: 'third',  label: 'Tercer puesto',  color: 'green',  pts: 3 },
+  { value: 'final',  label: 'Final',          color: 'green',  pts: 3 },
 ];
 
 const STATUS_OPTIONS = [
-  { value: 'upcoming',    label: 'Próximamente', color: 'default' },
-  { value: 'open',        label: 'Abierta',      color: 'green' },
-  { value: 'in_progress', label: 'En curso',     color: 'blue' },
-  { value: 'finished',    label: 'Finalizada',   color: 'purple' },
-  { value: 'cancelled',   label: 'Cancelada',    color: 'red' },
+  { value: 'upcoming',    label: 'Próximamente', cls: 'upcoming' },
+  { value: 'open',        label: 'Abierta',      cls: 'open' },
+  { value: 'in_progress', label: 'En curso',     cls: 'in_progress' },
+  { value: 'finished',    label: 'Finalizada',   cls: 'finished' },
+  { value: 'cancelled',   label: 'Cancelada',    cls: 'cancelled' },
 ];
 
 const fmtDate = (d) => d
@@ -45,26 +46,20 @@ export default function PollaAdminPage() {
   const [loading, setLoading]           = useState(true);
   const [activeTab, setActiveTab]       = useState('config');
 
-  // Competencias y partidos
   const [competitions, setCompetitions] = useState([]);
   const [selectedComp, setSelectedComp] = useState(null);
   const [compMatches, setCompMatches]   = useState([]);
   const [loadingMatches, setLoadingMatches] = useState(false);
 
-  // Partidos en la polla
   const [pollaMatches, setPollaMatches] = useState([]);
   const [loadingPM, setLoadingPM]       = useState(false);
 
-  // Selección múltiple
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [bulkPhase, setBulkPhase]             = useState('groups');
   const [addingBulk, setAddingBulk]           = useState(false);
 
-  // Participantes
   const [participants, setParticipants] = useState([]);
   const [loadingPart, setLoadingPart]   = useState(false);
-
-  // ── Carga inicial ──────────────────────────────────────────────────────
 
   const loadPolla = useCallback(async () => {
     setLoading(true);
@@ -90,8 +85,6 @@ export default function PollaAdminPage() {
     loadCompetitions();
   }, [loadPolla, loadCompetitions]);
 
-  // ── Cargar partidos de una competencia ────────────────────────────────
-
   const loadCompMatches = useCallback(async (compId) => {
     setLoadingMatches(true);
     try {
@@ -107,8 +100,6 @@ export default function PollaAdminPage() {
     loadCompMatches(compId);
   };
 
-  // ── Cargar partidos de la polla ───────────────────────────────────────
-
   const loadPollaMatches = useCallback(async () => {
     if (!polla) return;
     setLoadingPM(true);
@@ -122,8 +113,6 @@ export default function PollaAdminPage() {
   useEffect(() => {
     if (activeTab === 'matches') loadPollaMatches();
   }, [activeTab, loadPollaMatches]);
-
-  // ── Cargar participantes ──────────────────────────────────────────────
 
   const loadParticipants = useCallback(async () => {
     if (!polla) return;
@@ -139,10 +128,7 @@ export default function PollaAdminPage() {
     if (activeTab === 'participants') loadParticipants();
   }, [activeTab, loadParticipants]);
 
-  // ── IDs ya en la polla (para marcarlos como agregados) ────────────────
   const pollaMatchIds = new Set(pollaMatches.map(pm => pm.match_id));
-
-  // ── Agregar partidos en bloque ────────────────────────────────────────
 
   const handleAddBulk = async () => {
     if (!polla || selectedRowKeys.length === 0) return;
@@ -164,8 +150,6 @@ export default function PollaAdminPage() {
     loadPollaMatches();
   };
 
-  // ── Quitar partido de la polla ────────────────────────────────────────
-
   const handleRemove = async (pmId) => {
     try {
       await pollaService.adminRemoveMatch(polla.id, pmId);
@@ -176,8 +160,6 @@ export default function PollaAdminPage() {
     }
   };
 
-  // ── Actualizar rankings ───────────────────────────────────────────────
-
   const handleUpdateRankings = async () => {
     try {
       await pollaService.adminUpdateRankings(polla.id);
@@ -186,37 +168,88 @@ export default function PollaAdminPage() {
     } catch { message.error('Error al actualizar rankings'); }
   };
 
-  // ── Render ─────────────────────────────────────────────────────────────
+  if (loading) {
+    return (
+      <div style={{ padding: 80, textAlign: 'center' }}>
+        <Spin size="large" />
+      </div>
+    );
+  }
 
-  if (loading) return <div style={{ padding: 40, textAlign: 'center' }}><Spin size="large" /></div>;
+  const statusOpt = STATUS_OPTIONS.find(s => s.value === polla?.status);
 
   return (
-    <div style={{ padding: '24px', maxWidth: 1100, margin: '0 auto' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <div>
-          <h1 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 800 }}>
-            ⚽ Admin — Polla Mundial 2026
-          </h1>
-          {polla && (
-            <Tag color={STATUS_OPTIONS.find(s => s.value === polla.status)?.color || 'default'} style={{ marginTop: 6 }}>
-              {STATUS_OPTIONS.find(s => s.value === polla.status)?.label || polla.status}
-            </Tag>
-          )}
+    <div className="polla-admin">
+
+      {/* Hero header */}
+      <div className="polla-admin__hero">
+        <div className="polla-admin__hero-top">
+          <div className="polla-admin__title-block">
+            <h1>⚽ Admin — Polla Mundial 2026</h1>
+            <p>Gestiona la polla, partidos y participantes del Mundial 2026</p>
+          </div>
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+            {polla && statusOpt && (
+              <span className={`polla-admin__status polla-admin__status--${statusOpt.cls}`}>
+                {statusOpt.label}
+              </span>
+            )}
+            <Button
+              icon={<ReloadOutlined />}
+              onClick={loadPolla}
+              style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#94a3b8' }}
+            >
+              Recargar
+            </Button>
+          </div>
         </div>
-        <Button icon={<ReloadOutlined />} onClick={loadPolla}>Recargar</Button>
       </div>
 
-      {/* Stats rápidos */}
+      {/* Stat cards */}
       {polla && (
-        <Row gutter={16} style={{ marginBottom: 24 }}>
-          <Col xs={12} sm={6}><Card size="small"><Statistic title="Participantes" value={polla.participant_count} prefix={<TeamOutlined />} /></Card></Col>
-          <Col xs={12} sm={6}><Card size="small"><Statistic title="Premio actual" value={fmtCOP(polla.current_prize_cop)} /></Card></Col>
-          <Col xs={12} sm={6}><Card size="small"><Statistic title="Partidos en polla" value={pollaMatches.length} prefix={<UnorderedListOutlined />} /></Card></Col>
-          <Col xs={12} sm={6}><Card size="small"><Statistic title="Entrada" value={`${polla.entry_credits} créditos`} /></Card></Col>
-        </Row>
+        <div className="polla-admin__stats">
+          <div className="polla-admin__stat">
+            <div className="polla-admin__stat-icon polla-admin__stat-icon--blue">
+              <TeamOutlined />
+            </div>
+            <div>
+              <div className="polla-admin__stat-val">{polla.participant_count}</div>
+              <div className="polla-admin__stat-lbl">Participantes</div>
+            </div>
+          </div>
+          <div className="polla-admin__stat">
+            <div className="polla-admin__stat-icon polla-admin__stat-icon--gold">
+              <TrophyOutlined />
+            </div>
+            <div>
+              <div className="polla-admin__stat-val" style={{ fontSize: '1rem' }}>{fmtCOP(polla.current_prize_cop)}</div>
+              <div className="polla-admin__stat-lbl">Premio actual</div>
+            </div>
+          </div>
+          <div className="polla-admin__stat">
+            <div className="polla-admin__stat-icon polla-admin__stat-icon--purple">
+              <UnorderedListOutlined />
+            </div>
+            <div>
+              <div className="polla-admin__stat-val">{pollaMatches.length}</div>
+              <div className="polla-admin__stat-lbl">Partidos en la polla</div>
+            </div>
+          </div>
+          <div className="polla-admin__stat">
+            <div className="polla-admin__stat-icon polla-admin__stat-icon--green">
+              <CalendarOutlined />
+            </div>
+            <div>
+              <div className="polla-admin__stat-val">{polla.entry_credits} créditos</div>
+              <div className="polla-admin__stat-lbl">Inscripción</div>
+            </div>
+          </div>
+        </div>
       )}
 
+      {/* Tabs */}
       <Tabs
+        className="polla-admin__tabs"
         activeKey={activeTab}
         onChange={setActiveTab}
         items={[
@@ -248,7 +281,11 @@ export default function PollaAdminPage() {
           },
           {
             key: 'matches',
-            label: <Badge count={pollaMatches.length} color="blue"><span style={{ paddingRight: 8 }}><UnorderedListOutlined /> Partidos en la polla</span></Badge>,
+            label: (
+              <Badge count={pollaMatches.length} color="#22c55e" size="small">
+                <span style={{ paddingRight: 10 }}><UnorderedListOutlined /> Partidos ({pollaMatches.length})</span>
+              </Badge>
+            ),
             children: (
               <PollaMatchesTab
                 pollaMatches={pollaMatches}
@@ -281,7 +318,6 @@ export default function PollaAdminPage() {
 function ConfigTab({ polla, onSaved }) {
   const [form] = Form.useForm();
   const [saving, setSaving] = useState(false);
-  const [creating, setCreating] = useState(false);
 
   useEffect(() => {
     if (polla) {
@@ -305,36 +341,36 @@ function ConfigTab({ polla, onSaved }) {
         await pollaService.adminUpdatePolla(polla.id, values);
         message.success('Polla actualizada');
       } else {
-        setCreating(true);
         await pollaService.adminCreatePolla({ ...values, edition_year: 2026 });
         message.success('Polla creada');
       }
       onSaved();
     } catch (err) {
       message.error(err?.response?.data?.detail || 'Error al guardar');
-    } finally { setSaving(false); setCreating(false); }
+    } finally { setSaving(false); }
   };
 
   return (
-    <Card>
-      <Form form={form} layout="vertical" onFinish={handleSave} style={{ maxWidth: 600 }}>
+    <Card className="pa-card">
+      <div className="pa-section-label">Datos de la polla</div>
+      <Form form={form} layout="vertical" onFinish={handleSave} className="pa-form" style={{ maxWidth: 620 }}>
         <Form.Item name="name" label="Nombre" rules={[{ required: true }]}>
           <Input placeholder="Polla Mundial 2026" />
         </Form.Item>
         <Form.Item name="description" label="Descripción">
-          <Input.TextArea rows={2} />
+          <Input.TextArea rows={2} placeholder="Descripción visible para los participantes" />
         </Form.Item>
+
         {polla && (
           <Form.Item name="status" label="Estado">
             <Select>
               {STATUS_OPTIONS.map(s => (
-                <Option key={s.value} value={s.value}>
-                  <Tag color={s.color}>{s.label}</Tag>
-                </Option>
+                <Option key={s.value} value={s.value}>{s.label}</Option>
               ))}
             </Select>
           </Form.Item>
         )}
+
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item name="entry_credits" label="Créditos de entrada">
@@ -342,11 +378,12 @@ function ConfigTab({ polla, onSaved }) {
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item name="platform_fee_pct" label="% plataforma">
+            <Form.Item name="platform_fee_pct" label="% comisión plataforma">
               <InputNumber min={0} max={100} style={{ width: '100%' }} addonAfter="%" />
             </Form.Item>
           </Col>
         </Row>
+
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
@@ -365,8 +402,8 @@ function ConfigTab({ polla, onSaved }) {
           <Col span={12}>
             <Form.Item
               name="prize_per_user_cop"
-              label="Suma por participante (COP)"
-              extra="Lo que crece el pozo con cada inscrito. Ej: 32000"
+              label="Premio por participante (COP)"
+              extra="Lo que suma cada inscripción al pozo"
             >
               <InputNumber
                 min={0}
@@ -377,8 +414,9 @@ function ConfigTab({ polla, onSaved }) {
             </Form.Item>
           </Col>
         </Row>
-        <Form.Item>
-          <Button type="primary" htmlType="submit" loading={saving}>
+
+        <Form.Item style={{ marginTop: 8 }}>
+          <Button type="primary" htmlType="submit" loading={saving} className="pa-form-save-btn">
             {polla ? 'Guardar cambios' : 'Crear Polla'}
           </Button>
         </Form.Item>
@@ -395,9 +433,20 @@ function AddMatchesTab({
   selectedRowKeys, onSelectChange,
   bulkPhase, onBulkPhaseChange, onAddBulk, addingBulk,
 }) {
-  if (!polla) return <Card><p style={{ color: '#94a3b8' }}>Primero crea la Polla en la pestaña Configuración.</p></Card>;
+  if (!polla) {
+    return (
+      <Card className="pa-card">
+        <div className="pa-empty">
+          <SettingOutlined style={{ fontSize: 36, color: '#334155' }} />
+          <p>Primero crea la Polla en la pestaña Configuración.</p>
+        </div>
+      </Card>
+    );
+  }
 
   const pending = selectedRowKeys.filter(id => !pollaMatchIds.has(id));
+  const available = compMatches.filter(m => !pollaMatchIds.has(m.id));
+  const alreadyIn = compMatches.filter(m => pollaMatchIds.has(m.id));
 
   const cols = [
     {
@@ -413,7 +462,7 @@ function AddMatchesTab({
       render: (_, r) => (
         <span>
           {r.home_team?.name || r.home_team_name || '?'}
-          <span style={{ color: '#64748b', margin: '0 8px' }}>vs</span>
+          <span style={{ color: '#475569', margin: '0 8px' }}>vs</span>
           {r.away_team?.name || r.away_team_name || '?'}
         </span>
       ),
@@ -428,27 +477,23 @@ function AddMatchesTab({
       title: 'Estado',
       dataIndex: 'status',
       width: 110,
-      render: (v) => <Tag>{v}</Tag>,
+      render: (v) => <Tag style={{ fontSize: '0.75rem' }}>{v}</Tag>,
     },
     {
       title: '',
       width: 100,
       render: (_, r) => pollaMatchIds.has(r.id)
-        ? <Tag color="green"><CheckCircleOutlined /> En polla</Tag>
+        ? <Tag color="green" style={{ fontSize: '0.72rem' }}><CheckCircleOutlined /> En polla</Tag>
         : null,
     },
   ];
 
-  // Filtrar los ya agregados de los disponibles
-  const available = compMatches.filter(m => !pollaMatchIds.has(m.id));
-  const alreadyIn = compMatches.filter(m => pollaMatchIds.has(m.id));
-
   return (
-    <Card>
-      {/* Selector de competencia */}
-      <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap', alignItems: 'center' }}>
+    <Card className="pa-card">
+      <div className="pa-section-label">Selecciona una competencia</div>
+      <div className="pa-comp-selector">
         <Select
-          placeholder="Selecciona la competencia"
+          placeholder="Buscar competencia..."
           style={{ width: 320 }}
           onChange={onCompChange}
           value={selectedComp}
@@ -460,20 +505,15 @@ function AddMatchesTab({
           ))}
         </Select>
         {compMatches.length > 0 && (
-          <span style={{ color: '#64748b', fontSize: '0.85rem' }}>
+          <span className="pa-comp-count">
             {available.length} disponibles · {alreadyIn.length} ya en la polla
           </span>
         )}
       </div>
 
-      {/* Barra de acción masiva */}
       {pending.length > 0 && (
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 12,
-          background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.2)',
-          borderRadius: 10, padding: '12px 16px', marginBottom: 16, flexWrap: 'wrap',
-        }}>
-          <span style={{ fontWeight: 600 }}>{pending.length} partido(s) seleccionado(s)</span>
+        <div className="pa-bulk-bar">
+          <span className="pa-bulk-bar-label">{pending.length} partido(s) seleccionado(s)</span>
           <Select value={bulkPhase} onChange={onBulkPhaseChange} style={{ width: 180 }}>
             {PHASES.map(p => (
               <Option key={p.value} value={p.value}>
@@ -486,15 +526,21 @@ function AddMatchesTab({
             icon={<PlusOutlined />}
             onClick={onAddBulk}
             loading={addingBulk}
+            style={{ background: '#22c55e', borderColor: '#22c55e' }}
           >
             Agregar a la polla
           </Button>
-          <Button onClick={() => onSelectChange([])}>Limpiar selección</Button>
+          <Button
+            onClick={() => onSelectChange([])}
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#94a3b8' }}
+          >
+            Limpiar
+          </Button>
         </div>
       )}
 
-      {/* Tabla de partidos */}
       <Table
+        className="pa-table"
         rowKey="id"
         dataSource={compMatches}
         columns={cols}
@@ -509,7 +555,7 @@ function AddMatchesTab({
           }),
         }}
         rowClassName={(r) => pollaMatchIds.has(r.id) ? 'polla-admin-row-added' : ''}
-        locale={{ emptyText: selectedComp ? 'Sin partidos en esta competencia' : 'Selecciona una competencia' }}
+        locale={{ emptyText: selectedComp ? 'Sin partidos en esta competencia' : 'Selecciona una competencia para ver sus partidos' }}
       />
     </Card>
   );
@@ -536,7 +582,7 @@ function PollaMatchesTab({ pollaMatches, loading, onRemove, onReload }) {
       width: 130,
       render: (v) => {
         const ph = PHASES.find(p => p.value === v);
-        return <Tag color={ph?.color}>{ph?.label || v}</Tag>;
+        return <Tag color={ph?.color} style={{ fontSize: '0.75rem' }}>{ph?.label || v}</Tag>;
       },
     },
     {
@@ -551,35 +597,36 @@ function PollaMatchesTab({ pollaMatches, loading, onRemove, onReload }) {
       title: 'Partido',
       render: (_, r) => (
         <span>
-          {r.home_logo && <img src={r.home_logo} style={{ width: 20, marginRight: 6, verticalAlign: 'middle' }} alt="" />}
+          {r.home_logo && <img src={r.home_logo} style={{ width: 18, marginRight: 6, verticalAlign: 'middle' }} alt="" />}
           {r.home_team || '?'}
-          <span style={{ color: '#64748b', margin: '0 8px' }}>vs</span>
+          <span style={{ color: '#475569', margin: '0 8px' }}>vs</span>
           {r.away_team || '?'}
-          {r.away_logo && <img src={r.away_logo} style={{ width: 20, marginLeft: 6, verticalAlign: 'middle' }} alt="" />}
+          {r.away_logo && <img src={r.away_logo} style={{ width: 18, marginLeft: 6, verticalAlign: 'middle' }} alt="" />}
         </span>
       ),
     },
     {
       title: 'Estado',
-      width: 100,
+      width: 120,
       render: (_, r) => r.is_scored
-        ? <Tag color="green"><CheckCircleOutlined /> Puntuado</Tag>
-        : <Tag color="default"><ClockCircleOutlined /> Pendiente</Tag>,
+        ? <Tag color="green" style={{ fontSize: '0.72rem' }}><CheckCircleOutlined /> Puntuado</Tag>
+        : <Tag style={{ fontSize: '0.72rem', background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.1)', color: '#64748b' }}><ClockCircleOutlined /> Pendiente</Tag>,
     },
     {
-      title: 'Cierre predicciones',
+      title: 'Cierre',
       dataIndex: 'close_at',
       width: 140,
       render: fmtDate,
     },
     {
       title: '',
-      width: 60,
+      width: 50,
       render: (_, r) => (
-        <Tooltip title={r.is_scored ? 'Ya puntuado, no se puede eliminar' : 'Quitar de la polla'}>
+        <Tooltip title={r.is_scored ? 'Ya puntuado' : 'Quitar de la polla'}>
           <Button
             danger size="small" icon={<DeleteOutlined />}
             disabled={r.is_scored}
+            style={{ opacity: r.is_scored ? 0.4 : 1 }}
             onClick={() => Modal.confirm({
               title: '¿Quitar este partido de la polla?',
               content: `${r.home_team} vs ${r.away_team}`,
@@ -592,29 +639,33 @@ function PollaMatchesTab({ pollaMatches, loading, onRemove, onReload }) {
   ];
 
   return (
-    <Card>
-      {/* Resumen por fase */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
-        <Tag
-          style={{ cursor: 'pointer', fontWeight: phaseFilter === null ? 700 : 400 }}
+    <Card className="pa-card">
+      <div className="pa-phase-pills">
+        <span
+          className={`pa-pill${phaseFilter === null ? ' pa-pill--active' : ''}`}
           onClick={() => setPhaseFilter(null)}
         >
           Todos ({pollaMatches.length})
-        </Tag>
+        </span>
         {groupedCounts.filter(p => p.count > 0).map(p => (
-          <Tag
+          <span
             key={p.value}
-            color={phaseFilter === p.value ? p.color : 'default'}
-            style={{ cursor: 'pointer' }}
+            className={`pa-pill${phaseFilter === p.value ? ' pa-pill--active' : ''}`}
             onClick={() => setPhaseFilter(phaseFilter === p.value ? null : p.value)}
           >
             {p.label} ({p.count})
-          </Tag>
+          </span>
         ))}
-        <Button size="small" icon={<ReloadOutlined />} onClick={onReload} style={{ marginLeft: 'auto' }} />
+        <Button
+          size="small"
+          icon={<ReloadOutlined />}
+          onClick={onReload}
+          style={{ marginLeft: 'auto', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#94a3b8' }}
+        />
       </div>
 
       <Table
+        className="pa-table"
         rowKey="id"
         dataSource={filtered}
         columns={cols}
@@ -630,28 +681,80 @@ function PollaMatchesTab({ pollaMatches, loading, onRemove, onReload }) {
 
 function ParticipantsTab({ participants, loading, onUpdateRankings, onReload }) {
   const cols = [
-    { title: '#', dataIndex: 'rank', width: 50, render: r => r || '—' },
-    { title: 'Usuario', dataIndex: 'username', render: (n, r) => <span>{n}{r.prize_won_cop > 0 && <Tag color="gold" style={{ marginLeft: 8 }}>Premio</Tag>}</span> },
-    { title: 'Pts base', dataIndex: 'base_points', align: 'right' },
-    { title: 'Bonos', dataIndex: 'bonus_points', align: 'right', render: v => <Tag color={v > 0 ? 'gold' : 'default'}>{v > 0 ? `+${v}` : v}</Tag> },
-    { title: 'Total', dataIndex: 'total_points', align: 'right', render: v => <strong style={{ color: '#22c55e' }}>{v}</strong>, sorter: (a, b) => b.total_points - a.total_points, defaultSortOrder: 'descend' },
+    {
+      title: '#',
+      dataIndex: 'rank',
+      width: 50,
+      render: (r) => <span style={{ color: '#64748b', fontWeight: 700 }}>{r || '—'}</span>,
+    },
+    {
+      title: 'Usuario',
+      dataIndex: 'username',
+      render: (n, r) => (
+        <span>
+          {n}
+          {r.prize_won_cop > 0 && (
+            <Tag color="gold" style={{ marginLeft: 8, fontSize: '0.72rem' }}>
+              <TrophyOutlined /> Premio
+            </Tag>
+          )}
+        </span>
+      ),
+    },
+    {
+      title: 'Pts base',
+      dataIndex: 'base_points',
+      align: 'right',
+      render: (v) => <span style={{ color: '#94a3b8' }}>{v}</span>,
+    },
+    {
+      title: 'Bonos',
+      dataIndex: 'bonus_points',
+      align: 'right',
+      render: (v) => (
+        <span style={{ color: v > 0 ? '#fbbf24' : '#475569', fontWeight: v > 0 ? 700 : 400 }}>
+          {v > 0 ? `+${v}` : v}
+        </span>
+      ),
+    },
+    {
+      title: 'Total',
+      dataIndex: 'total_points',
+      align: 'right',
+      render: (v) => <strong style={{ color: '#22c55e', fontSize: '1rem' }}>{v}</strong>,
+      sorter: (a, b) => b.total_points - a.total_points,
+      defaultSortOrder: 'descend',
+    },
   ];
 
   return (
-    <Card>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginBottom: 16 }}>
-        <Button icon={<ReloadOutlined />} onClick={onReload}>Recargar</Button>
-        <Button type="primary" icon={<TrophyOutlined />} onClick={onUpdateRankings}>
+    <Card className="pa-card">
+      <div className="pa-actions">
+        <Button
+          icon={<ReloadOutlined />}
+          onClick={onReload}
+          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#94a3b8' }}
+        >
+          Recargar
+        </Button>
+        <Button
+          type="primary"
+          icon={<TrophyOutlined />}
+          onClick={onUpdateRankings}
+          style={{ background: '#22c55e', borderColor: '#22c55e' }}
+        >
           Recalcular rankings
         </Button>
       </div>
       <Table
+        className="pa-table"
         rowKey="user_id"
         dataSource={participants}
         columns={cols}
         loading={loading}
         size="small"
         pagination={{ pageSize: 30, showSizeChanger: false }}
+        locale={{ emptyText: 'Sin participantes aún' }}
       />
     </Card>
   );
