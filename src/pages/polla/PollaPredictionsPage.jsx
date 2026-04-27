@@ -50,7 +50,7 @@ export default function PollaPredictionsPage() {
         setPollaId(active.id);
 
         const [nextMatches, myPreds] = await Promise.all([
-          pollaService.getNextMatches(active.id, 50),
+          pollaService.getNextMatches(active.id, 104),
           pollaService.getMyPredictions(active.id).catch(() => []),
         ]);
 
