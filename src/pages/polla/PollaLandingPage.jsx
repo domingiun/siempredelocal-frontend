@@ -69,7 +69,15 @@ export default function PollaLandingPage() {
       message.success('¡Te inscribiste exitosamente!');
       navigate(`/mundial/dashboard`);
     } catch (err) {
-      message.error(err?.response?.data?.detail || 'Error al inscribirse');
+      const status = err?.response?.status;
+      const detail = err?.response?.data?.detail;
+      if (status === 401 || status === 403) {
+        message.error('Sesión expirada — inicia sesión nuevamente');
+      } else if (detail) {
+        message.error(typeof detail === 'string' ? detail : JSON.stringify(detail));
+      } else {
+        message.error(`Error al inscribirse (${status || 'sin respuesta'})`);
+      }
     } finally {
       setJoining(false);
     }
