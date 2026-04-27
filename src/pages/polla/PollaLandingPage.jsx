@@ -1,10 +1,10 @@
 // frontend/src/pages/polla/PollaLandingPage.jsx
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button, Tag, Spin, message } from 'antd';
 import {
   TrophyOutlined, TeamOutlined, CalendarOutlined,
-  StarOutlined, ThunderboltOutlined, GiftOutlined,
+  StarOutlined, ThunderboltOutlined, GiftOutlined, HomeOutlined,
 } from '@ant-design/icons';
 import { useAuth } from '../../context/AuthContext';
 import pollaService from '../../services/pollaService';
@@ -94,6 +94,13 @@ export default function PollaLandingPage() {
 
   return (
     <div className="polla-landing">
+      {/* Navbar mínima */}
+      <div className="polla-topbar">
+        <Link to="/" className="polla-topbar-home">
+          <HomeOutlined /> Inicio
+        </Link>
+      </div>
+
       {/* Hero */}
       <section className="polla-hero">
         <div className="polla-hero-bg" />
