@@ -289,8 +289,36 @@
 }
 
 @media (max-width: 480px) {
-  .polla-lev-options { gap: 8px; }
-  .polla-winner-btns { gap: 10px; }
-  .polla-team-name { font-size: 0.85rem; }
+  /* Página */
+  .polla-predict { padding: 16px 12px 60px; }
+
+  /* Dots más pequeños en mobile */
+  .polla-predict-dot { width: 10px; height: 10px; }
+  .polla-predict-nav { gap: 4px; margin-bottom: 20px; }
+
+  /* Header compacto */
+  .polla-predict-header { margin-bottom: 14px; }
+  .polla-predict-progress-label { font-size: 0.75rem; }
+
+  /* Match card */
+  .polla-match-card { padding: 18px 14px; border-radius: 14px; }
+
+  /* Equipos */
   .polla-team-logo { width: 36px; height: 36px; }
+  .polla-team-name { font-size: 0.85rem; }
+  .polla-card-teams { gap: 8px; }
+
+  /* L/E/V */
+  .polla-lev-options { gap: 8px; }
+  .polla-lev-key { font-size: 1.2rem; }
+  .polla-lev-label { font-size: 0.7rem; }
+  .polla-lev-btn { padding: 12px 4px; }
+
+  /* Eliminatorias */
+  .polla-winner-btns { gap: 8px; }
+  .polla-winner-logo { width: 40px; height: 40px; }
+  .polla-winner-btn { padding: 14px 8px; font-size: 0.82rem; }
+
+  /* Botones de acción */
+  .polla-card-actions { gap: 8px; }
 }

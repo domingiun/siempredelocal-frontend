@@ -904,10 +904,10 @@ const Dashboard = () => {
               borderColor: '#22c55e',
               color: '#fff',
               height: 48,
-              fontSize: '1rem',
+              fontSize: isMobile ? '0.9rem' : '1rem',
             }}
           >
-            ⚽ Polla Mundial 2026 — Ver mi dashboard
+            ⚽ {isMobile ? 'Polla Mundial 2026' : 'Polla Mundial 2026 — Ver mi dashboard'}
           </Button>
         </Col>
       </Row>
