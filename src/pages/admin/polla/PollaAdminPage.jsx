@@ -346,7 +346,15 @@ function ConfigTab({ polla, onSaved }) {
       }
       onSaved();
     } catch (err) {
-      message.error(err?.response?.data?.detail || 'Error al guardar');
+      const status = err?.response?.status;
+      const detail = err?.response?.data?.detail;
+      if (status === 401 || status === 403) {
+        message.error('Sesión expirada — vuelve a iniciar sesión');
+      } else if (detail) {
+        message.error(typeof detail === 'string' ? detail : JSON.stringify(detail));
+      } else {
+        message.error(`Error al guardar (${status || 'sin respuesta'})`);
+      }
     } finally { setSaving(false); }
   };
 
