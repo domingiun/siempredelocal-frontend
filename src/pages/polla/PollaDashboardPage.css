@@ -1,9 +1,7 @@
 /* PollaDashboardPage.css */
 
 .polla-db {
-  background: #060d18;
-  min-height: 100vh;
-  padding: 32px 24px 60px;
+  padding: 28px 24px 60px;
   max-width: 1100px;
   margin: 0 auto;
   color: #e2e8f0;
@@ -18,24 +16,39 @@
   height: 60vh;
   gap: 16px;
   color: #94a3b8;
-  background: #060d18;
 }
 
-/* Header */
-.polla-db-header {
+/* ── Hero header ──────────────────────────────────────────────────────── */
+
+.polla-db-hero {
+  background: linear-gradient(135deg, #0c1a2e 0%, #0f2a1a 100%);
+  border: 1px solid rgba(34,197,94,0.15);
+  border-radius: 16px;
+  padding: 28px 32px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 28px;
+  gap: 20px;
   flex-wrap: wrap;
-  gap: 16px;
+}
+
+.polla-db-hero::before {
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 220px; height: 220px;
+  background: radial-gradient(circle, rgba(34,197,94,0.08) 0%, transparent 70%);
+  pointer-events: none;
 }
 
 .polla-db-title {
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   font-weight: 800;
   color: #f1f5f9;
-  margin: 0;
+  margin: 0 0 6px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -43,54 +56,88 @@
 
 .polla-db-subtitle {
   color: #64748b;
-  margin: 4px 0 0;
-  font-size: 0.9rem;
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.polla-db-prize-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 0.875rem;
+  color: #94a3b8;
+}
+
+.polla-db-prize-inline strong {
+  color: #22c55e;
+  font-size: 1rem;
 }
 
 .polla-predict-btn {
   background: linear-gradient(135deg, #22c55e, #16a34a) !important;
   border: none !important;
   font-weight: 600 !important;
+  height: 42px !important;
+  padding: 0 24px !important;
+  border-radius: 10px !important;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
-/* Stats cards */
+/* ── Stat cards ───────────────────────────────────────────────────────── */
+
 .polla-db-stats {
-  margin-bottom: 20px !important;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
 }
 
-.polla-stat-card {
-  background: rgba(255,255,255,0.04) !important;
-  border: 1px solid rgba(255,255,255,0.08) !important;
-  border-radius: 12px !important;
-}
-
-.polla-stat-card .ant-statistic-title {
-  color: #64748b !important;
-  font-size: 0.8rem !important;
-}
-
-.polla-stat-card .ant-statistic-content {
-  color: #f1f5f9 !important;
-}
-
-/* Premio */
-.polla-db-prize {
-  background: rgba(34,197,94,0.07);
-  border: 1px solid rgba(34,197,94,0.2);
+.polla-db-stat {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
   border-radius: 12px;
-  padding: 16px 20px;
+  padding: 18px 20px;
   display: flex;
   align-items: center;
-  margin-bottom: 24px;
-  font-size: 1rem;
-  color: #cbd5e1;
+  gap: 14px;
+  transition: border-color 0.2s;
 }
 
-.polla-db-prize strong { color: #22c55e; }
+.polla-db-stat:hover { border-color: rgba(34,197,94,0.2); }
 
-/* Tabs */
+.polla-db-stat-icon {
+  width: 44px; height: 44px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.polla-db-stat-icon--gold   { background: rgba(245,158,11,0.12);  color: #fbbf24; }
+.polla-db-stat-icon--green  { background: rgba(34,197,94,0.12);   color: #22c55e; }
+.polla-db-stat-icon--blue   { background: rgba(59,130,246,0.12);  color: #60a5fa; }
+.polla-db-stat-icon--purple { background: rgba(139,92,246,0.12);  color: #a78bfa; }
+
+.polla-db-stat-val {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #e6edf3;
+  line-height: 1.1;
+}
+
+.polla-db-stat-lbl {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+/* ── Tabs ─────────────────────────────────────────────────────────────── */
+
 .polla-db-tabs .ant-tabs-tab {
   color: #64748b !important;
+  font-weight: 500;
 }
 
 .polla-db-tabs .ant-tabs-tab-active .ant-tabs-tab-btn {
@@ -101,21 +148,31 @@
   background: #22c55e !important;
 }
 
-/* Leaderboard */
+.polla-db-tabs .ant-tabs-nav::before {
+  border-bottom-color: rgba(255,255,255,0.07);
+}
+
+/* ── Leaderboard table ────────────────────────────────────────────────── */
+
 .polla-leaderboard-table .ant-table {
   background: transparent !important;
 }
 
 .polla-leaderboard-table .ant-table-thead > tr > th {
-  background: rgba(255,255,255,0.04) !important;
-  color: #94a3b8 !important;
-  border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+  background: rgba(255,255,255,0.03) !important;
+  color: #64748b !important;
+  border-color: rgba(255,255,255,0.06) !important;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .polla-leaderboard-table .ant-table-tbody > tr > td {
   background: transparent !important;
-  border-bottom: 1px solid rgba(255,255,255,0.04) !important;
+  border-color: rgba(255,255,255,0.04) !important;
   color: #cbd5e1 !important;
+  font-size: 0.875rem;
 }
 
 .polla-leaderboard-table .ant-table-tbody > tr:hover > td {
@@ -123,36 +180,39 @@
 }
 
 .polla-my-row > td {
-  background: rgba(34,197,94,0.06) !important;
+  background: rgba(34,197,94,0.05) !important;
 }
 
+.polla-leaderboard-table .ant-pagination-item {
+  background: rgba(255,255,255,0.03);
+  border-color: rgba(255,255,255,0.07);
+}
+
+.polla-leaderboard-table .ant-pagination-item a { color: #94a3b8; }
+.polla-leaderboard-table .ant-pagination-item-active { border-color: #22c55e !important; }
+.polla-leaderboard-table .ant-pagination-item-active a { color: #22c55e !important; }
+
+/* Player cell */
 .polla-player {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.polla-me {
-  font-weight: 600;
-  color: #22c55e;
-}
+.polla-me { font-weight: 700; color: #22c55e; }
 
-.polla-rank {
-  font-weight: 700;
-  font-size: 1rem;
-  color: #94a3b8;
-}
-
-.polla-rank.gold { color: #f59e0b; }
+.polla-rank { font-weight: 700; font-size: 1rem; color: #94a3b8; }
+.polla-rank.gold   { color: #f59e0b; }
 .polla-rank.silver { color: #94a3b8; }
-.polla-rank.bronze { color: #d97706; }
+.polla-rank.bronze { color: #cd7c2f; }
 
-/* Progreso por fase */
+/* ── Phase progress ───────────────────────────────────────────────────── */
+
 .polla-phases-progress {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding: 8px 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+  padding: 4px 0;
 }
 
 .polla-phase-progress-item {
@@ -160,54 +220,83 @@
   border: 1px solid rgba(255,255,255,0.06);
   border-radius: 10px;
   padding: 16px 20px;
+  transition: border-color 0.2s;
 }
+
+.polla-phase-progress-item:hover { border-color: rgba(34,197,94,0.15); }
 
 .polla-phase-progress-header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 8px;
-  font-weight: 600;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.polla-phase-progress-name {
+  font-weight: 700;
   color: #cbd5e1;
+  font-size: 0.9rem;
 }
 
 .polla-phase-progress-count {
   color: #64748b;
-  font-size: 0.85rem;
-  font-weight: 400;
+  font-size: 0.8rem;
+  background: rgba(255,255,255,0.04);
+  padding: 2px 8px;
+  border-radius: 10px;
 }
 
-/* Predicciones */
+.polla-phase-pts {
+  font-size: 0.75rem;
+  color: #475569;
+  margin-top: 8px;
+}
+
+/* ── Predictions table ────────────────────────────────────────────────── */
+
 .polla-predictions-table .ant-table {
   background: transparent !important;
 }
 
 .polla-predictions-table .ant-table-thead > tr > th {
-  background: rgba(255,255,255,0.04) !important;
-  color: #94a3b8 !important;
-  border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+  background: rgba(255,255,255,0.03) !important;
+  color: #64748b !important;
+  border-color: rgba(255,255,255,0.06) !important;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .polla-predictions-table .ant-table-tbody > tr > td {
   background: transparent !important;
-  border-bottom: 1px solid rgba(255,255,255,0.04) !important;
+  border-color: rgba(255,255,255,0.04) !important;
   color: #cbd5e1 !important;
+  font-size: 0.875rem;
+}
+
+.polla-predictions-table .ant-table-tbody > tr:hover > td {
+  background: rgba(255,255,255,0.03) !important;
 }
 
 .polla-mini-logo {
-  width: 18px;
-  height: 18px;
+  width: 18px; height: 18px;
   object-fit: contain;
-  margin: 0 6px;
+  margin: 0 5px;
   vertical-align: middle;
 }
 
-.polla-vs {
-  color: #64748b;
-  margin: 0 4px;
+.polla-match-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: nowrap;
 }
 
+.polla-vs { color: #475569; }
+
 .polla-match-date {
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   color: #64748b;
-  margin-top: 2px;
+  margin-top: 3px;
 }

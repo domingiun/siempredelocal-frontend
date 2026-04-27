@@ -2,23 +2,34 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Table, Tag, Progress, Button, Spin, Avatar, Tabs, Statistic, Row, Col, Card,
+  Table, Tag, Progress, Button, Spin, Avatar, Tabs,
 } from 'antd';
 import {
-  TrophyOutlined, EditOutlined, UserOutlined, StarOutlined, ThunderboltOutlined,
+  TrophyOutlined, EditOutlined, UserOutlined, StarOutlined,
+  ThunderboltOutlined, TeamOutlined, CalendarOutlined,
 } from '@ant-design/icons';
 import { useAuth } from '../../context/AuthContext';
 import pollaService from '../../services/pollaService';
 import './PollaDashboardPage.css';
 
 const PHASE_LABELS = {
-  groups: 'Grupos',
-  r32: 'Ronda 32',
-  r16: 'Octavos',
-  qf: 'Cuartos',
-  sf: 'Semis',
-  third: '3er Puesto',
-  final: 'Final',
+  groups: 'Fase de Grupos',
+  r32:    'Ronda de 32',
+  r16:    'Octavos de Final',
+  qf:     'Cuartos de Final',
+  sf:     'Semifinales',
+  third:  'Tercer Puesto',
+  final:  'Final',
+};
+
+const PHASE_PTS = {
+  groups: '1 pt por partido',
+  r32:    '2 pts por partido',
+  r16:    '2 pts por partido',
+  qf:     '3 pts por partido',
+  sf:     '3 pts por partido',
+  third:  '3 pts por partido',
+  final:  '3 pts por partido',
 };
 
 const PHASE_ORDER = ['groups', 'r32', 'r16', 'qf', 'sf', 'third', 'final'];
@@ -32,11 +43,11 @@ export default function PollaDashboardPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const [polla, setPolla] = useState(null);
-  const [myStatus, setMyStatus] = useState(null);
+  const [polla, setPolla]           = useState(null);
+  const [myStatus, setMyStatus]     = useState(null);
   const [pollaMatches, setPollaMatches] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [pollaId, setPollaId] = useState(null);
+  const [loading, setLoading]       = useState(true);
+  const [pollaId, setPollaId]       = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -54,20 +65,13 @@ export default function PollaDashboardPage() {
         setPolla(detail);
         setMyStatus(status);
         setPollaMatches(matches);
-      } catch (e) {
-        // silent
-      } finally {
-        setLoading(false);
-      }
+      } catch { }
+      finally { setLoading(false); }
     })();
   }, []);
 
   if (loading) {
-    return (
-      <div className="polla-db-loading">
-        <Spin size="large" />
-      </div>
-    );
+    return <div className="polla-db-loading"><Spin size="large" /></div>;
   }
 
   if (!polla) {
@@ -85,7 +89,7 @@ export default function PollaDashboardPage() {
     return null;
   }
 
-  // ── Calcular progreso por fase ─────────────────────────────────────────
+  // Progreso por fase
   const phaseStats = {};
   for (const pm of pollaMatches) {
     if (!phaseStats[pm.phase]) phaseStats[pm.phase] = { total: 0, scored: 0 };
@@ -93,7 +97,13 @@ export default function PollaDashboardPage() {
     if (pm.is_scored) phaseStats[pm.phase].scored++;
   }
 
-  // ── Leaderboard columns ────────────────────────────────────────────────
+  const myRank  = myStatus?.rank;
+  const myTotal = myStatus?.total_points  || 0;
+  const myBase  = myStatus?.base_points   || 0;
+  const myBonus = myStatus?.bonus_points  || 0;
+  const pending = myStatus?.predictions_pending || 0;
+
+  // ── Leaderboard columns ──────────────────────────────────────────────
   const leaderboardCols = [
     {
       title: '#',
@@ -111,125 +121,117 @@ export default function PollaDashboardPage() {
       dataIndex: 'username',
       render: (name, row) => (
         <div className="polla-player">
-          <Avatar
-            src={row.avatar_url}
-            icon={!row.avatar_url && <UserOutlined />}
-            size={32}
-          />
+          <Avatar src={row.avatar_url} icon={!row.avatar_url && <UserOutlined />} size={30} />
           <span className={row.user_id === user?.id ? 'polla-me' : ''}>{name}</span>
-          {row.user_id === user?.id && <Tag color="green" style={{ marginLeft: 4 }}>Tú</Tag>}
+          {row.user_id === user?.id && (
+            <Tag color="green" style={{ marginLeft: 2, fontSize: '0.7rem' }}>Tú</Tag>
+          )}
         </div>
       ),
     },
     {
-      title: 'Pts base',
+      title: 'Base',
       dataIndex: 'base_points',
       align: 'right',
-      sorter: (a, b) => b.base_points - a.base_points,
+      render: (v) => <span style={{ color: '#94a3b8' }}>{v}</span>,
     },
     {
       title: 'Bonos',
       dataIndex: 'bonus_points',
       align: 'right',
-      render: (v) => <Tag color={v > 0 ? 'gold' : 'default'}>{v > 0 ? `+${v}` : v}</Tag>,
+      render: (v) => (
+        <span style={{ color: v > 0 ? '#fbbf24' : '#475569', fontWeight: v > 0 ? 700 : 400 }}>
+          {v > 0 ? `+${v}` : v}
+        </span>
+      ),
     },
     {
       title: 'Total',
       dataIndex: 'total_points',
       align: 'right',
-      render: (v) => <strong style={{ color: '#22c55e' }}>{v}</strong>,
+      render: (v) => <strong style={{ color: '#22c55e', fontSize: '1rem' }}>{v}</strong>,
       sorter: (a, b) => b.total_points - a.total_points,
       defaultSortOrder: 'descend',
     },
   ];
 
-  const myRank = myStatus?.rank;
-  const myTotal = myStatus?.total_points || 0;
-  const myBase = myStatus?.base_points || 0;
-  const myBonus = myStatus?.bonus_points || 0;
-
   return (
     <div className="polla-db">
-      {/* Header */}
-      <div className="polla-db-header">
+
+      {/* Hero */}
+      <div className="polla-db-hero">
         <div>
-          <h1 className="polla-db-title">
-            <span>⚽</span> {polla.name}
-          </h1>
+          <h1 className="polla-db-title">⚽ {polla.name}</h1>
           <p className="polla-db-subtitle">Dashboard mundialista</p>
+          <div className="polla-db-prize-inline">
+            <TrophyOutlined style={{ color: '#fbbf24' }} />
+            <span>Premio acumulado: <strong>{formatCOP(polla.current_prize_cop)}</strong></span>
+            <span style={{ color: '#334155' }}>·</span>
+            <TeamOutlined style={{ color: '#60a5fa' }} />
+            <span style={{ color: '#60a5fa' }}>{polla.participant_count} participantes</span>
+          </div>
         </div>
         <Button
           type="primary"
           icon={<EditOutlined />}
           onClick={() => navigate('/mundial/predict')}
           className="polla-predict-btn"
-          disabled={myStatus?.predictions_pending === 0}
+          disabled={pending === 0}
         >
-          {myStatus?.predictions_pending > 0
-            ? `Predecir (${myStatus.predictions_pending} pendientes)`
-            : 'Sin predicciones pendientes'}
+          {pending > 0 ? `Predecir (${pending} pendientes)` : 'Sin predicciones pendientes'}
         </Button>
       </div>
 
       {/* Mis stats */}
-      <Row gutter={[16, 16]} className="polla-db-stats">
-        <Col xs={12} sm={6}>
-          <Card className="polla-stat-card">
-            <Statistic
-              title="Mi posición"
-              value={myRank || '—'}
-              prefix={<TrophyOutlined style={{ color: '#f59e0b' }} />}
-              valueStyle={{ color: '#f1f5f9' }}
-            />
-          </Card>
-        </Col>
-        <Col xs={12} sm={6}>
-          <Card className="polla-stat-card">
-            <Statistic
-              title="Pts totales"
-              value={myTotal}
-              prefix={<StarOutlined style={{ color: '#22c55e' }} />}
-              valueStyle={{ color: '#22c55e' }}
-            />
-          </Card>
-        </Col>
-        <Col xs={12} sm={6}>
-          <Card className="polla-stat-card">
-            <Statistic
-              title="Pts base"
-              value={myBase}
-              valueStyle={{ color: '#94a3b8' }}
-            />
-          </Card>
-        </Col>
-        <Col xs={12} sm={6}>
-          <Card className="polla-stat-card">
-            <Statistic
-              title="Bonificaciones"
-              value={myBonus}
-              prefix={<ThunderboltOutlined style={{ color: '#f59e0b' }} />}
-              valueStyle={{ color: '#f59e0b' }}
-            />
-          </Card>
-        </Col>
-      </Row>
-
-      {/* Premio */}
-      <div className="polla-db-prize">
-        <TrophyOutlined style={{ fontSize: 24, color: '#f59e0b', marginRight: 12 }} />
-        <span>Premio acumulado: <strong>{formatCOP(polla.current_prize_cop)}</strong></span>
-        <Tag color="green" style={{ marginLeft: 12 }}>
-          {polla.participant_count} participantes
-        </Tag>
+      <div className="polla-db-stats">
+        <div className="polla-db-stat">
+          <div className="polla-db-stat-icon polla-db-stat-icon--gold">
+            <TrophyOutlined />
+          </div>
+          <div>
+            <div className="polla-db-stat-val">{myRank || '—'}</div>
+            <div className="polla-db-stat-lbl">Mi posición</div>
+          </div>
+        </div>
+        <div className="polla-db-stat">
+          <div className="polla-db-stat-icon polla-db-stat-icon--green">
+            <StarOutlined />
+          </div>
+          <div>
+            <div className="polla-db-stat-val" style={{ color: '#22c55e' }}>{myTotal}</div>
+            <div className="polla-db-stat-lbl">Puntos totales</div>
+          </div>
+        </div>
+        <div className="polla-db-stat">
+          <div className="polla-db-stat-icon polla-db-stat-icon--blue">
+            <CalendarOutlined />
+          </div>
+          <div>
+            <div className="polla-db-stat-val">{myBase}</div>
+            <div className="polla-db-stat-lbl">Puntos base</div>
+          </div>
+        </div>
+        <div className="polla-db-stat">
+          <div className="polla-db-stat-icon polla-db-stat-icon--purple">
+            <ThunderboltOutlined />
+          </div>
+          <div>
+            <div className="polla-db-stat-val" style={{ color: myBonus > 0 ? '#fbbf24' : undefined }}>
+              {myBonus > 0 ? `+${myBonus}` : myBonus}
+            </div>
+            <div className="polla-db-stat-lbl">Bonificaciones</div>
+          </div>
+        </div>
       </div>
 
+      {/* Tabs */}
       <Tabs
         defaultActiveKey="leaderboard"
         className="polla-db-tabs"
         items={[
           {
             key: 'leaderboard',
-            label: 'Tabla de posiciones',
+            label: `Tabla de posiciones`,
             children: (
               <Table
                 dataSource={polla.leaderboard}
@@ -238,9 +240,8 @@ export default function PollaDashboardPage() {
                 pagination={{ pageSize: 20, showSizeChanger: false }}
                 size="small"
                 className="polla-leaderboard-table"
-                rowClassName={(row) =>
-                  row.user_id === user?.id ? 'polla-my-row' : ''
-                }
+                rowClassName={(row) => row.user_id === user?.id ? 'polla-my-row' : ''}
+                locale={{ emptyText: 'Aún no hay participantes con puntos' }}
               />
             ),
           },
@@ -256,21 +257,19 @@ export default function PollaDashboardPage() {
                   return (
                     <div key={phase} className="polla-phase-progress-item">
                       <div className="polla-phase-progress-header">
-                        <span>{PHASE_LABELS[phase]}</span>
+                        <span className="polla-phase-progress-name">{PHASE_LABELS[phase]}</span>
                         <span className="polla-phase-progress-count">
-                          {stat.scored}/{stat.total} partidos
+                          {stat.scored}/{stat.total} jugados
                         </span>
                       </div>
                       <Progress
                         percent={pct}
                         strokeColor={pct === 100 ? '#22c55e' : '#3b82f6'}
-                        trailColor="rgba(255,255,255,0.08)"
-                        showInfo={false}
+                        trailColor="rgba(255,255,255,0.06)"
+                        showInfo={pct > 0}
                         size="small"
                       />
-                      {pct === 100 && (
-                        <Tag color="green" style={{ marginTop: 4 }}>Fase completada</Tag>
-                      )}
+                      <div className="polla-phase-pts">{PHASE_PTS[phase]}</div>
                     </div>
                   );
                 })}
@@ -290,7 +289,7 @@ export default function PollaDashboardPage() {
 
 function MyPredictionsTab({ pollaId }) {
   const [predictions, setPredictions] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading]         = useState(true);
 
   useEffect(() => {
     if (!pollaId) return;
@@ -300,27 +299,25 @@ function MyPredictionsTab({ pollaId }) {
       .finally(() => setLoading(false));
   }, [pollaId]);
 
-  if (loading) return <Spin />;
+  if (loading) return <div style={{ padding: 40, textAlign: 'center' }}><Spin /></div>;
 
-  const RESULT_LABELS = { L: 'Local gana', E: 'Empate', V: 'Visitante gana' };
+  const RESULT_LABELS = { L: 'Local', E: 'Empate', V: 'Visitante' };
 
   const cols = [
     {
       title: 'Partido',
       render: (_, row) => (
         <div>
-          <div>
-            <img src={row.match?.home_logo} className="polla-mini-logo" alt="" />
-            {row.match?.home_team}
-            <span className="polla-vs"> vs </span>
-            {row.match?.away_team}
-            <img src={row.match?.away_logo} className="polla-mini-logo" alt="" />
+          <div className="polla-match-row">
+            {row.match?.home_logo && <img src={row.match.home_logo} className="polla-mini-logo" alt="" />}
+            <span>{row.match?.home_team}</span>
+            <span className="polla-vs">vs</span>
+            <span>{row.match?.away_team}</span>
+            {row.match?.away_logo && <img src={row.match.away_logo} className="polla-mini-logo" alt="" />}
           </div>
           <div className="polla-match-date">
             {row.match?.match_date
-              ? new Date(row.match.match_date).toLocaleString('es-CO', {
-                  dateStyle: 'short', timeStyle: 'short',
-                })
+              ? new Date(row.match.match_date).toLocaleString('es-CO', { dateStyle: 'short', timeStyle: 'short' })
               : '—'}
           </div>
         </div>
@@ -329,35 +326,47 @@ function MyPredictionsTab({ pollaId }) {
     {
       title: 'Fase',
       dataIndex: 'phase',
-      render: (v) => <Tag>{PHASE_LABELS[v] || v}</Tag>,
+      width: 120,
+      render: (v) => <Tag style={{ fontSize: '0.75rem' }}>{PHASE_LABELS[v] || v}</Tag>,
     },
     {
       title: 'Mi predicción',
+      width: 130,
       render: (_, row) => {
-        if (row.prediction_result) return RESULT_LABELS[row.prediction_result] || row.prediction_result;
-        return row.predicted_winner_name || '—';
+        if (row.prediction_result) {
+          return (
+            <Tag color="blue" style={{ fontSize: '0.75rem' }}>
+              {RESULT_LABELS[row.prediction_result] || row.prediction_result}
+            </Tag>
+          );
+        }
+        return <span style={{ color: '#94a3b8' }}>{row.predicted_winner_name || '—'}</span>;
       },
     },
     {
-      title: 'Resultado real',
+      title: 'Resultado',
+      width: 120,
       render: (_, row) => {
         const m = row.match;
-        if (!m || m.match_status !== 'Finalizado') return <Tag>Pendiente</Tag>;
+        if (!m || m.match_status !== 'Finalizado') {
+          return <Tag style={{ fontSize: '0.72rem', background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.1)', color: '#64748b' }}>Pendiente</Tag>;
+        }
         if (row.phase === 'groups') {
           const r = m.home_score > m.away_score ? 'L' : m.away_score > m.home_score ? 'V' : 'E';
-          return `${m.home_score}-${m.away_score} (${RESULT_LABELS[r]})`;
+          return <span>{m.home_score}–{m.away_score} <span style={{ color: '#64748b' }}>({RESULT_LABELS[r]})</span></span>;
         }
-        return row.match?.actual_winner_name || `${m.home_score}-${m.away_score}`;
+        return <span style={{ color: '#94a3b8' }}>{m.home_score}–{m.away_score}</span>;
       },
     },
     {
       title: 'Pts',
       dataIndex: 'points',
       align: 'right',
+      width: 70,
       render: (pts, row) => {
-        if (row.is_correct === null) return '—';
+        if (row.is_correct === null) return <span style={{ color: '#475569' }}>—</span>;
         return (
-          <Tag color={row.is_correct ? 'green' : 'red'}>
+          <Tag color={row.is_correct ? 'green' : 'red'} style={{ fontSize: '0.8rem' }}>
             {row.is_correct ? `+${pts}` : '0'}
           </Tag>
         );
@@ -373,6 +382,7 @@ function MyPredictionsTab({ pollaId }) {
       pagination={{ pageSize: 20, showSizeChanger: false }}
       size="small"
       className="polla-predictions-table"
+      locale={{ emptyText: 'Aún no has hecho predicciones' }}
     />
   );
 }
