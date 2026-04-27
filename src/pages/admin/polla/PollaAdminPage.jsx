@@ -349,13 +349,31 @@ function ConfigTab({ polla, onSaved }) {
         </Row>
         <Row gutter={16}>
           <Col span={12}>
-            <Form.Item name="guaranteed_prize_cop" label="Premio mínimo garantizado (COP)">
-              <InputNumber min={0} style={{ width: '100%' }} formatter={v => `$ ${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')} />
+            <Form.Item
+              name="guaranteed_prize_cop"
+              label="Premio mínimo garantizado (COP)"
+              extra="Ej: 1000000 = $1.000.000"
+            >
+              <InputNumber
+                min={0}
+                style={{ width: '100%' }}
+                formatter={v => v ? `$ ${Number(v).toLocaleString('es-CO')}` : ''}
+                parser={v => v.replace(/[^0-9]/g, '')}
+              />
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item name="prize_per_user_cop" label="Premio por usuario (COP)">
-              <InputNumber min={0} style={{ width: '100%' }} formatter={v => `$ ${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')} />
+            <Form.Item
+              name="prize_per_user_cop"
+              label="Suma por participante (COP)"
+              extra="Lo que crece el pozo con cada inscrito. Ej: 32000"
+            >
+              <InputNumber
+                min={0}
+                style={{ width: '100%' }}
+                formatter={v => v ? `$ ${Number(v).toLocaleString('es-CO')}` : ''}
+                parser={v => v.replace(/[^0-9]/g, '')}
+              />
             </Form.Item>
           </Col>
         </Row>

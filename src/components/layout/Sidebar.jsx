@@ -295,6 +295,11 @@ const Sidebar = ({ collapsed, onCollapse, isMobile }) => {
             icon: <FileTextOutlined />,
             label: 'Artículos',
           },
+          {
+            key: '/admin/mundial',
+            icon: <span style={{ fontSize: 14 }}>⚽</span>,
+            label: 'Polla Mundial',
+          },
         ],
       });
     }
