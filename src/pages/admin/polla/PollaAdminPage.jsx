@@ -596,13 +596,13 @@ function PollaMatchesTab({ pollaMatches, loading, onRemove, onReload }) {
     {
       title: 'Partido',
       render: (_, r) => (
-        <span>
-          {r.home_logo && <img src={r.home_logo} style={{ width: 18, marginRight: 6, verticalAlign: 'middle' }} alt="" />}
-          {r.home_team || '?'}
-          <span style={{ color: '#475569', margin: '0 8px' }}>vs</span>
-          {r.away_team || '?'}
-          {r.away_logo && <img src={r.away_logo} style={{ width: 18, marginLeft: 6, verticalAlign: 'middle' }} alt="" />}
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'nowrap' }}>
+          {r.home_logo && <img src={r.home_logo} style={{ width: 20, height: 20, objectFit: 'contain', flexShrink: 0 }} alt="" />}
+          <span style={{ whiteSpace: 'nowrap' }}>{r.home_team || '?'}</span>
+          <span style={{ color: '#475569', flexShrink: 0 }}>vs</span>
+          <span style={{ whiteSpace: 'nowrap' }}>{r.away_team || '?'}</span>
+          {r.away_logo && <img src={r.away_logo} style={{ width: 20, height: 20, objectFit: 'contain', flexShrink: 0 }} alt="" />}
+        </div>
       ),
     },
     {
