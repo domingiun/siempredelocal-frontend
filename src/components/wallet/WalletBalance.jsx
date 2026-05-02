@@ -236,7 +236,7 @@ const WalletBalance = ({ compact = false, showActions = true }) => {
         {/* Puntos */}
         <div className="wlt-card wlt-card--points">
           <div className="wlt-card-label wlt-card-label--green">
-            <TrophyOutlined /> Puntos acumulados
+            <TrophyOutlined /> Dinero disponible
           </div>
           <div className="wlt-card-value wlt-card-value--green">
             ${(wallet?.balance_PTS ?? 0).toLocaleString('es-CO')}
@@ -266,7 +266,7 @@ const WalletBalance = ({ compact = false, showActions = true }) => {
               style={{ opacity: 0.4, cursor: 'default' }}
               disabled
             >
-              <DollarOutlined /> Sin puntos disponibles
+              <DollarOutlined /> Sin dinero disponible
             </button>
           )}
         </div>
