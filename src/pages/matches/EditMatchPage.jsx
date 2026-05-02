@@ -630,7 +630,9 @@ const EditMatchPage = () => {
                       <Row gutter={8} align="middle">
                         <Col flex="auto">
                           <Space wrap size={4}>
-                            <Tag color="geekblue" style={{ fontSize: 11 }}>{f.league}</Tag>
+                            <Tag color="geekblue" style={{ fontSize: 11 }}>
+                              {[f.league_country, f.league, f.league_id ? `ID ${f.league_id}` : null].filter(Boolean).join(' · ')}
+                            </Tag>
                             {f.names_match
                               ? <Tag color="success" icon={<CheckCircleOutlined />}>Coincide</Tag>
                               : <Tag color="error">No coincide</Tag>

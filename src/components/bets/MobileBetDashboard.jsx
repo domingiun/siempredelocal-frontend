@@ -53,7 +53,7 @@ const MobileBetDashboard = () => {
             danger
             size="small"
             icon={<WalletOutlined />}
-            onClick={() => navigate('/wallet')}
+            onClick={() => navigate('/purchase')}
           >
             Recargar
           </Button>
@@ -65,7 +65,7 @@ const MobileBetDashboard = () => {
         <button
           className="mbd__bet-cta"
           onClick={() =>
-            navigate(hasCredits ? `/bets/${activeBetDate.id}/place` : '/wallet')
+            navigate(hasCredits ? `/bets/${activeBetDate.id}/place` : '/purchase')
           }
           aria-label={hasCredits ? 'Ir a pronosticar' : 'Solicitar créditos'}
         >
@@ -100,7 +100,7 @@ const MobileBetDashboard = () => {
       {!hasCredits && (
         <button
           className="mbd__no-credits-banner"
-          onClick={() => navigate('/wallet')}
+          onClick={() => navigate('/purchase')}
           aria-label="Solicitar créditos"
         >
           <WalletOutlined className="mbd__no-credits-icon" />

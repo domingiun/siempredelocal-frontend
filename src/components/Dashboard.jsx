@@ -846,7 +846,7 @@ const Dashboard = () => {
             icon={<WalletOutlined />}
             size="large"
             block
-            onClick={() => navigate('/wallet')}
+            onClick={() => navigate('/purchase')}
             style={{
               fontWeight: 700,
               backgroundColor: isDark ? '#0f1824' : '#fff',

@@ -62,3 +62,79 @@ body[data-theme="dark"] .purchase-credits-page .btn-outline-primary:hover {
   border-color: #3a7bff !important;
   color: #ffffff !important;
 }
+
+.purchase-credits-page .plan-credits {
+  margin: 0 18px 16px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f5f9ff 0%, #f0f7ff 100%);
+  border: 1px solid #d6e4ff;
+  text-align: center;
+}
+
+.purchase-credits-page .payment-qr-card {
+  border: 1px solid #b7eb8f;
+  background: #f6ffed;
+}
+
+.purchase-credits-page .payment-qr-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #d9f7be;
+}
+
+.purchase-credits-page .payment-qr-box img {
+  width: min(240px, 100%);
+  height: auto;
+  display: block;
+}
+
+.purchase-credits-page .payment-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.purchase-credits-page .payment-detail-grid > div {
+  padding: 12px;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #d9f7be;
+}
+
+.purchase-credits-page .payment-detail-grid span {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 12px;
+}
+
+.purchase-credits-page .payment-detail-grid strong {
+  display: block;
+  color: #10239e;
+  font-size: 16px;
+}
+
+body[data-theme="dark"] .purchase-credits-page .payment-qr-card {
+  background: #0d1f18;
+  border-color: #1f5f3a;
+}
+
+body[data-theme="dark"] .purchase-credits-page .payment-qr-box,
+body[data-theme="dark"] .purchase-credits-page .payment-detail-grid > div {
+  background: #08130f;
+  border-color: #1f5f3a;
+}
+
+body[data-theme="dark"] .purchase-credits-page .payment-detail-grid strong {
+  color: #91caff;
+}
+
+@media (max-width: 640px) {
+  .purchase-credits-page .payment-detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
