@@ -17,6 +17,7 @@ const { Title, Text } = Typography;
 
 const NEQUI_NUMBER = '3218424968';
 const SUPPORT_WHATSAPP = '573218424968';
+const NEQUI_QR_IMAGE = '/nequi-qr.png';
 const PLAN_AMOUNTS = {
   1: 5000,
   5: 24500,
@@ -244,8 +245,8 @@ const PurchaseCreditsPage = () => {
               <Col xs={24} md={9}>
                 <div className="payment-qr-box">
                   <img
-                    alt="QR con datos de pago Nequi"
-                    src={`https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=12&data=${encodeURIComponent(buildPaymentText(paymentRequest.plan, user, paymentRequest.transactionId))}`}
+                    alt="QR Nequi de SiempreDeLocal"
+                    src={NEQUI_QR_IMAGE}
                   />
                 </div>
               </Col>
@@ -255,10 +256,10 @@ const PurchaseCreditsPage = () => {
                   <div>
                     <Tag color="success" icon={<CheckCircleOutlined />}>Solicitud registrada</Tag>
                     <Title level={3} style={{ margin: '10px 0 4px' }}>
-                      Haz la transferencia a este codigo QR
+                      Haz la transferencia a este QR de Nequi
                     </Title>
                     <Text type="secondary">
-                      El QR contiene los datos del pago. Tambien puedes transferir manualmente con la informacion de abajo.
+                      Escanea el QR oficial de Nequi y confirma que el valor coincida con el plan seleccionado.
                     </Text>
                   </div>
 
@@ -285,7 +286,7 @@ const PurchaseCreditsPage = () => {
                     type="info"
                     showIcon
                     message="Despues de pagar, envia el comprobante por WhatsApp."
-                    description="Tu recarga queda pendiente hasta que el administrador verifique el pago y apruebe los creditos."
+                    description="Tu recarga queda pendiente hasta que el administrador verifique el pago y apruebe los creditos. Si prefieres, tambien puedes transferir manualmente al numero de Nequi."
                   />
 
                   <Space wrap>
@@ -316,7 +317,7 @@ const PurchaseCreditsPage = () => {
           <Title level={4}>Informacion importante</Title>
           <ul>
             <li><strong>Selecciona el plan</strong> que prefieras: <strong>Basico, Plus o Gold</strong>.</li>
-            <li>Al seleccionar el plan se registra una solicitud pendiente y veras el QR de pago.</li>
+            <li>Al seleccionar el plan se registra una solicitud pendiente y veras el QR oficial de Nequi.</li>
             <li>Haz la transferencia por <strong>Nequi</strong> al numero <strong>321 842 4968</strong>.</li>
             <li><strong>Envia el comprobante por WhatsApp</strong> para aprobar la recarga.</li>
             <li><strong>Recibiras tus creditos</strong> tras la aprobacion del administrador.</li>
