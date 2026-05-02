@@ -93,7 +93,23 @@ const Sidebar = ({ collapsed, onCollapse, isMobile }) => {
         icon: <DashboardOutlined />,
         label: 'Dashboard',
       },
-      // 2. Pronósticos
+      // 2. Mi Cuenta
+      {
+        key: '/wallet',
+        icon: <WalletOutlined />,
+        label: 'Mi Cuenta',
+        badge: wallet?.balance_PTS > 0 ? (
+          <Badge
+            count={`$${(wallet.balance_PTS / 1000).toFixed(0)}k`}
+            size="small"
+            style={{
+              backgroundColor: '#1890ff',
+              marginLeft: 8
+            }}
+          />
+        ) : null
+      },
+      // 3. Pronósticos
       {
         key: 'bets-submenu',
         icon: <FireOutlined />,
@@ -128,21 +144,6 @@ const Sidebar = ({ collapsed, onCollapse, isMobile }) => {
             key: '/bets/community',
             icon: <TeamOutlined />,
             label: 'Ver Pronósticos',
-          },
-          {
-            key: '/wallet',
-            icon: <WalletOutlined />,
-            label: 'Mi Cuenta',
-            badge: wallet?.balance_PTS > 0 ? (
-              <Badge
-                count={`$${(wallet.balance_PTS / 1000).toFixed(0)}k`}
-                size="small"
-                style={{
-                  backgroundColor: '#1890ff',
-                  marginLeft: 8
-                }}
-              />
-            ) : null
           },
           {
             key: '/transactions',
