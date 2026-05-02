@@ -36,6 +36,12 @@ const PHASE_PTS = {
 
 const PHASE_ORDER = ['groups', 'r32', 'r16', 'qf', 'sf', 'third', 'final'];
 
+const pickMundialPolla = (list) =>
+  list.find(p => (p.name || '').toLowerCase().includes('mundial') && p.status !== 'cancelled') ||
+  list.find(p => p.status === 'open' || p.status === 'in_progress') ||
+  list.find(p => p.status !== 'cancelled') ||
+  list[0];
+
 const formatCOP = (n) =>
   new Intl.NumberFormat('es-CO', {
     style: 'currency', currency: 'COP', minimumFractionDigits: 0,
@@ -57,7 +63,7 @@ export default function PollaDashboardPage() {
     (async () => {
       try {
         const list = await pollaService.listPollas();
-        const active = list.find(p => p.status !== 'cancelled') || list[0];
+        const active = pickMundialPolla(list);
         if (!active) { setLoading(false); return; }
 
         setPollaId(active.id);

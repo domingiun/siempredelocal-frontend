@@ -43,8 +43,11 @@ const fmtCOP = (n) =>
 
 export default function PollaAdminPage() {
   const [polla, setPolla]               = useState(null);
+  const [pollas, setPollas]             = useState([]);
+  const [selectedPollaId, setSelectedPollaId] = useState(null);
   const [loading, setLoading]           = useState(true);
   const [activeTab, setActiveTab]       = useState('config');
+  const [createOpen, setCreateOpen]     = useState(false);
 
   const [competitions, setCompetitions] = useState([]);
   const [selectedComp, setSelectedComp] = useState(null);
@@ -61,17 +64,23 @@ export default function PollaAdminPage() {
   const [participants, setParticipants] = useState([]);
   const [loadingPart, setLoadingPart]   = useState(false);
 
-  const loadPolla = useCallback(async () => {
+  const loadPolla = useCallback(async (targetId = selectedPollaId) => {
     setLoading(true);
     try {
       const list = await pollaService.listPollas();
+      setPollas(list);
       if (list.length > 0) {
-        const detail = await pollaService.getPolla(list[0].id);
+        const fallback = list.find(p => p.id === targetId) || list[0];
+        setSelectedPollaId(fallback.id);
+        const detail = await pollaService.getPolla(fallback.id);
         setPolla(detail);
+      } else {
+        setSelectedPollaId(null);
+        setPolla(null);
       }
     } catch { }
     finally { setLoading(false); }
-  }, []);
+  }, [selectedPollaId]);
 
   const loadCompetitions = useCallback(async () => {
     try {
@@ -98,6 +107,14 @@ export default function PollaAdminPage() {
     setSelectedComp(compId);
     setSelectedRowKeys([]);
     loadCompMatches(compId);
+  };
+
+  const handlePollaChange = async (pollaId) => {
+    setSelectedPollaId(pollaId);
+    setPollaMatches([]);
+    setParticipants([]);
+    setSelectedRowKeys([]);
+    await loadPolla(pollaId);
   };
 
   const loadPollaMatches = useCallback(async () => {
@@ -168,6 +185,12 @@ export default function PollaAdminPage() {
     } catch { message.error('Error al actualizar rankings'); }
   };
 
+  const handlePollaCreated = async (created) => {
+    setCreateOpen(false);
+    await loadPolla(created?.id);
+    setActiveTab('config');
+  };
+
   if (loading) {
     return (
       <div style={{ padding: 80, textAlign: 'center' }}>
@@ -189,11 +212,28 @@ export default function PollaAdminPage() {
             <p>Gestiona la polla, partidos y participantes del Mundial 2026</p>
           </div>
           <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+            <Select
+              value={selectedPollaId}
+              onChange={handlePollaChange}
+              placeholder="Seleccionar polla"
+              style={{ minWidth: 260 }}
+              options={pollas.map(p => ({
+                value: p.id,
+                label: `${p.name} (${p.status})`,
+              }))}
+            />
             {polla && statusOpt && (
               <span className={`polla-admin__status polla-admin__status--${statusOpt.cls}`}>
                 {statusOpt.label}
               </span>
             )}
+            <Button
+              icon={<PlusOutlined />}
+              onClick={() => setCreateOpen(true)}
+              style={{ background: '#16a34a', borderColor: '#16a34a', color: '#fff' }}
+            >
+              Nueva Polla de ensayo
+            </Button>
             <Button
               icon={<ReloadOutlined />}
               onClick={loadPolla}
@@ -204,6 +244,12 @@ export default function PollaAdminPage() {
           </div>
         </div>
       </div>
+
+      <CreatePollaModal
+        open={createOpen}
+        onCancel={() => setCreateOpen(false)}
+        onCreated={handlePollaCreated}
+      />
 
       {/* Stat cards */}
       {polla && (
@@ -314,6 +360,92 @@ export default function PollaAdminPage() {
 }
 
 // ── Tab: Configuración ─────────────────────────────────────────────────
+
+function CreatePollaModal({ open, onCancel, onCreated }) {
+  const [form] = Form.useForm();
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      form.setFieldsValue({
+        name: 'Polla de ensayo',
+        description: 'Polla temporal para validar el flujo con partidos activos.',
+        edition_year: new Date().getFullYear(),
+        entry_credits: 1,
+        guaranteed_prize_cop: 0,
+        prize_per_user_cop: 0,
+        threshold_users: 1,
+        platform_fee_pct: 0,
+      });
+    }
+  }, [open, form]);
+
+  const handleCreate = async () => {
+    const values = await form.validateFields();
+    setSaving(true);
+    try {
+      const created = await pollaService.adminCreatePolla(values);
+      message.success('Polla de ensayo creada');
+      onCreated(created);
+    } catch (err) {
+      message.error(err?.response?.data?.detail || 'No se pudo crear la polla');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <Modal
+      open={open}
+      title="Nueva Polla de ensayo"
+      okText="Crear Polla"
+      cancelText="Cancelar"
+      onOk={handleCreate}
+      onCancel={onCancel}
+      confirmLoading={saving}
+      destroyOnHidden
+    >
+      <Form form={form} layout="vertical">
+        <Form.Item name="name" label="Nombre" rules={[{ required: true }]}>
+          <Input placeholder="Polla de ensayo Brasileirao" />
+        </Form.Item>
+        <Form.Item name="description" label="Descripcion">
+          <Input.TextArea rows={2} />
+        </Form.Item>
+        <Row gutter={12}>
+          <Col span={12}>
+            <Form.Item name="edition_year" label="Ano">
+              <InputNumber min={2024} style={{ width: '100%' }} />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item name="entry_credits" label="Creditos entrada">
+              <InputNumber min={1} style={{ width: '100%' }} />
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row gutter={12}>
+          <Col span={12}>
+            <Form.Item name="guaranteed_prize_cop" label="Premio minimo">
+              <InputNumber min={0} style={{ width: '100%' }} />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item name="prize_per_user_cop" label="Premio por usuario">
+              <InputNumber min={0} style={{ width: '100%' }} />
+            </Form.Item>
+          </Col>
+        </Row>
+        <Form.Item name="threshold_users" hidden>
+          <InputNumber />
+        </Form.Item>
+        <Form.Item name="platform_fee_pct" hidden>
+          <InputNumber />
+        </Form.Item>
+      </Form>
+    </Modal>
+  );
+}
 
 function ConfigTab({ polla, onSaved }) {
   const [form] = Form.useForm();

@@ -12,6 +12,12 @@ import './PollaLandingPage.css';
 
 const POLLA_ID = 1; // ID de la Polla Mundial 2026 en la BD
 
+const pickMundialPolla = (list) =>
+  list.find(p => (p.name || '').toLowerCase().includes('mundial') && p.status !== 'cancelled') ||
+  list.find(p => p.status === 'open' || p.status === 'in_progress') ||
+  list.find(p => p.status !== 'cancelled') ||
+  list[0];
+
 const phaseLabels = {
   groups: 'Fase de Grupos',
   r32: 'Ronda de 32',
@@ -43,7 +49,7 @@ export default function PollaLandingPage() {
   useEffect(() => {
     pollaService.listPollas()
       .then(list => {
-        const found = list.find(p => p.status !== 'cancelled') || list[0];
+        const found = pickMundialPolla(list);
         if (found) {
           setPolla(found);
           if (user) {
