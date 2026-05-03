@@ -9,7 +9,7 @@ const { useBreakpoint } = Grid;
 import {
   TrophyOutlined, EditOutlined, UserOutlined, StarOutlined,
   ThunderboltOutlined, TeamOutlined, CalendarOutlined, ArrowLeftOutlined,
-  EyeOutlined, CheckCircleOutlined, CloseCircleOutlined,
+  EyeOutlined,
 } from '@ant-design/icons';
 import { useAuth } from '../../context/AuthContext';
 import pollaService from '../../services/pollaService';
@@ -541,116 +541,187 @@ function PollaDashboard({ pollaId }) {
   );
 }
 
+// ── Tarjeta visual compartida ──────────────────────────────────────────────
+function PredMatchCard({ pred, compact = false }) {
+  const RESULT_LABELS = { L: 'Local', E: 'Empate', V: 'Visitante' };
+  const m = pred.match || {};
+  const finished = m.home_score != null;
+  const isCorrect = pred.is_correct;
+  const pts = pred.points || 0;
+
+  let borderColor, bgGlow, statusLabel, statusColor, statusBg;
+  if (isCorrect === true) {
+    borderColor = 'rgba(34,197,94,0.4)';
+    bgGlow      = 'rgba(34,197,94,0.04)';
+    statusLabel = '✓ ACERTASTE';
+    statusColor = '#22c55e';
+    statusBg    = 'rgba(34,197,94,0.12)';
+  } else if (isCorrect === false) {
+    borderColor = 'rgba(239,68,68,0.4)';
+    bgGlow      = 'rgba(239,68,68,0.04)';
+    statusLabel = '✗ FALLASTE';
+    statusColor = '#ef4444';
+    statusBg    = 'rgba(239,68,68,0.10)';
+  } else {
+    borderColor = 'rgba(255,255,255,0.08)';
+    bgGlow      = 'transparent';
+    statusLabel = finished ? null : '⏳ PENDIENTE';
+    statusColor = '#64748b';
+    statusBg    = 'rgba(255,255,255,0.05)';
+  }
+
+  const pickText = pred.prediction_result
+    ? RESULT_LABELS[pred.prediction_result]
+    : (pred.predicted_winner_name || '—');
+
+  const logoSize = compact ? 24 : 30;
+  const nameSz   = compact ? '0.78rem' : '0.875rem';
+
+  return (
+    <div style={{
+      background: bgGlow,
+      border: `1px solid ${borderColor}`,
+      borderRadius: compact ? 10 : 14,
+      padding: compact ? '10px 14px' : '14px 18px',
+      transition: 'border-color 0.2s',
+    }}>
+      {/* Header: fecha + badge */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+        <span style={{ fontSize: '0.68rem', color: '#475569' }}>
+          {m.match_date ? formatDate(m.match_date) : '—'}
+        </span>
+        {statusLabel && (
+          <span style={{
+            background: statusBg, color: statusColor,
+            border: `1px solid ${borderColor}`,
+            borderRadius: 20, padding: '2px 10px',
+            fontSize: '0.65rem', fontWeight: 800, letterSpacing: '0.04em',
+          }}>
+            {statusLabel}
+          </span>
+        )}
+      </div>
+
+      {/* Equipos + marcador */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+        {/* Local */}
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'flex-end' }}>
+          <span style={{ fontSize: nameSz, fontWeight: 600, color: '#e2e8f0', textAlign: 'right', lineHeight: 1.2 }}>
+            {m.home_team}
+          </span>
+          {m.home_logo
+            ? <img src={m.home_logo} style={{ width: logoSize, height: logoSize, objectFit: 'contain', flexShrink: 0 }} alt="" />
+            : <div style={{ width: logoSize, height: logoSize, borderRadius: '50%', background: 'rgba(255,255,255,0.06)', flexShrink: 0 }} />
+          }
+        </div>
+
+        {/* Marcador / VS */}
+        <div style={{ textAlign: 'center', minWidth: compact ? 46 : 58 }}>
+          {finished ? (
+            <div>
+              <div style={{ fontSize: compact ? '1rem' : '1.15rem', fontWeight: 900, color: '#f1f5f9', lineHeight: 1 }}>
+                {m.home_score} – {m.away_score}
+              </div>
+              {pred.phase === 'groups' && (
+                <div style={{ fontSize: '0.62rem', color: '#64748b', marginTop: 2 }}>
+                  {m.home_score > m.away_score ? 'Local' : m.away_score > m.home_score ? 'Visitante' : 'Empate'}
+                </div>
+              )}
+            </div>
+          ) : (
+            <span style={{ color: '#475569', fontWeight: 700, fontSize: '0.85rem' }}>vs</span>
+          )}
+        </div>
+
+        {/* Visitante */}
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 6 }}>
+          {m.away_logo
+            ? <img src={m.away_logo} style={{ width: logoSize, height: logoSize, objectFit: 'contain', flexShrink: 0 }} alt="" />
+            : <div style={{ width: logoSize, height: logoSize, borderRadius: '50%', background: 'rgba(255,255,255,0.06)', flexShrink: 0 }} />
+          }
+          <span style={{ fontSize: nameSz, fontWeight: 600, color: '#e2e8f0', lineHeight: 1.2 }}>
+            {m.away_team}
+          </span>
+        </div>
+      </div>
+
+      {/* Footer: pick + puntos */}
+      <div style={{
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        paddingTop: 8, borderTop: '1px solid rgba(255,255,255,0.06)',
+      }}>
+        <span style={{ fontSize: '0.78rem', color: '#64748b' }}>
+          Pick:{' '}
+          <span style={{
+            color: isCorrect === true ? '#22c55e' : isCorrect === false ? '#ef4444' : '#94a3b8',
+            fontWeight: 700,
+          }}>
+            {pickText}
+          </span>
+        </span>
+        {isCorrect !== null && isCorrect !== undefined ? (
+          <span style={{
+            background: isCorrect ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.10)',
+            color: isCorrect ? '#22c55e' : '#ef4444',
+            border: `1px solid ${isCorrect ? 'rgba(34,197,94,0.25)' : 'rgba(239,68,68,0.25)'}`,
+            borderRadius: 20, padding: '3px 14px',
+            fontWeight: 900, fontSize: '0.85rem',
+          }}>
+            {isCorrect ? `+${pts} pt${pts !== 1 ? 's' : ''}` : '0 pts'}
+          </span>
+        ) : (
+          <span style={{ color: '#475569', fontSize: '0.72rem' }}>Sin resultado</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── Modal picks de participante ────────────────────────────────────────────
 function ParticipantPicksModal({ data }) {
-  const RESULT_LABELS = { L: 'Local', E: 'Empate', V: 'Visitante' };
-
-  const cols = [
-    {
-      title: 'Partido',
-      render: (_, row) => {
-        const m = row.match || {};
-        return (
-          <div>
-            <div className="polla-match-row">
-              {m.home_logo && <img src={m.home_logo} className="polla-mini-logo" alt="" />}
-              <span style={{ fontSize: '0.82rem' }}>{m.home_team}</span>
-              <span className="polla-vs"> vs </span>
-              <span style={{ fontSize: '0.82rem' }}>{m.away_team}</span>
-              {m.away_logo && <img src={m.away_logo} className="polla-mini-logo" alt="" />}
-            </div>
-            <div className="polla-match-date">
-              {m.match_date
-                ? formatDate(m.match_date)
-                : '—'}
-            </div>
-          </div>
-        );
-      },
-    },
-    {
-      title: 'Su pick',
-      width: 120,
-      render: (_, row) => {
-        const m = row.match || {};
-        if (row.prediction_result) {
-          return <Tag color="blue" style={{ fontSize: '0.72rem' }}>{RESULT_LABELS[row.prediction_result] || row.prediction_result}</Tag>;
-        }
-        if (row.predicted_winner_name) {
-          return <span style={{ color: '#94a3b8', fontSize: '0.78rem' }}>{row.predicted_winner_name}</span>;
-        }
-        return <span style={{ color: '#475569' }}>—</span>;
-      },
-    },
-    {
-      title: 'Resultado',
-      width: 100,
-      render: (_, row) => {
-        const m = row.match || {};
-        if (m.home_score == null) return <span style={{ color: '#475569', fontSize: '0.78rem' }}>—</span>;
-        return <span style={{ color: '#cbd5e1', fontSize: '0.82rem' }}>{m.home_score}–{m.away_score}</span>;
-      },
-    },
-    {
-      title: 'Pts',
-      dataIndex: 'points',
-      align: 'right',
-      width: 60,
-      render: (pts, row) => {
-        if (row.is_correct === null || row.is_correct === undefined) {
-          return <span style={{ color: '#475569' }}>—</span>;
-        }
-        return row.is_correct
-          ? <Tag color="green" icon={<CheckCircleOutlined />} style={{ fontSize: '0.72rem' }}>+{pts}</Tag>
-          : <Tag color="red" icon={<CloseCircleOutlined />} style={{ fontSize: '0.72rem' }}>0</Tag>;
-      },
-    },
-  ];
-
-  const scored = (data.predictions || []).filter(p => p.match?.home_score != null || p.is_correct !== null);
+  const scored = (data.predictions || []).filter(
+    p => p.match?.home_score != null || (p.is_correct !== null && p.is_correct !== undefined)
+  );
 
   if (!scored.length) {
     return (
       <div style={{ padding: '32px 0', textAlign: 'center', color: '#64748b' }}>
         <CalendarOutlined style={{ fontSize: 32, marginBottom: 12, display: 'block' }} />
         <p>Aún no hay partidos jugados con predicciones de este participante.</p>
+        <p style={{ fontSize: '0.78rem', color: '#475569' }}>
+          Aparecerán aquí una vez que el admin puntúe los partidos finalizados.
+        </p>
       </div>
     );
   }
 
-  const correct  = scored.filter(p => p.is_correct).length;
-  const total    = scored.filter(p => p.is_correct !== null).length;
+  const correct  = scored.filter(p => p.is_correct === true).length;
   const totalPts = scored.reduce((s, p) => s + (p.points || 0), 0);
 
   return (
     <div>
       {/* Mini stats */}
-      <div style={{ display: 'flex', gap: 16, marginBottom: 16, flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
         {[
-          { label: 'Posición', value: data.rank ? `#${data.rank}` : '—', color: '#fbbf24' },
-          { label: 'Pts totales', value: data.total_points ?? '—', color: '#22c55e' },
-          { label: 'Aciertos (jugados)', value: total ? `${correct}/${total}` : '—', color: '#60a5fa' },
-          { label: 'Pts (jugados)', value: totalPts, color: '#a78bfa' },
+          { label: 'Posición',   value: data.rank ? `#${data.rank}` : '—', color: '#fbbf24' },
+          { label: 'Pts totales', value: data.total_points ?? '—',         color: '#22c55e' },
+          { label: 'Aciertos',   value: `${correct}/${scored.length}`,     color: '#60a5fa' },
+          { label: 'Pts ganados', value: totalPts,                          color: '#a78bfa' },
         ].map(s => (
           <div key={s.label} style={{
             background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)',
-            borderRadius: 10, padding: '10px 16px', flex: '1 1 100px', minWidth: 90,
+            borderRadius: 10, padding: '10px 14px', flex: '1 1 80px', minWidth: 80,
           }}>
-            <div style={{ color: s.color, fontWeight: 700, fontSize: '1.1rem' }}>{s.value}</div>
-            <div style={{ color: '#64748b', fontSize: '0.72rem' }}>{s.label}</div>
+            <div style={{ color: s.color, fontWeight: 800, fontSize: '1.05rem' }}>{s.value}</div>
+            <div style={{ color: '#64748b', fontSize: '0.68rem' }}>{s.label}</div>
           </div>
         ))}
       </div>
 
-      <Table
-        dataSource={scored}
-        columns={cols}
-        rowKey={(_, i) => i}
-        pagination={false}
-        size="small"
-        className="polla-predictions-table"
-        scroll={{ y: 360 }}
-      />
+      {/* Cards */}
+      <div style={{ maxHeight: 420, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {scored.map((pred, i) => <PredMatchCard key={i} pred={pred} compact />)}
+      </div>
     </div>
   );
 }
@@ -659,8 +730,6 @@ function ParticipantPicksModal({ data }) {
 function MyPredictionsTab({ pollaId }) {
   const [predictions, setPredictions] = useState([]);
   const [loading, setLoading]         = useState(true);
-  const screens = useBreakpoint();
-  const isMobile = !screens.sm;
 
   useEffect(() => {
     if (!pollaId) return;
@@ -672,83 +741,47 @@ function MyPredictionsTab({ pollaId }) {
 
   if (loading) return <div style={{ padding: 40, textAlign: 'center' }}><Spin /></div>;
 
-  const RESULT_LABELS = { L: 'Local', E: 'Empate', V: 'Visitante' };
-  const RESULT_SHORT  = { L: 'L', E: 'E', V: 'V' };
+  if (!predictions.length) {
+    return (
+      <div style={{ padding: '40px 0', textAlign: 'center', color: '#64748b' }}>
+        <CalendarOutlined style={{ fontSize: 36, display: 'block', marginBottom: 12 }} />
+        <p>Aún no has hecho predicciones</p>
+      </div>
+    );
+  }
 
-  const cols = [
-    {
-      title: 'Partido',
-      render: (_, row) => (
-        <div>
-          <div className="polla-match-row">
-            {row.match?.home_logo && <img src={row.match.home_logo} className="polla-mini-logo" alt="" />}
-            <span style={{ fontSize: isMobile ? '0.78rem' : '0.875rem' }}>{row.match?.home_team}</span>
-            <span className="polla-vs">vs</span>
-            <span style={{ fontSize: isMobile ? '0.78rem' : '0.875rem' }}>{row.match?.away_team}</span>
-            {row.match?.away_logo && <img src={row.match.away_logo} className="polla-mini-logo" alt="" />}
-          </div>
-          <div className="polla-match-date">
-            {row.match?.match_date
-              ? formatDate(row.match.match_date)
-              : '—'}
-          </div>
-        </div>
-      ),
-    },
-    {
-      title: 'Pick',
-      width: isMobile ? 50 : 130,
-      render: (_, row) => {
-        if (row.prediction_result) {
-          return (
-            <Tag color="blue" style={{ fontSize: '0.72rem', padding: '0 4px' }}>
-              {isMobile ? RESULT_SHORT[row.prediction_result] : (RESULT_LABELS[row.prediction_result] || row.prediction_result)}
-            </Tag>
-          );
-        }
-        return <span style={{ color: '#94a3b8', fontSize: '0.78rem' }}>{row.predicted_winner_name?.split(' ')[0] || '—'}</span>;
-      },
-    },
-    ...(!isMobile ? [{
-      title: 'Resultado',
-      width: 120,
-      render: (_, row) => {
-        const m = row.match;
-        if (!m || m.match_status !== 'Finalizado') {
-          return <Tag style={{ fontSize: '0.72rem', background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.1)', color: '#64748b' }}>Pendiente</Tag>;
-        }
-        if (row.phase === 'groups') {
-          const r = m.home_score > m.away_score ? 'L' : m.away_score > m.home_score ? 'V' : 'E';
-          return <span style={{ fontSize: '0.8rem' }}>{m.home_score}–{m.away_score} <span style={{ color: '#64748b' }}>({RESULT_LABELS[r]})</span></span>;
-        }
-        return <span style={{ color: '#94a3b8', fontSize: '0.8rem' }}>{m.home_score}–{m.away_score}</span>;
-      },
-    }] : []),
-    {
-      title: 'Pts',
-      dataIndex: 'points',
-      align: 'right',
-      width: 50,
-      render: (pts, row) => {
-        if (row.is_correct === null) return <span style={{ color: '#475569' }}>—</span>;
-        return (
-          <Tag color={row.is_correct ? 'green' : 'red'} style={{ fontSize: '0.78rem', padding: '0 4px' }}>
-            {row.is_correct ? `+${pts}` : '0'}
-          </Tag>
-        );
-      },
-    },
-  ];
+  const scored   = predictions.filter(p => p.is_correct !== null && p.is_correct !== undefined);
+  const correct  = scored.filter(p => p.is_correct === true).length;
+  const totalPts = scored.reduce((s, p) => s + (p.points || 0), 0);
+  const pending  = predictions.length - scored.length;
 
   return (
-    <Table
-      dataSource={predictions}
-      columns={cols}
-      rowKey="id"
-      pagination={{ pageSize: 20, showSizeChanger: false }}
-      size="small"
-      className="polla-predictions-table"
-      locale={{ emptyText: 'Aún no has hecho predicciones' }}
-    />
+    <div>
+      {/* Resumen rápido */}
+      <div style={{ display: 'flex', gap: 10, marginBottom: 18, flexWrap: 'wrap' }}>
+        {[
+          { label: 'Mis picks',    value: predictions.length, color: '#60a5fa' },
+          { label: 'Finalizados',  value: scored.length,      color: '#94a3b8' },
+          { label: 'Acertados',    value: correct,            color: '#22c55e' },
+          { label: 'Mis puntos',   value: totalPts,           color: '#fbbf24' },
+          ...(pending > 0 ? [{ label: 'Pendientes', value: pending, color: '#f59e0b' }] : []),
+        ].map(s => (
+          <div key={s.label} style={{
+            background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: 10, padding: '10px 16px', flex: '1 1 80px',
+          }}>
+            <div style={{ color: s.color, fontWeight: 800, fontSize: '1.15rem' }}>{s.value}</div>
+            <div style={{ color: '#64748b', fontSize: '0.7rem' }}>{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Tarjetas por partido */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {predictions.map(pred => (
+          <PredMatchCard key={pred.id} pred={pred} />
+        ))}
+      </div>
+    </div>
   );
 }
