@@ -354,6 +354,7 @@ function PollaDashboard({ pollaId }) {
       render: (v) => <strong style={{ color: '#22c55e', fontSize: '1rem' }}>{v}</strong>,
       sorter: (a, b) => b.total_points - a.total_points,
       defaultSortOrder: 'descend',
+      sortDirections: ['descend'],
     },
     {
       title: '',
