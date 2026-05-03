@@ -2,13 +2,14 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
-  Table, Tag, Progress, Button, Spin, Avatar, Tabs, Grid, message,
+  Table, Tag, Progress, Button, Spin, Avatar, Tabs, Grid, message, Modal,
 } from 'antd';
 
 const { useBreakpoint } = Grid;
 import {
   TrophyOutlined, EditOutlined, UserOutlined, StarOutlined,
   ThunderboltOutlined, TeamOutlined, CalendarOutlined, ArrowLeftOutlined,
+  EyeOutlined, CheckCircleOutlined, CloseCircleOutlined,
 } from '@ant-design/icons';
 import { useAuth } from '../../context/AuthContext';
 import pollaService from '../../services/pollaService';
@@ -235,6 +236,25 @@ function PollaDashboard({ pollaId }) {
   const [pollaMatches, setPollaMatches] = useState([]);
   const [loading, setLoading]           = useState(true);
 
+  // Modal de predicciones de otro participante
+  const [viewUser, setViewUser]         = useState(null); // { user_id, username }
+  const [viewData, setViewData]         = useState(null);
+  const [viewLoading, setViewLoading]   = useState(false);
+
+  const openParticipantModal = async (row) => {
+    setViewUser({ user_id: row.user_id, username: row.username });
+    setViewData(null);
+    setViewLoading(true);
+    try {
+      const data = await pollaService.getParticipantPredictions(pollaId, row.user_id);
+      setViewData(data);
+    } catch {
+      message.error('No se pudieron cargar las predicciones');
+    } finally {
+      setViewLoading(false);
+    }
+  };
+
   useEffect(() => {
     (async () => {
       setLoading(true);
@@ -328,6 +348,20 @@ function PollaDashboard({ pollaId }) {
       render: (v) => <strong style={{ color: '#22c55e', fontSize: '1rem' }}>{v}</strong>,
       sorter: (a, b) => b.total_points - a.total_points,
       defaultSortOrder: 'descend',
+    },
+    {
+      title: '',
+      width: 44,
+      render: (_, row) => (
+        <Button
+          type="text"
+          icon={<EyeOutlined />}
+          size="small"
+          style={{ color: '#475569' }}
+          onClick={() => openParticipantModal(row)}
+          title="Ver picks jugados"
+        />
+      ),
     },
   ];
 
@@ -469,6 +503,147 @@ function PollaDashboard({ pollaId }) {
             children: <MyPredictionsTab pollaId={pollaId} />,
           },
         ]}
+      />
+
+      {/* Modal: picks de otro participante */}
+      <Modal
+        open={!!viewUser}
+        onCancel={() => { setViewUser(null); setViewData(null); }}
+        footer={null}
+        title={
+          viewData
+            ? <span>
+                <EyeOutlined style={{ marginRight: 8, color: '#60a5fa' }} />
+                Picks de <strong style={{ color: '#f1f5f9' }}>{viewData.username}</strong>
+                <span style={{ fontSize: '0.8rem', color: '#64748b', marginLeft: 10, fontWeight: 400 }}>
+                  — partidos jugados
+                </span>
+              </span>
+            : 'Cargando…'
+        }
+        width={680}
+        styles={{ content: { background: '#0c1525', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16 },
+                  header: { background: '#0c1525', borderBottom: '1px solid rgba(255,255,255,0.07)' } }}
+      >
+        {viewLoading ? (
+          <div style={{ padding: 40, textAlign: 'center' }}><Spin /></div>
+        ) : viewData ? (
+          <ParticipantPicksModal data={viewData} />
+        ) : null}
+      </Modal>
+    </div>
+  );
+}
+
+// ── Modal picks de participante ────────────────────────────────────────────
+function ParticipantPicksModal({ data }) {
+  const RESULT_LABELS = { L: 'Local', E: 'Empate', V: 'Visitante' };
+
+  const cols = [
+    {
+      title: 'Partido',
+      render: (_, row) => {
+        const m = row.match || {};
+        return (
+          <div>
+            <div className="polla-match-row">
+              {m.home_logo && <img src={m.home_logo} className="polla-mini-logo" alt="" />}
+              <span style={{ fontSize: '0.82rem' }}>{m.home_team}</span>
+              <span className="polla-vs"> vs </span>
+              <span style={{ fontSize: '0.82rem' }}>{m.away_team}</span>
+              {m.away_logo && <img src={m.away_logo} className="polla-mini-logo" alt="" />}
+            </div>
+            <div className="polla-match-date">
+              {m.match_date
+                ? new Date(m.match_date).toLocaleString('es-CO', { dateStyle: 'short', timeStyle: 'short' })
+                : '—'}
+            </div>
+          </div>
+        );
+      },
+    },
+    {
+      title: 'Su pick',
+      width: 120,
+      render: (_, row) => {
+        const m = row.match || {};
+        if (row.prediction_result) {
+          return <Tag color="blue" style={{ fontSize: '0.72rem' }}>{RESULT_LABELS[row.prediction_result] || row.prediction_result}</Tag>;
+        }
+        if (row.predicted_winner_name) {
+          return <span style={{ color: '#94a3b8', fontSize: '0.78rem' }}>{row.predicted_winner_name}</span>;
+        }
+        return <span style={{ color: '#475569' }}>—</span>;
+      },
+    },
+    {
+      title: 'Resultado',
+      width: 100,
+      render: (_, row) => {
+        const m = row.match || {};
+        if (m.home_score == null) return <span style={{ color: '#475569', fontSize: '0.78rem' }}>—</span>;
+        return <span style={{ color: '#cbd5e1', fontSize: '0.82rem' }}>{m.home_score}–{m.away_score}</span>;
+      },
+    },
+    {
+      title: 'Pts',
+      dataIndex: 'points',
+      align: 'right',
+      width: 60,
+      render: (pts, row) => {
+        if (row.is_correct === null || row.is_correct === undefined) {
+          return <span style={{ color: '#475569' }}>—</span>;
+        }
+        return row.is_correct
+          ? <Tag color="green" icon={<CheckCircleOutlined />} style={{ fontSize: '0.72rem' }}>+{pts}</Tag>
+          : <Tag color="red" icon={<CloseCircleOutlined />} style={{ fontSize: '0.72rem' }}>0</Tag>;
+      },
+    },
+  ];
+
+  const scored = (data.predictions || []).filter(p => p.match?.home_score != null || p.is_correct !== null);
+
+  if (!scored.length) {
+    return (
+      <div style={{ padding: '32px 0', textAlign: 'center', color: '#64748b' }}>
+        <CalendarOutlined style={{ fontSize: 32, marginBottom: 12, display: 'block' }} />
+        <p>Aún no hay partidos jugados con predicciones de este participante.</p>
+      </div>
+    );
+  }
+
+  const correct  = scored.filter(p => p.is_correct).length;
+  const total    = scored.filter(p => p.is_correct !== null).length;
+  const totalPts = scored.reduce((s, p) => s + (p.points || 0), 0);
+
+  return (
+    <div>
+      {/* Mini stats */}
+      <div style={{ display: 'flex', gap: 16, marginBottom: 16, flexWrap: 'wrap' }}>
+        {[
+          { label: 'Posición', value: data.rank ? `#${data.rank}` : '—', color: '#fbbf24' },
+          { label: 'Pts totales', value: data.total_points ?? '—', color: '#22c55e' },
+          { label: 'Aciertos (jugados)', value: total ? `${correct}/${total}` : '—', color: '#60a5fa' },
+          { label: 'Pts (jugados)', value: totalPts, color: '#a78bfa' },
+        ].map(s => (
+          <div key={s.label} style={{
+            background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)',
+            borderRadius: 10, padding: '10px 16px', flex: '1 1 100px', minWidth: 90,
+          }}>
+            <div style={{ color: s.color, fontWeight: 700, fontSize: '1.1rem' }}>{s.value}</div>
+            <div style={{ color: '#64748b', fontSize: '0.72rem' }}>{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      <Table
+        dataSource={scored}
+        columns={cols}
+        rowKey={(_, i) => i}
+        pagination={false}
+        size="small"
+        className="polla-predictions-table"
+        scroll={{ y: 360 }}
       />
     </div>
   );

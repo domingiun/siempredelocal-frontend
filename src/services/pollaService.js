@@ -59,6 +59,9 @@ const pollaService = {
 
   adminResetCloseAt: (pollaId, hours = 2) =>
     api.post(`${BASE}/admin/${pollaId}/reset-close-at?hours=${hours}`).then(r => r.data),
+
+  getParticipantPredictions: (pollaId, userId) =>
+    api.get(`${BASE}/${pollaId}/participant/${userId}/predictions`).then(r => r.data),
 };
 
 export default pollaService;
