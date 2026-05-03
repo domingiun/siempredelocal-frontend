@@ -1,10 +1,11 @@
 // frontend/src/components/wallet/WalletBalance.jsx
 import React, { useState, useEffect } from 'react';
-import { Spin, Modal, InputNumber, Radio, notification } from 'antd';
+import { Spin, Modal, InputNumber, Radio, notification, Select, Input } from 'antd';
 import {
   FireOutlined, DollarOutlined, TrophyOutlined,
   PlusCircleOutlined, HistoryOutlined, ReloadOutlined,
   SafetyOutlined, InfoCircleOutlined, CreditCardOutlined,
+  BankOutlined, SwapOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useWallet } from '../../context/WalletContext';
@@ -58,10 +59,13 @@ const WalletBalance = ({ compact = false, showActions = true }) => {
   } = useWallet();
 
   const [recentActivity, setRecentActivity] = useState([]);
-  const [redeemOpen, setRedeemOpen]         = useState(false);
-  const [redeemType, setRedeemType]         = useState('credits');
-  const [pointsToConvert, setPointsToConvert] = useState(5000);
-  const [withdrawAmount, setWithdrawAmount]   = useState(20000);
+  const [redeemOpen, setRedeemOpen]             = useState(false);
+  const [redeemType, setRedeemType]             = useState('credits');
+  const [pointsToConvert, setPointsToConvert]   = useState(5000);
+  const [withdrawAmount, setWithdrawAmount]     = useState(20000);
+  const [withdrawBank, setWithdrawBank]         = useState(null);
+  const [withdrawAccType, setWithdrawAccType]   = useState(null);
+  const [withdrawAccNum, setWithdrawAccNum]     = useState('');
   const [redeemSubmitting, setRedeemSubmitting] = useState(false);
   const [stats, setStats] = useState({
     win_rate: 0, avg_points: 0, total_won: 0, total_bets: 0, wins: 0,
@@ -120,11 +124,19 @@ const WalletBalance = ({ compact = false, showActions = true }) => {
         const r = await requestPointsToCredits(pointsToConvert, 5000);
         if (r?.success) { setRedeemOpen(false); refreshWallet(); }
       } else {
+        if (!withdrawBank) { notification.warning({ message: 'Selecciona el banco o método de pago' }); return; }
+        if (withdrawBank === 'bancolombia' && !withdrawAccType) { notification.warning({ message: 'Selecciona el tipo de cuenta' }); return; }
+        if (!withdrawAccNum.trim()) { notification.warning({ message: 'Ingresa el número de cuenta' }); return; }
         if (withdrawAmount < 20000) { notification.warning({ message: 'Retiro mínimo $20,000' }); return; }
         if (withdrawAmount > 1000000) { notification.warning({ message: 'Retiro máximo $1,000,000' }); return; }
         if (withdrawAmount > balancePts) { notification.warning({ message: 'Saldo insuficiente' }); return; }
-        const r = await requestWithdrawPoints(withdrawAmount, 'nequi');
-        if (r?.success) { setRedeemOpen(false); refreshWallet(); }
+        const paymentMethod = `${withdrawBank}|${withdrawAccType || 'nequi'}|${withdrawAccNum.trim()}`;
+        const r = await requestWithdrawPoints(withdrawAmount, paymentMethod);
+        if (r?.success) {
+          setRedeemOpen(false);
+          setWithdrawBank(null); setWithdrawAccType(null); setWithdrawAccNum('');
+          refreshWallet();
+        }
       }
     } finally {
       setRedeemSubmitting(false);
@@ -416,53 +428,180 @@ const WalletBalance = ({ compact = false, showActions = true }) => {
       {/* Redeem modal */}
       <Modal
         open={redeemOpen}
-        onCancel={() => setRedeemOpen(false)}
-        title="Canjear puntos"
-        okText="Confirmar"
-        cancelText="Cancelar"
-        onOk={handleRedeemSubmit}
-        confirmLoading={redeemSubmitting}
-        okButtonProps={{ style: { background: '#22c55e', borderColor: '#22c55e' } }}
+        onCancel={() => { setRedeemOpen(false); setWithdrawBank(null); setWithdrawAccType(null); setWithdrawAccNum(''); }}
+        title={null}
+        footer={null}
+        width={480}
+        styles={{
+          content: { background: '#0c1525', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 18, padding: 0 },
+        }}
       >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <Radio.Group
-            value={redeemType}
-            onChange={(e) => setRedeemType(e.target.value)}
-          >
-            <Radio value="credits">Convertir puntos a créditos</Radio>
-            <Radio value="withdraw">Solicitar retiro (Nequi)</Radio>
-          </Radio.Group>
+        {/* Header del modal */}
+        <div style={{ padding: '22px 24px 16px', borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
+          <div style={{ fontSize: '1.05rem', fontWeight: 800, color: '#f1f5f9' }}>Canjear dinero disponible</div>
+          <div style={{ fontSize: '0.78rem', color: '#64748b', marginTop: 3 }}>
+            Saldo disponible: <strong style={{ color: '#22c55e' }}>${(wallet?.balance_PTS ?? 0).toLocaleString()} COP</strong>
+          </div>
+        </div>
 
-          {redeemType === 'credits' ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <span style={{ fontSize: 12, color: '#64748b' }}>
-                Mínimo 5,000 puntos · Múltiplo de 5,000 · Saldo: ${(wallet?.balance_PTS ?? 0).toLocaleString()}
-              </span>
+        <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+          {/* Selector de tipo — cards clickeables */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            {[
+              { val: 'credits', icon: <CreditCardOutlined />, label: 'Dinero a créditos', sub: '5,000 COP = 1 crédito' },
+              { val: 'withdraw', icon: <BankOutlined />, label: 'Solicitar retiro', sub: 'Transferencia bancaria' },
+            ].map(opt => (
+              <button
+                key={opt.val}
+                onClick={() => setRedeemType(opt.val)}
+                style={{
+                  background: redeemType === opt.val ? 'rgba(34,197,94,0.1)' : 'rgba(255,255,255,0.03)',
+                  border: `1px solid ${redeemType === opt.val ? 'rgba(34,197,94,0.4)' : 'rgba(255,255,255,0.08)'}`,
+                  borderRadius: 12, padding: '14px 12px', cursor: 'pointer',
+                  textAlign: 'left', transition: 'all 0.2s',
+                }}
+              >
+                <div style={{ fontSize: '1.1rem', color: redeemType === opt.val ? '#22c55e' : '#64748b', marginBottom: 6 }}>
+                  {opt.icon}
+                </div>
+                <div style={{ fontSize: '0.82rem', fontWeight: 700, color: '#e2e8f0' }}>{opt.label}</div>
+                <div style={{ fontSize: '0.72rem', color: '#64748b', marginTop: 2 }}>{opt.sub}</div>
+              </button>
+            ))}
+          </div>
+
+          {/* Formulario: Dinero a créditos */}
+          {redeemType === 'credits' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
+                Mínimo $5,000 · Múltiplos de $5,000
+              </div>
               <InputNumber
                 min={5000} step={5000}
                 value={pointsToConvert}
                 onChange={(v) => setPointsToConvert(Number(v || 0))}
                 style={{ width: '100%' }}
                 prefix="$"
+                formatter={v => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')}
+                parser={v => v.replace(/\./g, '')}
               />
-              <span style={{ fontSize: 13 }}>
-                Recibirás: <strong>{Math.floor((pointsToConvert || 0) / 5000)}</strong> crédito(s)
-              </span>
-            </div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <span style={{ fontSize: 12, color: '#64748b' }}>
-                Mínimo $20,000 · Máximo $1,000,000 · Saldo: ${(wallet?.balance_PTS ?? 0).toLocaleString()}
-              </span>
-              <InputNumber
-                min={20000} max={1000000} step={1000}
-                value={withdrawAmount}
-                onChange={(v) => setWithdrawAmount(Number(v || 0))}
-                style={{ width: '100%' }}
-                prefix="$"
-              />
+              <div style={{
+                background: 'rgba(34,197,94,0.07)', border: '1px solid rgba(34,197,94,0.2)',
+                borderRadius: 10, padding: '10px 14px', display: 'flex', justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
+                <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Recibirás</span>
+                <span style={{ fontSize: '1rem', fontWeight: 800, color: '#22c55e' }}>
+                  {Math.floor((pointsToConvert || 0) / 5000)} crédito{Math.floor((pointsToConvert || 0) / 5000) !== 1 ? 's' : ''}
+                </span>
+              </div>
             </div>
           )}
+
+          {/* Formulario: Solicitar retiro */}
+          {redeemType === 'withdraw' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+
+              {/* Banco */}
+              <div>
+                <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginBottom: 6, fontWeight: 600 }}>Banco / Método de pago</div>
+                <Select
+                  placeholder="Selecciona banco o método"
+                  value={withdrawBank}
+                  onChange={(v) => { setWithdrawBank(v); setWithdrawAccType(null); setWithdrawAccNum(''); }}
+                  style={{ width: '100%' }}
+                  options={[
+                    { value: 'bancolombia', label: '🏦 Bancolombia' },
+                    { value: 'nequi',       label: '📱 Nequi' },
+                  ]}
+                />
+              </div>
+
+              {/* Tipo de cuenta — solo Bancolombia */}
+              {withdrawBank === 'bancolombia' && (
+                <div>
+                  <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginBottom: 6, fontWeight: 600 }}>Tipo de cuenta</div>
+                  <Select
+                    placeholder="Selecciona tipo de cuenta"
+                    value={withdrawAccType}
+                    onChange={setWithdrawAccType}
+                    style={{ width: '100%' }}
+                    options={[
+                      { value: 'ahorros',   label: 'Cuenta de Ahorros' },
+                      { value: 'corriente', label: 'Cuenta Corriente' },
+                    ]}
+                  />
+                </div>
+              )}
+
+              {/* Número de cuenta / celular */}
+              {withdrawBank && (
+                <div>
+                  <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginBottom: 6, fontWeight: 600 }}>
+                    {withdrawBank === 'nequi' ? 'Número celular' : 'Número de cuenta'}
+                  </div>
+                  <Input
+                    placeholder={withdrawBank === 'nequi' ? '3XX XXX XXXX' : 'Ingresa el número de cuenta'}
+                    value={withdrawAccNum}
+                    onChange={(e) => setWithdrawAccNum(e.target.value)}
+                    maxLength={20}
+                  />
+                </div>
+              )}
+
+              {/* Monto */}
+              <div>
+                <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginBottom: 6, fontWeight: 600 }}>Monto a transferir</div>
+                <div style={{ fontSize: '0.72rem', color: '#64748b', marginBottom: 6 }}>
+                  Mínimo $20,000 · Máximo $1,000,000
+                </div>
+                <InputNumber
+                  min={20000} max={1000000} step={1000}
+                  value={withdrawAmount}
+                  onChange={(v) => setWithdrawAmount(Number(v || 0))}
+                  style={{ width: '100%' }}
+                  prefix="$"
+                  formatter={v => `${v}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')}
+                  parser={v => v.replace(/\./g, '')}
+                />
+              </div>
+
+              <div style={{
+                background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.2)',
+                borderRadius: 10, padding: '10px 14px', fontSize: '0.78rem', color: '#94a3b8',
+              }}>
+                ⚠️ Las solicitudes de retiro son aprobadas manualmente en menos de 24 horas hábiles.
+              </div>
+            </div>
+          )}
+
+          {/* Botones */}
+          <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', paddingTop: 4 }}>
+            <button
+              onClick={() => { setRedeemOpen(false); setWithdrawBank(null); setWithdrawAccType(null); setWithdrawAccNum(''); }}
+              style={{
+                background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: 10, padding: '9px 20px', color: '#94a3b8',
+                fontSize: '0.875rem', fontWeight: 600, cursor: 'pointer',
+              }}
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={handleRedeemSubmit}
+              disabled={redeemSubmitting}
+              style={{
+                background: 'linear-gradient(135deg, #22c55e, #16a34a)',
+                border: 'none', borderRadius: 10, padding: '9px 24px',
+                color: '#fff', fontSize: '0.875rem', fontWeight: 700,
+                cursor: redeemSubmitting ? 'default' : 'pointer',
+                opacity: redeemSubmitting ? 0.7 : 1,
+              }}
+            >
+              {redeemSubmitting ? 'Procesando…' : 'Confirmar'}
+            </button>
+          </div>
         </div>
       </Modal>
     </div>
