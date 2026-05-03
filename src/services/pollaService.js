@@ -62,6 +62,9 @@ const pollaService = {
 
   getParticipantPredictions: (pollaId, userId) =>
     api.get(`${BASE}/${pollaId}/participant/${userId}/predictions`).then(r => r.data),
+
+  adminRescoreFinished: (pollaId) =>
+    api.post(`${BASE}/admin/${pollaId}/rescore-finished`).then(r => r.data),
 };
 
 export default pollaService;

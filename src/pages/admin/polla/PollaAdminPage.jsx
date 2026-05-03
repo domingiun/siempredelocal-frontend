@@ -185,6 +185,20 @@ export default function PollaAdminPage() {
     } catch { message.error('Error al actualizar rankings'); }
   };
 
+  const [rescoring, setRescoring] = useState(false);
+  const handleRescoreFinished = async () => {
+    setRescoring(true);
+    try {
+      const res = await pollaService.adminRescoreFinished(polla.id);
+      message.success(`Puntuados: ${res.scored} partidos · Omitidos (sin resultado): ${res.skipped}`);
+      loadParticipants();
+    } catch (err) {
+      message.error(err?.response?.data?.detail || 'Error al puntuar');
+    } finally {
+      setRescoring(false);
+    }
+  };
+
   const handlePollaCreated = async (created) => {
     setCreateOpen(false);
     await loadPolla(created?.id);
@@ -349,6 +363,8 @@ export default function PollaAdminPage() {
                 participants={participants}
                 loading={loadingPart}
                 onUpdateRankings={handleUpdateRankings}
+                onRescoreFinished={handleRescoreFinished}
+                rescoring={rescoring}
                 onReload={loadParticipants}
               />
             ),
@@ -820,7 +836,7 @@ function PollaMatchesTab({ pollaMatches, loading, onRemove, onReload }) {
 
 // ── Tab: Participantes ─────────────────────────────────────────────────
 
-function ParticipantsTab({ participants, loading, onUpdateRankings, onReload }) {
+function ParticipantsTab({ participants, loading, onUpdateRankings, onRescoreFinished, rescoring, onReload }) {
   const cols = [
     {
       title: '#',
@@ -878,6 +894,16 @@ function ParticipantsTab({ participants, loading, onUpdateRankings, onReload }) 
         >
           Recargar
         </Button>
+        <Tooltip title="Puntúa automáticamente los partidos de la polla cuyo resultado real ya está disponible (Finalizado)">
+          <Button
+            icon={<CheckCircleOutlined />}
+            onClick={onRescoreFinished}
+            loading={rescoring}
+            style={{ background: '#1d4ed8', borderColor: '#1d4ed8', color: '#fff' }}
+          >
+            Puntuar partidos finalizados
+          </Button>
+        </Tooltip>
         <Button
           type="primary"
           icon={<TrophyOutlined />}
