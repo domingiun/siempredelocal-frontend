@@ -42,6 +42,12 @@ const formatCOP = (n) =>
     style: 'currency', currency: 'COP', minimumFractionDigits: 0,
   }).format(n || 0);
 
+const formatDate = (d) => {
+  if (!d) return '—';
+  const utc = d.endsWith('Z') || d.includes('+') ? d : d + 'Z';
+  return new Date(utc).toLocaleString('es-CO', { dateStyle: 'short', timeStyle: 'short' });
+};
+
 // ── Router raíz ────────────────────────────────────────────────────────────
 export default function PollaDashboardPage() {
   const [searchParams] = useSearchParams();
@@ -555,7 +561,7 @@ function ParticipantPicksModal({ data }) {
             </div>
             <div className="polla-match-date">
               {m.match_date
-                ? new Date(m.match_date).toLocaleString('es-CO', { dateStyle: 'short', timeStyle: 'short' })
+                ? formatDate(m.match_date)
                 : '—'}
             </div>
           </div>
@@ -683,7 +689,7 @@ function MyPredictionsTab({ pollaId }) {
           </div>
           <div className="polla-match-date">
             {row.match?.match_date
-              ? new Date(row.match.match_date).toLocaleString('es-CO', { dateStyle: 'short', timeStyle: 'short' })
+              ? formatDate(row.match.match_date)
               : '—'}
           </div>
         </div>
