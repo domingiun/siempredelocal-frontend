@@ -1,14 +1,14 @@
 // frontend/src/pages/polla/PollaDashboardPage.jsx
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
-  Table, Tag, Progress, Button, Spin, Avatar, Tabs, Grid,
+  Table, Tag, Progress, Button, Spin, Avatar, Tabs, Grid, Select,
 } from 'antd';
 
 const { useBreakpoint } = Grid;
 import {
   TrophyOutlined, EditOutlined, UserOutlined, StarOutlined,
-  ThunderboltOutlined, TeamOutlined, CalendarOutlined,
+  ThunderboltOutlined, TeamOutlined, CalendarOutlined, SwapOutlined,
 } from '@ant-design/icons';
 import { useAuth } from '../../context/AuthContext';
 import pollaService from '../../services/pollaService';
@@ -49,36 +49,51 @@ const formatCOP = (n) =>
 
 export default function PollaDashboardPage() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
   const screens = useBreakpoint();
   const isMobile = !screens.sm;
 
   const [polla, setPolla]           = useState(null);
+  const [allPollas, setAllPollas]   = useState([]);
   const [myStatus, setMyStatus]     = useState(null);
   const [pollaMatches, setPollaMatches] = useState([]);
   const [loading, setLoading]       = useState(true);
   const [pollaId, setPollaId]       = useState(null);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const list = await pollaService.listPollas();
-        const active = pickMundialPolla(list);
-        if (!active) { setLoading(false); return; }
+  const loadPolla = async (targetId) => {
+    setLoading(true);
+    try {
+      const list = await pollaService.listPollas();
+      const nonCancelled = list.filter(p => p.status !== 'cancelled');
+      setAllPollas(nonCancelled);
 
-        setPollaId(active.id);
-        const [detail, status, matches] = await Promise.all([
-          pollaService.getPolla(active.id),
-          pollaService.getMyStatus(active.id).catch(() => ({ is_participant: false })),
-          pollaService.getPollaMatches(active.id),
-        ]);
-        setPolla(detail);
-        setMyStatus(status);
-        setPollaMatches(matches);
-      } catch { }
-      finally { setLoading(false); }
-    })();
-  }, []);
+      const active = targetId
+        ? (list.find(p => p.id === Number(targetId)) || pickMundialPolla(list))
+        : pickMundialPolla(list);
+
+      if (!active) { setLoading(false); return; }
+
+      setPollaId(active.id);
+      const [detail, status, matches] = await Promise.all([
+        pollaService.getPolla(active.id),
+        pollaService.getMyStatus(active.id).catch(() => ({ is_participant: false })),
+        pollaService.getPollaMatches(active.id),
+      ]);
+      setPolla(detail);
+      setMyStatus(status);
+      setPollaMatches(matches);
+    } catch { }
+    finally { setLoading(false); }
+  };
+
+  useEffect(() => {
+    loadPolla(searchParams.get('id'));
+  }, [searchParams.get('id')]);
+
+  const handlePollaSwitch = (id) => {
+    setSearchParams({ id });
+  };
 
   if (loading) {
     return <div className="polla-db-loading"><Spin size="large" /></div>;
@@ -172,6 +187,19 @@ export default function PollaDashboardPage() {
       <div className="polla-db-hero">
         <div>
           <h1 className="polla-db-title">⚽ {polla.name}</h1>
+          {allPollas.length > 1 && (
+            <Select
+              value={pollaId}
+              onChange={handlePollaSwitch}
+              size="small"
+              style={{ marginBottom: 8, minWidth: 220 }}
+              options={allPollas.map(p => ({
+                value: p.id,
+                label: `${p.name} (${p.status})`,
+              }))}
+              suffixIcon={<SwapOutlined />}
+            />
+          )}
           <p className="polla-db-subtitle">Dashboard mundialista</p>
           <div className="polla-db-prize-inline">
             <TrophyOutlined style={{ color: '#fbbf24' }} />
@@ -184,7 +212,7 @@ export default function PollaDashboardPage() {
         <Button
           type="primary"
           icon={<EditOutlined />}
-          onClick={() => navigate('/mundial/predict')}
+          onClick={() => navigate(`/mundial/predict?id=${pollaId}`)}
           className="polla-predict-btn"
           disabled={pending === 0}
         >

@@ -1,6 +1,6 @@
 // frontend/src/pages/polla/PollaLandingPage.jsx
 import { useEffect, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { Button, Tag, Spin, message } from 'antd';
 import {
   TrophyOutlined, TeamOutlined, CalendarOutlined,
@@ -40,6 +40,7 @@ const phasePoints = {
 
 export default function PollaLandingPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user } = useAuth();
   const [polla, setPolla] = useState(null);
   const [myStatus, setMyStatus] = useState(null);
@@ -49,7 +50,10 @@ export default function PollaLandingPage() {
   useEffect(() => {
     pollaService.listPollas()
       .then(list => {
-        const found = pickMundialPolla(list);
+        const paramId = searchParams.get('id');
+        const found = paramId
+          ? (list.find(p => p.id === Number(paramId)) || pickMundialPolla(list))
+          : pickMundialPolla(list);
         if (found) {
           setPolla(found);
           if (user) {
@@ -73,7 +77,7 @@ export default function PollaLandingPage() {
     try {
       await pollaService.joinPolla(polla.id);
       message.success('¡Te inscribiste exitosamente!');
-      navigate(`/mundial/dashboard`);
+      navigate(`/mundial/dashboard?id=${polla.id}`);
     } catch (err) {
       const status = err?.response?.status;
       const detail = err?.response?.data?.detail;

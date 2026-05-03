@@ -1,6 +1,6 @@
 // frontend/src/pages/polla/PollaPredictionsPage.jsx
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Tag, Spin, message, Progress } from 'antd';
 import { CheckOutlined, ArrowLeftOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import pollaService from '../../services/pollaService';
@@ -39,6 +39,7 @@ function formatCountdown(closeAt) {
 
 export default function PollaPredictionsPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [pollaId, setPollaId] = useState(null);
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -51,7 +52,10 @@ export default function PollaPredictionsPage() {
     (async () => {
       try {
         const list = await pollaService.listPollas();
-        const active = pickMundialPolla(list);
+        const paramId = searchParams.get('id');
+        const active = paramId
+          ? (list.find(p => p.id === Number(paramId)) || pickMundialPolla(list))
+          : pickMundialPolla(list);
         if (!active) { setLoading(false); return; }
         setPollaId(active.id);
 
@@ -139,7 +143,7 @@ export default function PollaPredictionsPage() {
         <CheckOutlined style={{ fontSize: 48, color: '#22c55e' }} />
         <h2>¡Todo al día!</h2>
         <p>No hay partidos pendientes de predicción en este momento.</p>
-        <Button type="primary" onClick={() => navigate('/mundial/dashboard')}>
+        <Button type="primary" onClick={() => navigate(`/mundial/dashboard${pollaId ? `?id=${pollaId}` : ''}`)}>
           Ver mi dashboard
         </Button>
       </div>
@@ -152,7 +156,7 @@ export default function PollaPredictionsPage() {
       <div className="polla-predict-header">
         <Button
           icon={<ArrowLeftOutlined />}
-          onClick={() => navigate('/mundial/dashboard')}
+          onClick={() => navigate(`/mundial/dashboard${pollaId ? `?id=${pollaId}` : ''}`)}
           type="text"
           style={{ color: '#94a3b8' }}
         >
@@ -215,7 +219,7 @@ export default function PollaPredictionsPage() {
         <div className="polla-predict-done">
           <CheckOutlined style={{ color: '#22c55e', fontSize: 20 }} />
           <span>Todas las predicciones guardadas</span>
-          <Button type="primary" onClick={() => navigate('/mundial/dashboard')} style={{ marginLeft: 12 }}>
+          <Button type="primary" onClick={() => navigate(`/mundial/dashboard${pollaId ? `?id=${pollaId}` : ''}`)} style={{ marginLeft: 12 }}>
             Ver mi dashboard
           </Button>
         </div>
