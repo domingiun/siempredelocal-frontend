@@ -74,6 +74,7 @@ import WalletPage from './pages/wallet/WalletPage';
 import PurchaseCreditPage from './pages/wallet/PurchaseCreditsPage';
 import TransactionHistoryPage from './pages/wallet/TransactionHistoryPage';
 import SecurityPolicyPage from './pages/help/SecurityPolicyPage';
+import HelpPage from './pages/help/HelpPage';
 import PerformanceReportPage from './pages/reports/PerformanceReportPage';
 import FinancialReportPage from './pages/reports/FinancialReportPage';
 import AttendanceReportPage from './pages/reports/AttendanceReportPage';
@@ -157,6 +158,9 @@ function App() {
                   <Route element={<MainLayout />}>
                     {/* Dashboard */}
                     <Route path="/dashboard" element={<Dashboard />} />
+
+                    {/* Ayuda */}
+                    <Route path="/help" element={<HelpPage />} />
 
                     {/* Rutas de perfil de usuario */}
                     <Route path="/profile" element={<ProfilePage />} />
