@@ -542,32 +542,47 @@ function PollaDashboard({ pollaId }) {
 }
 
 // ── Tarjeta visual compartida ──────────────────────────────────────────────
+const MATCH_STATUS_META = {
+  'Finalizado':  { label: 'Finalizado',  color: '#22c55e', bg: 'rgba(34,197,94,0.10)',   border: 'rgba(34,197,94,0.25)' },
+  'En curso':    { label: 'En curso',    color: '#f59e0b', bg: 'rgba(245,158,11,0.10)',  border: 'rgba(245,158,11,0.3)' },
+  'Programado':  { label: 'Programado',  color: '#60a5fa', bg: 'rgba(96,165,250,0.08)',  border: 'rgba(96,165,250,0.2)' },
+  'Cancelado':   { label: 'Cancelado',   color: '#ef4444', bg: 'rgba(239,68,68,0.08)',   border: 'rgba(239,68,68,0.2)' },
+  'Aplazado':    { label: 'Aplazado',    color: '#94a3b8', bg: 'rgba(148,163,184,0.08)', border: 'rgba(148,163,184,0.2)' },
+};
+
 function PredMatchCard({ pred, compact = false }) {
   const RESULT_LABELS = { L: 'Local', E: 'Empate', V: 'Visitante' };
   const m = pred.match || {};
-  const finished = m.home_score != null;
-  const isCorrect = pred.is_correct;
-  const pts = pred.points || 0;
+  const isFinalized = m.match_status === 'Finalizado';
+  const hasScore    = m.home_score != null;
+  const isCorrect   = pred.is_correct;
+  const pts         = pred.points || 0;
 
-  let borderColor, bgGlow, statusLabel, statusColor, statusBg;
+  // Badge de resultado del usuario
+  let borderColor, bgGlow, resultBadge;
   if (isCorrect === true) {
     borderColor = 'rgba(34,197,94,0.4)';
     bgGlow      = 'rgba(34,197,94,0.04)';
-    statusLabel = '✓ ACERTASTE';
-    statusColor = '#22c55e';
-    statusBg    = 'rgba(34,197,94,0.12)';
+    resultBadge = { label: '✓ ACERTASTE', color: '#22c55e', bg: 'rgba(34,197,94,0.12)', border: 'rgba(34,197,94,0.3)' };
   } else if (isCorrect === false) {
     borderColor = 'rgba(239,68,68,0.4)';
     bgGlow      = 'rgba(239,68,68,0.04)';
-    statusLabel = '✗ FALLASTE';
-    statusColor = '#ef4444';
-    statusBg    = 'rgba(239,68,68,0.10)';
+    resultBadge = { label: '✗ FALLASTE',  color: '#ef4444', bg: 'rgba(239,68,68,0.10)',  border: 'rgba(239,68,68,0.3)' };
   } else {
     borderColor = 'rgba(255,255,255,0.08)';
     bgGlow      = 'transparent';
-    statusLabel = finished ? null : '⏳ PENDIENTE';
-    statusColor = '#64748b';
-    statusBg    = 'rgba(255,255,255,0.05)';
+    resultBadge = null;
+  }
+
+  // Estado del partido
+  const statusMeta = MATCH_STATUS_META[m.match_status] || MATCH_STATUS_META['Programado'];
+
+  // Resultado del partido (L/E/V) — solo para Finalizado y phase groups
+  let matchResultLabel = null;
+  if (isFinalized && hasScore && pred.phase === 'groups') {
+    matchResultLabel = m.home_score > m.away_score ? 'Local'
+      : m.away_score > m.home_score ? 'Visitante'
+      : 'Empate';
   }
 
   const pickText = pred.prediction_result
@@ -585,19 +600,31 @@ function PredMatchCard({ pred, compact = false }) {
       padding: compact ? '10px 14px' : '14px 18px',
       transition: 'border-color 0.2s',
     }}>
-      {/* Header: fecha + badge */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-        <span style={{ fontSize: '0.68rem', color: '#475569' }}>
-          {m.match_date ? formatDate(m.match_date) : '—'}
-        </span>
-        {statusLabel && (
+      {/* Header: fecha · estado partido · badge resultado usuario */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, gap: 8, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: '0.68rem', color: '#475569' }}>
+            {m.match_date ? formatDate(m.match_date) : '—'}
+          </span>
+          {/* Estado del partido */}
           <span style={{
-            background: statusBg, color: statusColor,
-            border: `1px solid ${borderColor}`,
+            background: statusMeta.bg, color: statusMeta.color,
+            border: `1px solid ${statusMeta.border}`,
+            borderRadius: 20, padding: '1px 8px',
+            fontSize: '0.62rem', fontWeight: 700, letterSpacing: '0.03em',
+          }}>
+            {statusMeta.label}
+          </span>
+        </div>
+        {/* ACERTASTE / FALLASTE */}
+        {resultBadge && (
+          <span style={{
+            background: resultBadge.bg, color: resultBadge.color,
+            border: `1px solid ${resultBadge.border}`,
             borderRadius: 20, padding: '2px 10px',
             fontSize: '0.65rem', fontWeight: 800, letterSpacing: '0.04em',
           }}>
-            {statusLabel}
+            {resultBadge.label}
           </span>
         )}
       </div>
@@ -617,14 +644,14 @@ function PredMatchCard({ pred, compact = false }) {
 
         {/* Marcador / VS */}
         <div style={{ textAlign: 'center', minWidth: compact ? 46 : 58 }}>
-          {finished ? (
+          {isFinalized && hasScore ? (
             <div>
               <div style={{ fontSize: compact ? '1rem' : '1.15rem', fontWeight: 900, color: '#f1f5f9', lineHeight: 1 }}>
                 {m.home_score} – {m.away_score}
               </div>
-              {pred.phase === 'groups' && (
-                <div style={{ fontSize: '0.62rem', color: '#64748b', marginTop: 2 }}>
-                  {m.home_score > m.away_score ? 'Local' : m.away_score > m.home_score ? 'Visitante' : 'Empate'}
+              {matchResultLabel && (
+                <div style={{ fontSize: '0.60rem', color: '#64748b', marginTop: 2 }}>
+                  {matchResultLabel}
                 </div>
               )}
             </div>
@@ -750,10 +777,11 @@ function MyPredictionsTab({ pollaId }) {
     );
   }
 
-  const scored   = predictions.filter(p => p.is_correct !== null && p.is_correct !== undefined);
-  const correct  = scored.filter(p => p.is_correct === true).length;
-  const totalPts = scored.reduce((s, p) => s + (p.points || 0), 0);
-  const pending  = predictions.length - scored.length;
+  const finalized = predictions.filter(p => p.match?.match_status === 'Finalizado');
+  const scored    = predictions.filter(p => p.is_correct !== null && p.is_correct !== undefined);
+  const correct   = scored.filter(p => p.is_correct === true).length;
+  const totalPts  = scored.reduce((s, p) => s + (p.points || 0), 0);
+  const pending   = predictions.filter(p => p.match?.match_status !== 'Finalizado').length;
 
   return (
     <div>
@@ -761,7 +789,7 @@ function MyPredictionsTab({ pollaId }) {
       <div style={{ display: 'flex', gap: 10, marginBottom: 18, flexWrap: 'wrap' }}>
         {[
           { label: 'Mis picks',    value: predictions.length, color: '#60a5fa' },
-          { label: 'Finalizados',  value: scored.length,      color: '#94a3b8' },
+          { label: 'Finalizados',  value: finalized.length,    color: '#94a3b8' },
           { label: 'Acertados',    value: correct,            color: '#22c55e' },
           { label: 'Mis puntos',   value: totalPts,           color: '#fbbf24' },
           ...(pending > 0 ? [{ label: 'Pendientes', value: pending, color: '#f59e0b' }] : []),
