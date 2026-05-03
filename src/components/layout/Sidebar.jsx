@@ -84,9 +84,9 @@ const Sidebar = ({ collapsed, onCollapse, isMobile }) => {
     ]);
   }, []);
 
-  // Elementos del menú principal 
+  // Elementos del menú principal
   const getMainMenuItems = () => {
-    const baseItems = [
+    const items = [
       // 1. Dashboard
       {
         key: '/dashboard',
@@ -99,17 +99,17 @@ const Sidebar = ({ collapsed, onCollapse, isMobile }) => {
         icon: <WalletOutlined />,
         label: 'Mi Cuenta',
         badge: wallet?.balance_PTS > 0 ? (
-          <Badge
-            count={`$${(wallet.balance_PTS / 1000).toFixed(0)}k`}
-            size="small"
-            style={{
-              backgroundColor: '#1890ff',
-              marginLeft: 8
-            }}
-          />
-        ) : null
+          <Badge count={`$${(wallet.balance_PTS / 1000).toFixed(0)}k`} size="small"
+            style={{ backgroundColor: '#1890ff', marginLeft: 8 }} />
+        ) : null,
       },
-      // 3. Pronósticos
+      // 3. Polla Mundial — todos los usuarios
+      {
+        key: '/mundial/dashboard',
+        icon: <span style={{ fontSize: 14 }}>⚽</span>,
+        label: 'Polla Mundial',
+      },
+      // 4. Pronósticos
       {
         key: 'bets-submenu',
         icon: <FireOutlined />,
@@ -120,15 +120,9 @@ const Sidebar = ({ collapsed, onCollapse, isMobile }) => {
             icon: <FireOutlined />,
             label: 'Hacer Pronósticos',
             badge: wallet?.credits > 0 ? (
-              <Badge
-                count={wallet.credits}
-                size="small"
-                style={{
-                  backgroundColor: wallet.credits > 0 ? '#52c41a' : '#ff4d4f',
-                  marginLeft: 8
-                }}
-              />
-            ) : null
+              <Badge count={wallet.credits} size="small"
+                style={{ backgroundColor: '#52c41a', marginLeft: 8 }} />
+            ) : null,
           },
           {
             key: '/active-bets',
@@ -152,7 +146,7 @@ const Sidebar = ({ collapsed, onCollapse, isMobile }) => {
           },
         ],
       },
-      // 3. Partidos
+      // 5. Partidos — 3 items para todos, gestión solo admin
       {
         key: 'matches-submenu',
         icon: <CalendarOutlined />,
@@ -164,14 +158,14 @@ const Sidebar = ({ collapsed, onCollapse, isMobile }) => {
             label: 'Calendario',
           },
           {
-            key: '/matches',
-            icon: <AppstoreOutlined />,
-            label: 'Todos los Partidos',
-          },
-          {
             key: '/matches/today',
             icon: <FireOutlined />,
             label: 'Partidos de Hoy',
+          },
+          {
+            key: '/matches',
+            icon: <AppstoreOutlined />,
+            label: 'Todos los Partidos',
           },
           ...(user?.role === 'admin' ? [
             {
@@ -187,125 +181,58 @@ const Sidebar = ({ collapsed, onCollapse, isMobile }) => {
           ] : []),
         ],
       },
-      // 4. Competencias
-      {
-        key: 'competitions-submenu',
-        icon: <TrophyOutlined />,
-        label: 'Competencias',
-        children: [
-          {
-            key: '/competitions',
-            icon: <AppstoreOutlined />,
-            label: 'Todas las Competencias',
-          },
-          ...(user?.role === 'admin' ? [
-            {
-              key: '/competitions/new',
-              icon: <PlusOutlined />,
-              label: 'Nueva Competencia',
-            },
-            {
-              key: '/rounds/management',
-              icon: <ScheduleOutlined />,
-              label: 'Gestión de Jornadas',
-            },
-            {
-              key: '/rounds/new',
-              icon: <FlagOutlined />,
-              label: 'Nueva Jornada',
-            },
-          ] : []),
-        ],
-      },
-      // 5. Equipos
-      {
-        key: 'teams-submenu',
-        icon: <TeamOutlined />,
-        label: 'Equipos',
-        children: [
-          {
-            key: '/teams',
-            icon: <TeamOutlined />,
-            label: 'Todos los Equipos',
-          },
-          ...(user?.role === 'admin' ? [
-            {
-              key: '/teams/new',
-              icon: <PlusOutlined />,
-              label: 'Nuevo Equipo',
-            },
-          ] : []),
-        ],
-      },
-      // Reportes — solo admin
-      ...(user?.role === 'admin' ? [
+    ];
+
+    // Solo admin: Competencias, Equipos, Reportes, Administración
+    if (user?.role === 'admin') {
+      items.push(
+        {
+          key: 'competitions-submenu',
+          icon: <TrophyOutlined />,
+          label: 'Competencias',
+          children: [
+            { key: '/competitions',      icon: <AppstoreOutlined />, label: 'Todas las Competencias' },
+            { key: '/competitions/new',  icon: <PlusOutlined />,     label: 'Nueva Competencia' },
+            { key: '/rounds/management', icon: <ScheduleOutlined />, label: 'Gestión de Jornadas' },
+            { key: '/rounds/new',        icon: <FlagOutlined />,     label: 'Nueva Jornada' },
+          ],
+        },
+        {
+          key: 'teams-submenu',
+          icon: <TeamOutlined />,
+          label: 'Equipos',
+          children: [
+            { key: '/teams',     icon: <TeamOutlined />, label: 'Todos los Equipos' },
+            { key: '/teams/new', icon: <PlusOutlined />, label: 'Nuevo Equipo' },
+          ],
+        },
         {
           key: 'reports-submenu',
           icon: <LineChartOutlined />,
           label: 'Reportes',
           children: [
-            {
-              key: '/reports/performance',
-              icon: <LineChartOutlined />,
-              label: 'Rendimiento',
-            },
-            {
-              key: '/reports/financial',
-              icon: <ContainerOutlined />,
-              label: 'Financiero',
-            },
-            {
-              key: '/reports/attendance',
-              icon: <UserOutlined />,
-              label: 'Asistencia',
-            },
+            { key: '/reports/performance', icon: <LineChartOutlined />, label: 'Rendimiento' },
+            { key: '/reports/financial',   icon: <ContainerOutlined />, label: 'Financiero' },
+            { key: '/reports/attendance',  icon: <UserOutlined />,      label: 'Asistencia' },
           ],
         },
-      ] : []),
-    ];
-
-    // Administración — solo admin
-    if (user?.role === 'admin') {
-      baseItems.push({
-        key: 'admin-submenu',
-        icon: <SettingOutlined />,
-        label: 'Administración',
-        children: [
-          {
-            key: '/admin/users',
-            icon: <UserOutlined />,
-            label: 'Usuarios',
-          },
-          {
-            key: '/admin/system',
-            icon: <SettingOutlined />,
-            label: 'Configuración',
-          },
-          {
-            key: '/admin/bets',
-            icon: <ControlOutlined />,
-            label: 'Admin Recargas',
-          },
-          {
-            key: '/admin/create-betdate',
-            icon: <PlusCircleOutlined />,
-            label: 'Nueva Fecha',
-          },
-          {
-            key: '/admin/articles',
-            icon: <FileTextOutlined />,
-            label: 'Artículos',
-          },
-          {
-            key: '/admin/mundial',
-            icon: <span style={{ fontSize: 14 }}>⚽</span>,
-            label: 'Polla Mundial',
-          },
-        ],
-      });
+        {
+          key: 'admin-submenu',
+          icon: <SettingOutlined />,
+          label: 'Administración',
+          children: [
+            { key: '/admin/users',          icon: <UserOutlined />,       label: 'Usuarios' },
+            { key: '/admin/system',         icon: <SettingOutlined />,    label: 'Configuración' },
+            { key: '/admin/bets',           icon: <ControlOutlined />,    label: 'Admin Recargas' },
+            { key: '/admin/create-betdate', icon: <PlusCircleOutlined />, label: 'Nueva Fecha' },
+            { key: '/admin/articles',       icon: <FileTextOutlined />,   label: 'Artículos' },
+            { key: '/admin/polla',          icon: <span style={{ fontSize: 14 }}>⚽</span>, label: 'Polla Mundial' },
+          ],
+        },
+      );
     }
 
-    return baseItems;
+    return items;
   };
 
   // Función para procesar items con badges
@@ -542,21 +469,6 @@ const Sidebar = ({ collapsed, onCollapse, isMobile }) => {
               />
             </Tooltip>
             
-            {/* Pronósticos rápidas */}
-            <Tooltip title="Pronósticos" placement="right">
-              <Button
-                type="dashed"
-                icon={<FireOutlined />}
-                onClick={() => navigate('/bets')}
-                className="quick-btn"
-                style={{ 
-                  marginBottom: 8,
-                  borderColor: '#ff4d4f',
-                  color: '#ff4d4f'
-                }}
-              />
-            </Tooltip>
-            
             {/* Mi Cuenta */}
             <Tooltip title="Mi Cuenta" placement="right">
               <Button
@@ -564,11 +476,29 @@ const Sidebar = ({ collapsed, onCollapse, isMobile }) => {
                 icon={<WalletOutlined />}
                 onClick={() => navigate('/wallet')}
                 className="quick-btn"
-                style={{ 
-                  marginBottom: 8,
-                  borderColor: '#52c41a',
-                  color: '#52c41a'
-                }}
+                style={{ marginBottom: 8, borderColor: '#52c41a', color: '#52c41a' }}
+              />
+            </Tooltip>
+
+            {/* Polla Mundial */}
+            <Tooltip title="Polla Mundial" placement="right">
+              <Button
+                type="dashed"
+                icon={<TrophyOutlined />}
+                onClick={() => navigate('/mundial/dashboard')}
+                className="quick-btn"
+                style={{ marginBottom: 8, borderColor: '#22c55e', color: '#22c55e' }}
+              />
+            </Tooltip>
+
+            {/* Pronósticos */}
+            <Tooltip title="Pronósticos" placement="right">
+              <Button
+                type="dashed"
+                icon={<FireOutlined />}
+                onClick={() => navigate('/bets')}
+                className="quick-btn"
+                style={{ marginBottom: 8, borderColor: '#ff4d4f', color: '#ff4d4f' }}
               />
             </Tooltip>
             
