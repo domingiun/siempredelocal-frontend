@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import {
   Card, Alert, Table, Button, Space, Typography,
-  Tag, Modal, Input, InputNumber, Form, message, Divider, Badge
+  Tag, Modal, Input, InputNumber, Form, message, Divider, Badge, Select
 } from 'antd';
 import { CheckCircleOutlined, ClockCircleOutlined, TrophyOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useAuth } from '../../../context/AuthContext';
@@ -22,6 +22,10 @@ const BetAdminPage = () => {
   const [betDates, setBetDates] = useState([]);
   const [loadingDates, setLoadingDates] = useState(false);
   const [finalizingId, setFinalizingId] = useState(null);
+
+  // Búsqueda de usuarios para agregar créditos
+  const [allUsers, setAllUsers] = useState([]);
+  const [userSearch, setUserSearch] = useState('');
 
   if (user?.role !== 'admin') {
     return (
@@ -117,6 +121,7 @@ const BetAdminPage = () => {
     fetchPending();
     fetchPendingRequests();
     fetchBetDates();
+    api.get('/users/').then(r => setAllUsers(r.data || [])).catch(() => {});
   }, [fetchBetDates]);
 
   const handleApprove = (transactionId) => {
@@ -575,11 +580,22 @@ const BetAdminPage = () => {
         >
           <Space wrap style={{ width: '100%' }}>
             <Form.Item
-              label="ID de usuario"
+              label="Usuario"
               name="user_id"
-              rules={[{ required: true, message: 'Ingresa el ID del usuario' }]}
+              rules={[{ required: true, message: 'Selecciona un usuario' }]}
             >
-              <InputNumber min={1} style={{ width: 180 }} />
+              <Select
+                showSearch
+                placeholder="Buscar por nombre de usuario…"
+                style={{ width: 260 }}
+                filterOption={false}
+                onSearch={setUserSearch}
+                options={allUsers
+                  .filter(u => !userSearch || u.username.toLowerCase().includes(userSearch.toLowerCase()))
+                  .map(u => ({ value: u.id, label: `${u.username} (ID ${u.id})` }))
+                }
+                notFoundContent="No se encontró ningún usuario"
+              />
             </Form.Item>
             <Form.Item
               label="Créditos a agregar"
