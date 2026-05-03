@@ -191,16 +191,6 @@ export default function PollaAdminPage() {
     setActiveTab('config');
   };
 
-  const handleResetCloseAt = async () => {
-    if (!polla) return;
-    try {
-      const res = await pollaService.adminResetCloseAt(polla.id, 2);
-      message.success(`✅ ${res.updated} partidos habilitados para predicciones (cierre en 2h)`);
-    } catch (err) {
-      message.error(err?.response?.data?.detail || 'Error al resetear cierre');
-    }
-  };
-
   if (loading) {
     return (
       <div style={{ padding: 80, textAlign: 'center' }}>
@@ -312,7 +302,7 @@ export default function PollaAdminPage() {
           {
             key: 'config',
             label: <><SettingOutlined /> Configuración</>,
-            children: <ConfigTab polla={polla} onSaved={loadPolla} onResetCloseAt={handleResetCloseAt} />,
+            children: <ConfigTab polla={polla} onSaved={loadPolla} />,
           },
           {
             key: 'add',
@@ -457,7 +447,7 @@ function CreatePollaModal({ open, onCancel, onCreated }) {
   );
 }
 
-function ConfigTab({ polla, onSaved, onResetCloseAt }) {
+function ConfigTab({ polla, onSaved }) {
   const [form] = Form.useForm();
   const [saving, setSaving] = useState(false);
 
@@ -572,36 +562,6 @@ function ConfigTab({ polla, onSaved, onResetCloseAt }) {
         </Form.Item>
       </Form>
 
-      {polla && (
-        <div style={{
-          marginTop: 24,
-          padding: '16px 20px',
-          background: 'rgba(251,191,36,0.06)',
-          border: '1px solid rgba(251,191,36,0.2)',
-          borderRadius: 12,
-          maxWidth: 620,
-        }}>
-          <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#fbbf24', marginBottom: 8 }}>
-            🧪 Modo pruebas
-          </div>
-          <p style={{ fontSize: '0.82rem', color: '#94a3b8', margin: '0 0 12px' }}>
-            Si los partidos tienen fechas pasadas, su ventana de predicción ya cerró.
-            Este botón mueve el cierre de todos los partidos no puntuados a <strong>2 horas desde ahora</strong>,
-            permitiendo hacer predicciones para probar el sistema.
-          </p>
-          <Button
-            onClick={onResetCloseAt}
-            style={{
-              background: 'rgba(251,191,36,0.12)',
-              border: '1px solid rgba(251,191,36,0.3)',
-              color: '#fbbf24',
-              fontWeight: 600,
-            }}
-          >
-            ⏰ Habilitar predicciones de prueba (cierre en 2h)
-          </Button>
-        </div>
-      )}
     </Card>
   );
 }
