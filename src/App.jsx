@@ -236,7 +236,7 @@ function App() {
                     <Route path="/admin/create-betdate" element={<CreateBetDatePage />} />
                     <Route path="/admin/bets/:id" element={<BetAdminPage />} />
                     {/* Polla Mundial admin */}
-                    <Route path="/admin/mundial" element={<PollaAdminPage />} />
+                    <Route path="/admin/polla" element={<PollaAdminPage />} />
                     {/* Artículos del homepage */}
                     <Route path="/admin/articles" element={<AdminArticlesPage />} />
                     {/* Usuarios y sistema */}
