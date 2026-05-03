@@ -2,13 +2,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
-  Table, Tag, Progress, Button, Spin, Avatar, Tabs, Grid, Select,
+  Table, Tag, Progress, Button, Spin, Avatar, Tabs, Grid, message,
 } from 'antd';
 
 const { useBreakpoint } = Grid;
 import {
   TrophyOutlined, EditOutlined, UserOutlined, StarOutlined,
-  ThunderboltOutlined, TeamOutlined, CalendarOutlined, SwapOutlined,
+  ThunderboltOutlined, TeamOutlined, CalendarOutlined, ArrowLeftOutlined,
 } from '@ant-design/icons';
 import { useAuth } from '../../context/AuthContext';
 import pollaService from '../../services/pollaService';
@@ -36,85 +36,237 @@ const PHASE_PTS = {
 
 const PHASE_ORDER = ['groups', 'r32', 'r16', 'qf', 'sf', 'third', 'final'];
 
-const pickMundialPolla = (list) =>
-  list.find(p => (p.name || '').toLowerCase().includes('mundial') && p.status !== 'cancelled') ||
-  list.find(p => p.status === 'open' || p.status === 'in_progress') ||
-  list.find(p => p.status !== 'cancelled') ||
-  list[0];
-
 const formatCOP = (n) =>
   new Intl.NumberFormat('es-CO', {
     style: 'currency', currency: 'COP', minimumFractionDigits: 0,
-  }).format(n);
+  }).format(n || 0);
 
+// ── Router raíz ────────────────────────────────────────────────────────────
 export default function PollaDashboardPage() {
+  const [searchParams] = useSearchParams();
+  const idParam = searchParams.get('id');
+
+  if (!idParam) return <PollaSelector />;
+  return <PollaDashboard pollaId={Number(idParam)} />;
+}
+
+// ── Selector de pollas ─────────────────────────────────────────────────────
+const STATUS_META = {
+  upcoming:    { label: 'Próximamente', color: '#64748b', bg: 'rgba(100,116,139,0.1)', border: 'rgba(100,116,139,0.2)' },
+  open:        { label: 'Abierta',      color: '#22c55e', bg: 'rgba(34,197,94,0.1)',   border: 'rgba(34,197,94,0.25)' },
+  in_progress: { label: 'En curso',     color: '#60a5fa', bg: 'rgba(59,130,246,0.1)',  border: 'rgba(59,130,246,0.25)' },
+  finished:    { label: 'Finalizada',   color: '#f59e0b', bg: 'rgba(245,158,11,0.1)',  border: 'rgba(245,158,11,0.2)' },
+};
+
+function PollaSelector() {
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const { user } = useAuth();
+  const [pollas, setPollas]   = useState([]);
+  const [statuses, setStatuses] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [joining, setJoining] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const list = await pollaService.listPollas();
+        const active = list.filter(p => p.status !== 'cancelled');
+        setPollas(active);
+
+        if (user && active.length > 0) {
+          const results = await Promise.all(
+            active.map(p =>
+              pollaService.getMyStatus(p.id)
+                .then(s => [p.id, s])
+                .catch(() => [p.id, { is_participant: false }])
+            )
+          );
+          setStatuses(Object.fromEntries(results));
+        }
+      } catch {}
+      finally { setLoading(false); }
+    })();
+  }, [user]);
+
+  const handleJoin = async (polla) => {
+    if (!user) { navigate('/login?redirect=/mundial/dashboard'); return; }
+    setJoining(polla.id);
+    try {
+      await pollaService.joinPolla(polla.id);
+      message.success('¡Inscripción exitosa!');
+      navigate(`/mundial/dashboard?id=${polla.id}`);
+    } catch (err) {
+      const detail = err?.response?.data?.detail;
+      message.error(typeof detail === 'string' ? detail : 'Error al inscribirse');
+    } finally {
+      setJoining(null);
+    }
+  };
+
+  if (loading) return <div className="polla-db-loading"><Spin size="large" /></div>;
+
+  if (!pollas.length) return (
+    <div className="polla-db-empty">
+      <TrophyOutlined style={{ fontSize: 48, color: '#22c55e' }} />
+      <p>No hay ninguna Polla disponible en este momento.</p>
+    </div>
+  );
+
+  return (
+    <div className="polla-db">
+      <div className="polla-selector-header">
+        <h1 className="polla-selector-title">
+          <TrophyOutlined style={{ color: '#22c55e' }} /> Mis Pollas
+        </h1>
+        <p className="polla-selector-sub">
+          Selecciona la polla en la que quieres participar
+        </p>
+      </div>
+
+      <div className="polla-selector-grid">
+        {pollas.map(polla => {
+          const myStatus = statuses[polla.id];
+          const enrolled = myStatus?.is_participant;
+          const s = STATUS_META[polla.status] || STATUS_META.upcoming;
+          const canJoin = polla.status === 'open' || polla.status === 'in_progress';
+
+          return (
+            <div
+              key={polla.id}
+              className={`polla-selector-card ${enrolled ? 'polla-selector-card--enrolled' : ''}`}
+            >
+              {/* Header */}
+              <div className="polla-selector-card-top">
+                <span
+                  className="polla-selector-status"
+                  style={{ color: s.color, background: s.bg, borderColor: s.border }}
+                >
+                  {s.label}
+                </span>
+                {enrolled && (
+                  <span className="polla-selector-enrolled-badge">✓ Inscrito</span>
+                )}
+              </div>
+
+              <h2 className="polla-selector-card-name">{polla.name}</h2>
+
+              {/* Info rows */}
+              <div className="polla-selector-info">
+                <div className="polla-selector-info-row">
+                  <span>Premio acumulado</span>
+                  <span style={{ color: '#22c55e', fontWeight: 700 }}>
+                    {formatCOP(polla.current_prize_cop)}
+                  </span>
+                </div>
+                <div className="polla-selector-info-row">
+                  <span>Participantes</span>
+                  <span>{polla.participant_count}</span>
+                </div>
+                <div className="polla-selector-info-row">
+                  <span>Costo de entrada</span>
+                  <span style={{ color: '#60a5fa' }}>
+                    {polla.entry_credits} crédito{polla.entry_credits !== 1 ? 's' : ''}
+                  </span>
+                </div>
+                {enrolled && myStatus?.rank && (
+                  <div className="polla-selector-info-row">
+                    <span>Mi posición</span>
+                    <span style={{ color: '#fbbf24', fontWeight: 700 }}>#{myStatus.rank}</span>
+                  </div>
+                )}
+                {enrolled && (
+                  <div className="polla-selector-info-row">
+                    <span>Mis puntos</span>
+                    <span style={{ color: '#22c55e', fontWeight: 700 }}>
+                      {myStatus?.total_points || 0} pts
+                    </span>
+                  </div>
+                )}
+                {enrolled && (myStatus?.predictions_pending || 0) > 0 && (
+                  <div className="polla-selector-info-row">
+                    <span>Predicciones pendientes</span>
+                    <span style={{ color: '#f59e0b', fontWeight: 700 }}>
+                      {myStatus.predictions_pending}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* CTA */}
+              {enrolled ? (
+                <button
+                  className="polla-selector-btn polla-selector-btn--enter"
+                  onClick={() => navigate(`/mundial/dashboard?id=${polla.id}`)}
+                >
+                  Ver mi dashboard →
+                </button>
+              ) : canJoin ? (
+                <button
+                  className="polla-selector-btn polla-selector-btn--join"
+                  onClick={() => handleJoin(polla)}
+                  disabled={joining === polla.id}
+                >
+                  {joining === polla.id
+                    ? 'Inscribiendo…'
+                    : `Inscribirme — ${polla.entry_credits} crédito${polla.entry_credits !== 1 ? 's' : ''}`}
+                </button>
+              ) : (
+                <button className="polla-selector-btn polla-selector-btn--disabled" disabled>
+                  {polla.status === 'upcoming' ? 'Próximamente disponible' : 'Polla finalizada'}
+                </button>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ── Dashboard de polla específica ──────────────────────────────────────────
+function PollaDashboard({ pollaId }) {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const screens = useBreakpoint();
   const isMobile = !screens.sm;
 
-  const [polla, setPolla]           = useState(null);
-  const [allPollas, setAllPollas]   = useState([]);
-  const [myStatus, setMyStatus]     = useState(null);
+  const [polla, setPolla]               = useState(null);
+  const [myStatus, setMyStatus]         = useState(null);
   const [pollaMatches, setPollaMatches] = useState([]);
-  const [loading, setLoading]       = useState(true);
-  const [pollaId, setPollaId]       = useState(null);
-
-  const loadPolla = async (targetId) => {
-    setLoading(true);
-    try {
-      const list = await pollaService.listPollas();
-      const nonCancelled = list.filter(p => p.status !== 'cancelled');
-      setAllPollas(nonCancelled);
-
-      const active = targetId
-        ? (list.find(p => p.id === Number(targetId)) || pickMundialPolla(list))
-        : pickMundialPolla(list);
-
-      if (!active) { setLoading(false); return; }
-
-      setPollaId(active.id);
-      const [detail, status, matches] = await Promise.all([
-        pollaService.getPolla(active.id),
-        pollaService.getMyStatus(active.id).catch(() => ({ is_participant: false })),
-        pollaService.getPollaMatches(active.id),
-      ]);
-      setPolla(detail);
-      setMyStatus(status);
-      setPollaMatches(matches);
-    } catch { }
-    finally { setLoading(false); }
-  };
+  const [loading, setLoading]           = useState(true);
 
   useEffect(() => {
-    loadPolla(searchParams.get('id'));
-  }, [searchParams.get('id')]);
+    (async () => {
+      setLoading(true);
+      try {
+        const [detail, status, matches] = await Promise.all([
+          pollaService.getPolla(pollaId),
+          pollaService.getMyStatus(pollaId).catch(() => ({ is_participant: false })),
+          pollaService.getPollaMatches(pollaId),
+        ]);
+        setPolla(detail);
+        setMyStatus(status);
+        setPollaMatches(matches);
+      } catch {}
+      finally { setLoading(false); }
+    })();
+  }, [pollaId]);
 
-  const handlePollaSwitch = (id) => {
-    setSearchParams({ id });
-  };
+  if (loading) return <div className="polla-db-loading"><Spin size="large" /></div>;
 
-  if (loading) {
-    return <div className="polla-db-loading"><Spin size="large" /></div>;
-  }
-
-  if (!polla) {
-    return (
-      <div className="polla-db-empty">
-        <TrophyOutlined style={{ fontSize: 48, color: '#22c55e' }} />
-        <p>No hay ninguna Polla activa en este momento.</p>
-        <Button onClick={() => navigate('/mundial')}>Volver</Button>
-      </div>
-    );
-  }
+  if (!polla) return (
+    <div className="polla-db-empty">
+      <TrophyOutlined style={{ fontSize: 48, color: '#22c55e' }} />
+      <p>Polla no encontrada.</p>
+      <Button onClick={() => navigate('/mundial/dashboard')}>Volver</Button>
+    </div>
+  );
 
   if (!myStatus?.is_participant) {
-    navigate('/mundial');
+    navigate('/mundial/dashboard');
     return null;
   }
 
-  // Progreso por fase
   const phaseStats = {};
   for (const pm of pollaMatches) {
     if (!phaseStats[pm.phase]) phaseStats[pm.phase] = { total: 0, scored: 0 };
@@ -128,7 +280,6 @@ export default function PollaDashboardPage() {
   const myBonus = myStatus?.bonus_points  || 0;
   const pending = myStatus?.predictions_pending || 0;
 
-  // ── Leaderboard columns ──────────────────────────────────────────────
   const leaderboardCols = [
     {
       title: '#',
@@ -183,23 +334,18 @@ export default function PollaDashboardPage() {
   return (
     <div className="polla-db">
 
+      {/* Back link */}
+      <button
+        className="polla-db-back"
+        onClick={() => navigate('/mundial/dashboard')}
+      >
+        <ArrowLeftOutlined /> Mis Pollas
+      </button>
+
       {/* Hero */}
       <div className="polla-db-hero">
         <div>
           <h1 className="polla-db-title">⚽ {polla.name}</h1>
-          {allPollas.length > 1 && (
-            <Select
-              value={pollaId}
-              onChange={handlePollaSwitch}
-              size="small"
-              style={{ marginBottom: 8, minWidth: 220 }}
-              options={allPollas.map(p => ({
-                value: p.id,
-                label: `${p.name} (${p.status})`,
-              }))}
-              suffixIcon={<SwapOutlined />}
-            />
-          )}
           <p className="polla-db-subtitle">Dashboard mundialista</p>
           <div className="polla-db-prize-inline">
             <TrophyOutlined style={{ color: '#fbbf24' }} />
@@ -317,7 +463,9 @@ export default function PollaDashboardPage() {
           },
           {
             key: 'predictions',
-            label: isMobile ? `⚽ Mis picks (${myStatus?.predictions_submitted || 0})` : `Mis predicciones (${myStatus?.predictions_submitted || 0})`,
+            label: isMobile
+              ? `⚽ Mis picks (${myStatus?.predictions_submitted || 0})`
+              : `Mis predicciones (${myStatus?.predictions_submitted || 0})`,
             children: <MyPredictionsTab pollaId={pollaId} />,
           },
         ]}
@@ -326,6 +474,7 @@ export default function PollaDashboardPage() {
   );
 }
 
+// ── Tab mis predicciones ───────────────────────────────────────────────────
 function MyPredictionsTab({ pollaId }) {
   const [predictions, setPredictions] = useState([]);
   const [loading, setLoading]         = useState(true);
