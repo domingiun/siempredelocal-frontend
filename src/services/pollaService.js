@@ -65,6 +65,9 @@ const pollaService = {
 
   adminRescoreFinished: (pollaId) =>
     api.post(`${BASE}/admin/${pollaId}/rescore-finished`).then(r => r.data),
+
+  adminFinalizePolla: (pollaId) =>
+    api.post(`${BASE}/admin/${pollaId}/finalize`).then(r => r.data),
 };
 
 export default pollaService;

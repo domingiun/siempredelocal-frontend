@@ -199,6 +199,26 @@ export default function PollaAdminPage() {
     }
   };
 
+  const [finalizing, setFinalizing] = useState(false);
+  const handleFinalizePolla = async () => {
+    setFinalizing(true);
+    try {
+      const res = await pollaService.adminFinalizePolla(polla.id);
+      message.success(
+        `¡Polla liquidada! ${res.winner_count} ganador(es) · ${fmtCOP(res.prize_per_winner_cop)} c/u acreditados en wallet`
+      );
+      await loadPolla(polla.id);
+      loadParticipants();
+      return res;
+    } catch (err) {
+      const detail = err?.response?.data?.detail;
+      message.error(typeof detail === 'string' ? detail : 'Error al finalizar la polla');
+      throw err;
+    } finally {
+      setFinalizing(false);
+    }
+  };
+
   const handlePollaCreated = async (created) => {
     setCreateOpen(false);
     await loadPolla(created?.id);
@@ -361,11 +381,14 @@ export default function PollaAdminPage() {
             children: (
               <ParticipantsTab
                 participants={participants}
+                polla={polla}
                 loading={loadingPart}
                 onUpdateRankings={handleUpdateRankings}
                 onRescoreFinished={handleRescoreFinished}
                 rescoring={rescoring}
                 onReload={loadParticipants}
+                onFinalize={handleFinalizePolla}
+                finalizing={finalizing}
               />
             ),
           },
@@ -836,7 +859,28 @@ function PollaMatchesTab({ pollaMatches, loading, onRemove, onReload }) {
 
 // ── Tab: Participantes ─────────────────────────────────────────────────
 
-function ParticipantsTab({ participants, loading, onUpdateRankings, onRescoreFinished, rescoring, onReload }) {
+function ParticipantsTab({
+  participants, polla, loading,
+  onUpdateRankings, onRescoreFinished, rescoring,
+  onReload, onFinalize, finalizing,
+}) {
+  const [showFinalizeModal, setShowFinalizeModal] = useState(false);
+
+  const isFinished = polla?.status === 'finished';
+  const maxPts = participants.length > 0 ? Math.max(...participants.map(p => p.total_points)) : 0;
+  const previewWinners = maxPts > 0 ? participants.filter(p => p.total_points === maxPts) : [];
+  const totalPrize = polla?.current_prize_cop || 0;
+  const feePct = polla?.platform_fee_pct || 0;
+  const netTotal = Math.floor(totalPrize * (1 - feePct / 100));
+  const prizePerWinner = previewWinners.length > 0 ? Math.floor(netTotal / previewWinners.length) : 0;
+
+  const handleConfirmFinalize = async () => {
+    try {
+      await onFinalize();
+      setShowFinalizeModal(false);
+    } catch { /* error ya manejado en onFinalize */ }
+  };
+
   const cols = [
     {
       title: '#',
@@ -852,7 +896,7 @@ function ParticipantsTab({ participants, loading, onUpdateRankings, onRescoreFin
           {n}
           {r.prize_won_cop > 0 && (
             <Tag color="gold" style={{ marginLeft: 8, fontSize: '0.72rem' }}>
-              <TrophyOutlined /> Premio
+              <TrophyOutlined /> {fmtCOP(r.prize_won_cop)}
             </Tag>
           )}
         </span>
@@ -899,6 +943,7 @@ function ParticipantsTab({ participants, loading, onUpdateRankings, onRescoreFin
             icon={<CheckCircleOutlined />}
             onClick={onRescoreFinished}
             loading={rescoring}
+            disabled={isFinished}
             style={{ background: '#1d4ed8', borderColor: '#1d4ed8', color: '#fff' }}
           >
             Puntuar partidos finalizados
@@ -908,21 +953,119 @@ function ParticipantsTab({ participants, loading, onUpdateRankings, onRescoreFin
           type="primary"
           icon={<TrophyOutlined />}
           onClick={onUpdateRankings}
+          disabled={isFinished}
           style={{ background: '#22c55e', borderColor: '#22c55e' }}
         >
           Recalcular rankings
         </Button>
+        <Tooltip title={isFinished ? 'La polla ya fue liquidada' : 'Distribuir el premio al ganador y cerrar la polla'}>
+          <Button
+            icon={<TrophyOutlined />}
+            onClick={() => setShowFinalizeModal(true)}
+            loading={finalizing}
+            disabled={isFinished || participants.length === 0}
+            style={isFinished
+              ? { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#475569' }
+              : { background: '#d97706', borderColor: '#b45309', color: '#fff', fontWeight: 700 }
+            }
+          >
+            {isFinished ? '✓ Polla liquidada' : '🏆 Liquidar ganador'}
+          </Button>
+        </Tooltip>
       </div>
+
       <Table
         className="pa-table"
         rowKey="user_id"
-        dataSource={participants}
+        dataSource={[...participants].sort((a, b) => b.total_points - a.total_points)}
         columns={cols}
         loading={loading}
         size="small"
         pagination={{ pageSize: 30, showSizeChanger: false }}
         locale={{ emptyText: 'Sin participantes aún' }}
       />
+
+      {/* Modal de confirmación de liquidación */}
+      <Modal
+        open={showFinalizeModal}
+        onCancel={() => setShowFinalizeModal(false)}
+        footer={null}
+        title={
+          <span>
+            <TrophyOutlined style={{ color: '#fbbf24', marginRight: 8 }} />
+            Liquidar polla — distribución del premio
+          </span>
+        }
+        width={480}
+        styles={{
+          content: { background: '#0c1525', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16 },
+          header: { background: '#0c1525', borderBottom: '1px solid rgba(255,255,255,0.07)' },
+        }}
+      >
+        {/* Ganadores */}
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            {previewWinners.length === 1 ? 'Ganador' : `Ganadores (${previewWinners.length} empatados)`}
+          </div>
+          {previewWinners.map(w => (
+            <div key={w.user_id} style={{
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              background: 'rgba(34,197,94,0.06)', border: '1px solid rgba(34,197,94,0.2)',
+              borderRadius: 10, padding: '10px 14px', marginBottom: 8,
+            }}>
+              <span style={{ color: '#f1f5f9', fontWeight: 700 }}>
+                🥇 {w.username}
+              </span>
+              <span style={{ color: '#22c55e', fontWeight: 800 }}>{w.total_points} pts</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Desglose económico */}
+        <div style={{
+          background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)',
+          borderRadius: 10, padding: '14px 18px', marginBottom: 20,
+        }}>
+          {[
+            { label: 'Premio total del pozo', value: fmtCOP(totalPrize), color: '#f1f5f9' },
+            ...(feePct > 0 ? [{ label: `Comisión plataforma (${feePct}%)`, value: `-${fmtCOP(totalPrize - netTotal)}`, color: '#ef4444' }] : []),
+            { label: 'Premio neto a repartir', value: fmtCOP(netTotal), color: '#60a5fa' },
+            ...(previewWinners.length > 1 ? [{ label: `Dividido entre ${previewWinners.length} ganadores`, value: fmtCOP(prizePerWinner) + ' c/u', color: '#fbbf24' }] : []),
+          ].map(row => (
+            <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+              <span style={{ color: '#64748b', fontSize: '0.85rem' }}>{row.label}</span>
+              <span style={{ color: row.color, fontWeight: 700, fontSize: '0.9rem' }}>{row.value}</span>
+            </div>
+          ))}
+          <div style={{ borderTop: '1px solid rgba(255,255,255,0.07)', paddingTop: 10, marginTop: 4, display: 'flex', justifyContent: 'space-between' }}>
+            <span style={{ color: '#f1f5f9', fontWeight: 700 }}>Cada ganador recibe</span>
+            <span style={{ color: '#22c55e', fontWeight: 900, fontSize: '1.1rem' }}>{fmtCOP(prizePerWinner)}</span>
+          </div>
+        </div>
+
+        {/* Advertencia */}
+        <div style={{
+          background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)',
+          borderRadius: 10, padding: '10px 14px', marginBottom: 20,
+          fontSize: '0.82rem', color: '#fbbf24',
+        }}>
+          ⚠️ Esta acción es irreversible. El saldo se acreditará inmediatamente en la wallet de cada ganador y la polla quedará marcada como Finalizada.
+        </div>
+
+        {/* Botones */}
+        <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+          <Button onClick={() => setShowFinalizeModal(false)} style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', color: '#94a3b8' }}>
+            Cancelar
+          </Button>
+          <Button
+            loading={finalizing}
+            onClick={handleConfirmFinalize}
+            style={{ background: '#d97706', borderColor: '#b45309', color: '#fff', fontWeight: 700 }}
+          >
+            Confirmar liquidación
+          </Button>
+        </div>
+      </Modal>
     </Card>
   );
 }
