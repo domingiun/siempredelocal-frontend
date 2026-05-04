@@ -460,7 +460,7 @@ function PollaDashboard({ pollaId }) {
             label: isMobile ? '🏆 Ranking' : 'Tabla de posiciones',
             children: (
               <Table
-                dataSource={polla.leaderboard}
+                dataSource={[...(polla.leaderboard || [])].sort((a, b) => b.total_points - a.total_points)}
                 columns={leaderboardCols}
                 rowKey="user_id"
                 pagination={{ pageSize: 20, showSizeChanger: false }}
