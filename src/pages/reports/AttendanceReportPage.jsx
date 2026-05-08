@@ -120,6 +120,14 @@ const AttendanceReportPage = () => {
       ),
     },
     {
+      title: 'Teléfono',
+      dataIndex: 'phone',
+      key: 'phone',
+      render: (v) => v
+        ? <Text style={{ color: '#94a3b8', fontSize: 13 }}>{v}</Text>
+        : <Text style={{ color: '#334155', fontSize: 12 }}>—</Text>,
+    },
+    {
       title: 'Créditos usados',
       dataIndex: 'credits_used',
       key: 'credits_used',
