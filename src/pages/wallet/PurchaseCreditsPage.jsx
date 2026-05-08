@@ -5,12 +5,14 @@ import {
   ArrowLeftOutlined,
   CheckCircleOutlined,
   CopyOutlined,
+  TrophyOutlined,
   WhatsAppOutlined
 } from '@ant-design/icons';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useWallet } from '../../context/WalletContext';
 import { useAuth } from '../../context/AuthContext';
 import betService from '../../services/betService';
+import pollaService from '../../services/pollaService';
 import './PurchaseCreditsPage.css';
 
 const { Title, Text } = Typography;
@@ -48,6 +50,7 @@ const PurchaseCreditsPage = () => {
   const { user } = useAuth();
   const { purchaseCredits } = useWallet();
   const [plans, setPlans] = useState([]);
+  const [activePolla, setActivePolla] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [purchasing, setPurchasing] = useState(false);
@@ -56,6 +59,7 @@ const PurchaseCreditsPage = () => {
 
   useEffect(() => {
     fetchPlans();
+    fetchActivePolla();
   }, []);
 
   const fetchPlans = async () => {
@@ -68,6 +72,14 @@ const PurchaseCreditsPage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchActivePolla = async () => {
+    try {
+      const list = await pollaService.listPollas();
+      const open = list.find(p => p.status === 'open' || p.status === 'in_progress');
+      if (open) setActivePolla(open);
+    } catch (_) {}
   };
 
   const handlePurchase = async (plan) => {
@@ -164,6 +176,67 @@ const PurchaseCreditsPage = () => {
         <Text type="secondary">
           Selecciona un plan, realiza la transferencia por Nequi y envia el comprobante por WhatsApp.
         </Text>
+
+        {/* Plan Polla — si hay una polla activa */}
+        {activePolla && (
+          <div
+            onClick={() => navigate(`/mundial/checkout?id=${activePolla.id}`)}
+            style={{
+              marginTop: 24,
+              background: 'linear-gradient(135deg, rgba(217,119,6,0.15), rgba(251,191,36,0.07))',
+              border: '1.5px solid rgba(251,191,36,0.4)',
+              borderRadius: 14,
+              padding: '20px 24px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 16,
+              transition: 'box-shadow 0.2s',
+            }}
+            onMouseEnter={e => e.currentTarget.style.boxShadow = '0 6px 24px rgba(217,119,6,0.3)'}
+            onMouseLeave={e => e.currentTarget.style.boxShadow = 'none'}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              <div style={{
+                width: 48, height: 48, borderRadius: 14, flexShrink: 0,
+                background: 'linear-gradient(135deg, #d97706, #fbbf24)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22,
+              }}>
+                <TrophyOutlined style={{ color: '#fff' }} />
+              </div>
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ color: '#f1f5f9', fontWeight: 800, fontSize: '1.05rem' }}>
+                    Plan POLLA ⚽
+                  </span>
+                  <Tag color="gold" style={{ fontSize: '0.7rem', margin: 0 }}>Inscripción</Tag>
+                </div>
+                <div style={{ color: '#94a3b8', fontSize: '0.82rem', marginTop: 2 }}>
+                  {activePolla.name} · acceso completo al torneo · 104 partidos
+                </div>
+              </div>
+            </div>
+            <div style={{ textAlign: 'right', flexShrink: 0 }}>
+              <div style={{ color: '#fbbf24', fontWeight: 900, fontSize: '1.3rem', lineHeight: 1 }}>
+                {formatCop((activePolla.entry_credits || 8) * 5000)}
+              </div>
+              <div style={{ color: '#94a3b8', fontSize: '0.75rem', marginTop: 2 }}>
+                {activePolla.entry_credits || 8} créditos
+              </div>
+              <Button
+                size="small"
+                style={{
+                  marginTop: 8, background: 'linear-gradient(135deg, #d97706, #f59e0b)',
+                  border: 'none', color: '#fff', fontWeight: 700, fontSize: '0.78rem',
+                }}
+                onClick={e => { e.stopPropagation(); navigate(`/mundial/checkout?id=${activePolla.id}`); }}
+              >
+                Ver plan →
+              </Button>
+            </div>
+          </div>
+        )}
 
         <Row gutter={[24, 24]} style={{ marginTop: 24 }}>
           {plans.map((plan) => {
