@@ -7,7 +7,7 @@ import {
   CopyOutlined,
   WhatsAppOutlined
 } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useWallet } from '../../context/WalletContext';
 import { useAuth } from '../../context/AuthContext';
 import betService from '../../services/betService';
@@ -43,6 +43,8 @@ const buildPaymentText = (plan, user, transactionId) => {
 
 const PurchaseCreditsPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const returnTo = searchParams.get('return');
   const { user } = useAuth();
   const { purchaseCredits } = useWallet();
   const [plans, setPlans] = useState([]);
@@ -125,14 +127,37 @@ const PurchaseCreditsPage = () => {
 
   return (
     <div className="purchase-credits-page" style={{ padding: '24px' }}>
-      <Button
-        icon={<ArrowLeftOutlined />}
-        onClick={() => navigate('/wallet')}
-        className="btn-outline-primary"
-        style={{ marginBottom: 16 }}
-      >
-        Volver a Mi Cuenta
-      </Button>
+      <Space style={{ marginBottom: 16 }}>
+        <Button
+          icon={<ArrowLeftOutlined />}
+          onClick={() => navigate(returnTo || '/wallet')}
+          className="btn-outline-primary"
+        >
+          {returnTo ? 'Volver' : 'Volver a Mi Cuenta'}
+        </Button>
+      </Space>
+
+      {returnTo && (
+        <Alert
+          type="warning"
+          showIcon
+          style={{ marginBottom: 20 }}
+          message="Recarga pendiente de aprobación"
+          description={
+            <span>
+              Tu recarga queda pendiente hasta que el administrador apruebe el pago.
+              Una vez aprobada, haz clic en{' '}
+              <strong
+                style={{ color: '#1677ff', cursor: 'pointer' }}
+                onClick={() => navigate(returnTo)}
+              >
+                Volver a inscribirme
+              </strong>{' '}
+              para completar tu inscripción.
+            </span>
+          }
+        />
+      )}
 
       <Card className="purchase-credits-card">
         <Title level={2}>Recargar Creditos</Title>
@@ -306,6 +331,16 @@ const PurchaseCreditsPage = () => {
                     <Button onClick={() => navigate('/wallet')}>
                       Ver mi wallet
                     </Button>
+                    {returnTo && (
+                      <Button
+                        type="default"
+                        icon={<ArrowLeftOutlined />}
+                        onClick={() => navigate(returnTo)}
+                        style={{ borderColor: '#fbbf24', color: '#fbbf24' }}
+                      >
+                        Volver a inscribirme
+                      </Button>
+                    )}
                   </Space>
                 </Space>
               </Col>

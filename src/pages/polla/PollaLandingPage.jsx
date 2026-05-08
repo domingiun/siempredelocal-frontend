@@ -70,6 +70,9 @@ export default function PollaLandingPage() {
       .finally(() => setLoading(false));
   }, [user]);
 
+  const goToPurchase = () =>
+    navigate(`/purchase?return=${encodeURIComponent('/mundial?join=true')}`);
+
   // Auto-inscripción: viene de /login?redirect=/mundial?join=true
   useEffect(() => {
     if (!autoJoin || autoJoinFired.current) return;
@@ -92,9 +95,14 @@ export default function PollaLandingPage() {
         navigate(`/mundial/dashboard?id=${polla.id}`, { replace: true });
       })
       .catch((err) => {
-        const detail = err?.response?.data?.detail;
-        message.error(typeof detail === 'string' ? detail : 'Error al inscribirse');
-        navigate('/mundial', { replace: true });
+        const detail = err?.response?.data?.detail || '';
+        if (detail.toLowerCase().includes('crédito') || detail.toLowerCase().includes('credito') || detail.toLowerCase().includes('insuficiente')) {
+          message.warning('No tienes suficientes créditos — te llevamos a recargar');
+          goToPurchase();
+        } else {
+          message.error(typeof detail === 'string' && detail ? detail : 'Error al inscribirse');
+          navigate('/mundial', { replace: true });
+        }
       })
       .finally(() => setJoining(false));
   }, [autoJoin, user, polla, myStatus]);
@@ -112,13 +120,15 @@ export default function PollaLandingPage() {
       navigate(`/mundial/dashboard?id=${polla.id}`);
     } catch (err) {
       const status = err?.response?.status;
-      const detail = err?.response?.data?.detail;
+      const detail = err?.response?.data?.detail || '';
+      const detailStr = typeof detail === 'string' ? detail : JSON.stringify(detail);
       if (status === 401 || status === 403) {
         message.error('Sesión expirada — inicia sesión nuevamente');
-      } else if (detail) {
-        message.error(typeof detail === 'string' ? detail : JSON.stringify(detail));
+      } else if (detailStr.toLowerCase().includes('crédito') || detailStr.toLowerCase().includes('credito') || detailStr.toLowerCase().includes('insuficiente')) {
+        message.warning('No tienes suficientes créditos — te llevamos a recargar');
+        goToPurchase();
       } else {
-        message.error(`Error al inscribirse (${status || 'sin respuesta'})`);
+        message.error(detailStr || `Error al inscribirse (${status || 'sin respuesta'})`);
       }
     } finally {
       setJoining(false);
