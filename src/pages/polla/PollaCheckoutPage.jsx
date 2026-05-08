@@ -186,16 +186,24 @@ export default function PollaCheckoutPage() {
         <div ref={paymentRef}>
           {/* Success banner */}
           <div style={{
-            background: 'rgba(34,197,94,0.07)', border: '1px solid rgba(34,197,94,0.25)',
-            borderRadius: 14, padding: '14px 20px', marginBottom: 20,
-            display: 'flex', alignItems: 'center', gap: 12,
+            background: 'rgba(34,197,94,0.08)', border: '1.5px solid rgba(34,197,94,0.35)',
+            borderRadius: 20, padding: '32px 24px', marginBottom: 24, textAlign: 'center',
           }}>
-            <CheckCircleOutlined style={{ color: '#22c55e', fontSize: 22, flexShrink: 0 }} />
-            <div>
-              <div style={{ color: '#22c55e', fontWeight: 700 }}>¡Solicitud registrada!</div>
-              <div style={{ color: '#64748b', fontSize: '0.78rem' }}>
-                Referencia #{paymentInfo.transaction_id} · El admin aprobará al confirmar el pago
-              </div>
+            <CheckCircleOutlined style={{ color: '#22c55e', fontSize: 52, display: 'block', marginBottom: 12 }} />
+            <div style={{ color: '#22c55e', fontWeight: 800, fontSize: '1.5rem', marginBottom: 8 }}>
+              ¡Solicitud registrada!
+            </div>
+            <div style={{
+              display: 'inline-block',
+              background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.3)',
+              borderRadius: 50, padding: '4px 20px', marginBottom: 10,
+            }}>
+              <span style={{ color: '#4ade80', fontWeight: 700, fontSize: '1rem', letterSpacing: '0.03em' }}>
+                Referencia #{paymentInfo.transaction_id}
+              </span>
+            </div>
+            <div style={{ color: '#64748b', fontSize: '0.85rem' }}>
+              El admin aprobará tu recarga al confirmar el pago por Nequi
             </div>
           </div>
 
