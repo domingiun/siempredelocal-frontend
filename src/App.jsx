@@ -91,6 +91,7 @@ import AdminArticlesPage from './pages/admin/articles/AdminArticlesPage';
 import PollaLandingPage from './pages/polla/PollaLandingPage';
 import PollaDashboardPage from './pages/polla/PollaDashboardPage';
 import PollaPredictionsPage from './pages/polla/PollaPredictionsPage';
+import PollaCheckoutPage from './pages/polla/PollaCheckoutPage';
 import PollaAdminPage from './pages/admin/polla/PollaAdminPage';
 
 // Componentes comunes
@@ -172,6 +173,7 @@ function App() {
                     {/* Polla Mundial — páginas autenticadas */}
                     <Route path="/mundial/dashboard" element={<PollaDashboardPage />} />
                     <Route path="/mundial/predict" element={<PollaPredictionsPage />} />
+                    <Route path="/mundial/checkout" element={<PollaCheckoutPage />} />
 
                     {/* Pronósticos */}
                     <Route path="/bets" element={<BetPage />} />

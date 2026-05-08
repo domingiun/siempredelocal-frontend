@@ -71,7 +71,7 @@ export default function PollaLandingPage() {
   }, [user]);
 
   const goToPurchase = () =>
-    navigate(`/purchase?return=${encodeURIComponent('/mundial?join=true')}`);
+    navigate(`/mundial/checkout?id=${polla?.id || ''}`);
 
   // Auto-inscripción: viene de /login?redirect=/mundial?join=true
   useEffect(() => {

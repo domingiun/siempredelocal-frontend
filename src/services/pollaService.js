@@ -70,6 +70,9 @@ const pollaService = {
 
   adminFinalizePolla: (pollaId) =>
     api.post(`${BASE}/admin/${pollaId}/finalize`).then(r => r.data),
+
+  purchasePollaEntry: (pollaId) =>
+    api.post(`${BASE}/${pollaId}/purchase-entry`).then(r => r.data),
 };
 
 export default pollaService;
