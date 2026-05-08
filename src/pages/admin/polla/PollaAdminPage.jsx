@@ -31,6 +31,7 @@ const STATUS_OPTIONS = [
   { value: 'open',        label: 'Abierta',      cls: 'open' },
   { value: 'in_progress', label: 'En curso',     cls: 'in_progress' },
   { value: 'finished',    label: 'Finalizada',   cls: 'finished' },
+  { value: 'hidden',      label: 'Oculta',       cls: 'cancelled' },
   { value: 'cancelled',   label: 'Cancelada',    cls: 'cancelled' },
 ];
 
@@ -67,7 +68,7 @@ export default function PollaAdminPage() {
   const loadPolla = useCallback(async (targetId = selectedPollaId) => {
     setLoading(true);
     try {
-      const list = await pollaService.listPollas();
+      const list = await pollaService.adminListAllPollas();
       setPollas(list);
       if (list.length > 0) {
         const fallback = list.find(p => p.id === targetId) || list[0];

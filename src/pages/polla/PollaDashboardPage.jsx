@@ -77,7 +77,7 @@ function PollaSelector() {
     (async () => {
       try {
         const list = await pollaService.listPollas();
-        const active = list.filter(p => p.status !== 'cancelled');
+        const active = list.filter(p => p.status !== 'cancelled' && p.status !== 'hidden');
         setPollas(active);
 
         if (user && active.length > 0) {

@@ -8,6 +8,8 @@ const pollaService = {
 
   listPollas: () => api.get(`${BASE}/`).then(r => r.data),
 
+  adminListAllPollas: () => api.get(`${BASE}/admin/all`).then(r => r.data),
+
   getPolla: (pollaId) => api.get(`${BASE}/${pollaId}`).then(r => r.data),
 
   getPollaMatches: (pollaId, phase = null) => {
