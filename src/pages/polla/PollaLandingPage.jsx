@@ -1,5 +1,5 @@
 // frontend/src/pages/polla/PollaLandingPage.jsx
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { Button, Tag, Spin, message } from 'antd';
 import {
@@ -46,6 +46,9 @@ export default function PollaLandingPage() {
   const [myStatus, setMyStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState(false);
+  const autoJoinFired = useRef(false);
+
+  const autoJoin = searchParams.get('join') === 'true';
 
   useEffect(() => {
     pollaService.listPollas()
@@ -67,9 +70,38 @@ export default function PollaLandingPage() {
       .finally(() => setLoading(false));
   }, [user]);
 
+  // Auto-inscripción: viene de /login?redirect=/mundial?join=true
+  useEffect(() => {
+    if (!autoJoin || autoJoinFired.current) return;
+    if (!user || !polla || !myStatus) return;
+
+    autoJoinFired.current = true;
+
+    // Ya inscrito → ir directo al dashboard
+    if (myStatus.is_participant) {
+      navigate(`/mundial/dashboard?id=${polla.id}`, { replace: true });
+      return;
+    }
+
+    if (polla.status !== 'open' && polla.status !== 'in_progress') return;
+
+    setJoining(true);
+    pollaService.joinPolla(polla.id)
+      .then(() => {
+        message.success('¡Te inscribiste exitosamente!');
+        navigate(`/mundial/dashboard?id=${polla.id}`, { replace: true });
+      })
+      .catch((err) => {
+        const detail = err?.response?.data?.detail;
+        message.error(typeof detail === 'string' ? detail : 'Error al inscribirse');
+        navigate('/mundial', { replace: true });
+      })
+      .finally(() => setJoining(false));
+  }, [autoJoin, user, polla, myStatus]);
+
   const handleJoin = async () => {
     if (!user) {
-      navigate('/login?redirect=/mundial');
+      navigate(`/login?redirect=${encodeURIComponent('/mundial?join=true')}`);
       return;
     }
     if (!polla) return;
@@ -97,10 +129,11 @@ export default function PollaLandingPage() {
     new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 })
       .format(n);
 
-  if (loading) {
+  if (loading || (autoJoin && user && !autoJoinFired.current)) {
     return (
       <div className="polla-landing-loading">
         <Spin size="large" />
+        {autoJoin && user && <p style={{ color: '#94a3b8', marginTop: 16 }}>Inscribiendo…</p>}
       </div>
     );
   }
