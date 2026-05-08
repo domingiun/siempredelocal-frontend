@@ -135,7 +135,11 @@ const MatchManagementPage = () => {
       title: 'Fecha',
       dataIndex: 'match_date',
       key: 'match_date',
-      render: (date) => date ? new Date(date).toLocaleString() : '-',
+      render: (date) => {
+        if (!date) return '-';
+        const utc = date.endsWith('Z') || date.includes('+') ? date : date + 'Z';
+        return new Date(utc).toLocaleString('es-CO', { timeZone: 'America/Bogota' });
+      },
       sorter: true,
     },
     {

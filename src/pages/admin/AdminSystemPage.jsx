@@ -219,7 +219,8 @@ const AdminSystemPage = () => {
 
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleString();
+    const utc = dateString.endsWith('Z') || dateString.includes('+') ? dateString : dateString + 'Z';
+    return new Date(utc).toLocaleString('es-CO', { timeZone: 'America/Bogota' });
   };
 
   if (user?.role !== 'admin') {

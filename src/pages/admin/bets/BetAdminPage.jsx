@@ -9,6 +9,12 @@ import { useAuth } from '../../../context/AuthContext';
 import api from '../../../services/api';
 import './BetAdminPage.css';
 
+const fmtDate = (value) => {
+  if (!value) return '-';
+  const utc = value.endsWith('Z') || value.includes('+') ? value : value + 'Z';
+  return new Date(utc).toLocaleString('es-CO', { timeZone: 'America/Bogota' });
+};
+
 const BetAdminPage = () => {
   const { user } = useAuth();
   const [pending, setPending] = useState([]);
@@ -306,7 +312,7 @@ const BetAdminPage = () => {
       title: 'Fecha',
       dataIndex: 'created_at',
       key: 'created_at',
-      render: (value) => value ? new Date(value).toLocaleString() : '-'
+      render: (value) => fmtDate(value)
     },
     {
       title: 'Descripción',
@@ -398,7 +404,7 @@ const BetAdminPage = () => {
       title: 'Fecha',
       dataIndex: 'created_at',
       key: 'created_at',
-      render: (value) => value ? new Date(value).toLocaleString() : '-'
+      render: (value) => fmtDate(value)
     },
     {
       title: 'Descripción',
