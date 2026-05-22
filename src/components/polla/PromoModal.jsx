@@ -49,5 +49,3 @@ export default function PromoModal({ onClose }) {
     </div>
   );
 }
-
-export { STORAGE_KEY };
