@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Polla Mundial 2026 — siempredelocal.com</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+body{
+  background:#060d18;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  min-height:100vh;
+  overflow:hidden;
+  font-family:'Inter','Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── Frame 360×640 ─────────────────── */
+.frame{
+  position:relative;
+  width:360px;height:640px;
+  overflow:hidden;flex-shrink:0;
+  box-shadow:0 0 80px rgba(74,222,128,0.18),0 0 0 1px rgba(255,255,255,0.06);
+  background:#060d18;
+}
+
+/* ── Background image ──────────────── */
+.frame-bg{
+  position:absolute;inset:0;
+  background:url('/mundial-bg.png') center/cover no-repeat;
+  opacity:0.28;
+  pointer-events:none;
+  z-index:0;
+}
+.frame-bg-overlay{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(74,222,128,0.06) 0%, transparent 70%),
+    linear-gradient(180deg, rgba(6,13,24,0.72) 0%, rgba(6,13,24,0.90) 100%);
+  z-index:1;pointer-events:none;
+}
+
+/* ── Progress bar ──────────────────── */
+.prog-track{
+  position:absolute;top:0;left:0;right:0;height:3px;
+  background:rgba(255,255,255,0.07);z-index:300;
+}
+.prog-fill{height:100%;width:0%;background:linear-gradient(90deg,#4ade80,#22d3ee);}
+
+/* ── Dots ──────────────────────────── */
+.dots{
+  position:absolute;top:9px;left:0;right:0;
+  display:flex;justify-content:center;gap:3px;z-index:300;
+}
+.dot{width:14px;height:2px;border-radius:2px;background:rgba(255,255,255,0.13);transition:all .3s;}
+.dot.on{background:#4ade80;width:20px;}
+.dot.done{background:rgba(74,222,128,0.38);}
+
+/* ── Top bar: logo + counter ───────── */
+.topbar{
+  position:absolute;top:18px;left:0;right:0;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 14px;z-index:300;
+}
+.logo-img{height:22px;object-fit:contain;opacity:.9;}
+.scene-counter{font-size:9px;font-weight:700;color:rgba(255,255,255,0.28);letter-spacing:.1em;}
+
+/* ── Subtitle bar ──────────────────── */
+.subtitle-bar{
+  display:none;
+  position:absolute;bottom:52px;left:0;right:0;
+  min-height:42px;
+  display:flex;align-items:center;justify-content:center;
+  padding:0 18px;z-index:300;text-align:center;
+}
+.subtitle-text{
+  font-size:11.5px;line-height:1.55;color:#e2e8f0;
+  background:rgba(6,13,24,0.72);
+  border-radius:10px;padding:6px 12px;
+  border:1px solid rgba(255,255,255,0.07);
+  backdrop-filter:blur(6px);
+  max-width:320px;
+  opacity:0;transition:opacity .4s;
+}
+.subtitle-text.show{opacity:1;}
+
+/* ── Controls ──────────────────────── */
+.controls{
+  display:none;
+  position:absolute;bottom:0;left:0;right:0;height:52px;
+  align-items:center;justify-content:center;gap:12px;
+  background:linear-gradient(transparent,rgba(0,0,0,0.8));
+  z-index:300;padding-bottom:8px;
+}
+.ctrl{
+  width:34px;height:34px;border-radius:50%;
+  border:1px solid rgba(255,255,255,0.18);
+  background:rgba(255,255,255,0.06);
+  color:#fff;font-size:13px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .2s;
+}
+.ctrl:hover{background:rgba(255,255,255,0.15);}
+.ctrl.big{width:42px;height:42px;font-size:15px;}
+.ctrl.mute{font-size:14px;}
+#skipBtn{
+  position:absolute;top:10px;right:10px;
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.18);
+  border-radius:50px;padding:5px 14px;
+  color:#fff;font-size:10px;font-weight:700;
+  letter-spacing:.07em;cursor:pointer;
+  transition:background .2s;
+}
+#skipBtn:hover{background:rgba(255,255,255,0.18);}
+#audioBtn{
+  position:absolute;top:10px;left:10px;
+  width:34px;height:34px;border-radius:50%;
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.18);
+  color:#fff;font-size:16px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .2s;z-index:400;
+}
+#audioBtn:hover{background:rgba(255,255,255,0.18);}
+
+/* ── Scenes ────────────────────────── */
+.scene{
+  position:absolute;inset:0;
+  padding:46px 22px 100px;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity .55s ease;
+  z-index:2;
+}
+.scene.active{opacity:1;pointer-events:auto;}
+
+/* ── Keyframes ─────────────────────── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.72)}to{opacity:1;transform:scale(1)}}
+@keyframes slideL{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:translateX(0)}}
+@keyframes popIn{0%{opacity:0;transform:scale(.5)}70%{transform:scale(1.12)}100%{opacity:1;transform:scale(1)}}
+@keyframes rankIn{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes starBurst{0%{opacity:0;transform:scale(.4) rotate(-20deg)}65%{transform:scale(1.15) rotate(4deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-14px) rotate(4deg)}}
+@keyframes ballBounce{0%,100%{transform:translateY(0) scale(1)}40%{transform:translateY(-16px) scale(1.04)}70%{transform:translateY(-6px) scale(.98)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(74,222,128,.45)}55%{box-shadow:0 0 0 10px rgba(74,222,128,0)}}
+@keyframes glow{0%,100%{text-shadow:0 0 18px rgba(74,222,128,.5)}50%{text-shadow:0 0 40px rgba(74,222,128,.95),0 0 70px rgba(74,222,128,.35)}}
+@keyframes goldGlow{0%,100%{text-shadow:0 0 18px rgba(251,191,36,.5)}50%{text-shadow:0 0 40px rgba(251,191,36,.9),0 0 70px rgba(251,191,36,.3)}}
+@keyframes bounce{0%,100%{transform:translateY(0)}45%{transform:translateY(-10px)}}
+@keyframes redPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.5)}55%{box-shadow:0 0 0 8px rgba(239,68,68,0)}}
+
+/* ── Shared ─────────────────────────── */
+.badge{
+  display:inline-flex;align-items:center;gap:5px;
+  background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.28);
+  border-radius:50px;padding:4px 13px;
+  color:#4ade80;font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  margin-bottom:12px;
+}
+.h2{font-size:19px;font-weight:800;color:#f1f5f9;line-height:1.2;text-align:center;margin-bottom:13px;}
+.sub{font-size:11px;color:#64748b;text-align:center;line-height:1.55;}
+.green{color:#4ade80}.gold{color:#fbbf24}.blue{color:#60a5fa}.purple{color:#a78bfa}.gray{color:#64748b}
+
+/* ── S1 Hero ────────────────────────── */
+.s1-ball{display:block;text-align:center;animation:float 3.5s ease-in-out infinite;}
+.s1-ball img{width:72px;height:72px;object-fit:contain;filter:drop-shadow(0 0 18px rgba(74,222,128,0.45));}
+.s1-title{
+  font-size:30px;font-weight:900;text-align:center;line-height:1.0;margin-top:9px;
+  background:linear-gradient(135deg,#f1f5f9 35%,#4ade80);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.s1-year{
+  font-size:50px;font-weight:900;color:#fbbf24;text-align:center;line-height:1;
+  animation:goldGlow 2.5s ease-in-out infinite;
+}
+.s1-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;width:100%;margin-top:16px;}
+.s1-stat{background:rgba(13,31,45,.8);border:1px solid #1e3a4a;border-radius:12px;padding:11px 7px;text-align:center;backdrop-filter:blur(4px);}
+.s1-stat-val{font-size:15px;font-weight:900;color:#4ade80;line-height:1;}
+.s1-stat-label{font-size:9px;color:#64748b;margin-top:3px;text-transform:uppercase;letter-spacing:.05em;}
+
+.scene[data-s="0"].active .s1-title{animation:fadeUp .6s .1s both}
+.scene[data-s="0"].active .s1-year{animation:scaleIn .5s .35s both,goldGlow 2.5s .9s ease-in-out infinite}
+.scene[data-s="0"].active .s1-stats{animation:fadeUp .5s .65s both}
+
+/* ── S2 Regístrate ──────────────────── */
+.s2-step{
+  display:flex;align-items:flex-start;gap:13px;width:100%;
+  padding:12px 14px;
+  background:rgba(13,31,45,.85);border:1px solid #1e3a4a;border-radius:14px;
+  margin-bottom:9px;opacity:0;backdrop-filter:blur(4px);
+}
+.s2-num{
+  width:31px;height:31px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,#4ade80,#22d3ee);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:900;color:#060d18;
+}
+.s2-body strong{display:block;font-size:13px;color:#f1f5f9;font-weight:700;margin-bottom:2px;}
+.s2-body span{font-size:10.5px;color:#64748b;}
+.s2-tag{
+  display:inline-flex;align-items:center;margin-top:5px;
+  background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.28);
+  border-radius:50px;padding:2px 10px;font-size:10px;font-weight:700;color:#fbbf24;
+}
+.scene[data-s="1"].active .s2-step:nth-child(2){animation:slideL .45s .15s both}
+.scene[data-s="1"].active .s2-step:nth-child(3){animation:slideL .45s .45s both}
+.scene[data-s="1"].active .s2-step:nth-child(4){animation:slideL .45s .75s both}
+
+/* ── S3 Predice ─────────────────────── */
+.s3-wrap{width:100%;opacity:0;}
+.s3-card{background:rgba(13,31,45,.88);border:1px solid #1e3a4a;border-radius:16px;padding:15px;backdrop-filter:blur(4px);}
+.s3-header{text-align:center;font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:.1em;margin-bottom:11px;}
+.s3-teams{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;}
+.s3-team{text-align:center;flex:1;}
+.s3-flag{font-size:32px;display:block;margin-bottom:3px;}
+.s3-tname{font-size:11px;font-weight:700;color:#f1f5f9;}
+.s3-vs{font-size:18px;font-weight:900;color:#4ade80;padding:0 8px;}
+.s3-btns{display:flex;gap:8px;}
+.s3-btn{flex:1;padding:12px 6px;border-radius:12px;border:1.5px solid #1e3a4a;background:transparent;cursor:pointer;text-align:center;transition:all .35s;}
+.s3-lbl{display:block;font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;}
+.s3-val{display:block;font-size:21px;font-weight:900;color:#475569;transition:color .35s;}
+.s3-btn.aL{border-color:#60a5fa;background:rgba(96,165,250,.12);}
+.s3-btn.aL .s3-val{color:#60a5fa;}
+.s3-btn.aE{border-color:#94a3b8;background:rgba(148,163,184,.1);}
+.s3-btn.aE .s3-val{color:#94a3b8;}
+.s3-btn.aV{border-color:#4ade80;background:rgba(74,222,128,.12);}
+.s3-btn.aV .s3-val{color:#4ade80;}
+.s3-pts-row{display:flex;align-items:center;justify-content:center;margin-top:10px;opacity:0;}
+.s3-chip{display:inline-flex;align-items:center;gap:4px;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);border-radius:50px;padding:4px 13px;font-size:12px;font-weight:700;color:#4ade80;}
+.scene[data-s="2"].active .s3-wrap{animation:fadeUp .5s .2s both}
+.scene[data-s="2"].active .s3-pts-row{animation:fadeUp .4s 2.1s both}
+
+/* ── S4 Puntos ──────────────────────── */
+.s4-row{
+  display:flex;align-items:center;gap:10px;padding:9px 13px;
+  background:rgba(13,31,45,.85);border:1px solid #1e3a4a;border-radius:10px;
+  margin-bottom:6px;width:100%;opacity:0;backdrop-filter:blur(4px);
+}
+.s4-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.s4-info{flex:1;}
+.s4-phase{font-size:11.5px;font-weight:600;color:#94a3b8;}
+.s4-detail{font-size:9px;color:#475569;margin-top:1px;}
+.s4-pts{font-size:20px;font-weight:900;min-width:52px;text-align:right;flex-shrink:0;}
+.scene[data-s="3"].active .s4-row:nth-child(1){animation:slideL .38s .1s both}
+.scene[data-s="3"].active .s4-row:nth-child(2){animation:slideL .38s .33s both}
+.scene[data-s="3"].active .s4-row:nth-child(3){animation:slideL .38s .56s both}
+.scene[data-s="3"].active .s4-row:nth-child(4){animation:slideL .38s .79s both}
+.scene[data-s="3"].active .s4-row:nth-child(5){animation:slideL .38s 1.02s both}
+
+/* ── S5 Racha ───────────────────────── */
+.s5-checks{display:flex;gap:13px;margin:16px 0 18px;}
+.s5-check{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:29px;opacity:0;background:rgba(74,222,128,.1);border:2px solid #4ade80;color:#4ade80;}
+.s5-plus{font-size:56px;font-weight:900;color:#4ade80;text-align:center;opacity:0;line-height:1;text-shadow:0 0 30px rgba(74,222,128,.6);}
+.s5-label{font-size:16px;font-weight:800;color:#f1f5f9;text-align:center;opacity:0;margin-top:6px;}
+.s5-sub{font-size:10px;color:#64748b;text-align:center;margin-top:4px;opacity:0;}
+.scene[data-s="4"].active .s5-check:nth-child(1){animation:popIn .4s .2s both}
+.scene[data-s="4"].active .s5-check:nth-child(2){animation:popIn .4s .72s both}
+.scene[data-s="4"].active .s5-check:nth-child(3){animation:popIn .4s 1.24s both}
+.scene[data-s="4"].active .s5-plus{animation:scaleIn .5s 1.8s both}
+.scene[data-s="4"].active .s5-label{animation:fadeUp .35s 2.05s both}
+.scene[data-s="4"].active .s5-sub{animation:fadeIn .35s 2.25s both}
+
+/* ── S6 Mejor de fase ───────────────── */
+.s6-crown{font-size:54px;display:block;text-align:center;opacity:0;}
+.s6-title{font-size:16px;font-weight:800;color:#fbbf24;text-align:center;margin:9px 0 4px;opacity:0;}
+.s6-cards{display:grid;grid-template-columns:1fr 1fr;gap:9px;width:100%;margin-top:13px;}
+.s6-card{border-radius:14px;padding:14px;text-align:center;opacity:0;backdrop-filter:blur(4px);}
+.s6-card.c-blue{background:rgba(96,165,250,.08);border:1px solid rgba(96,165,250,.25);}
+.s6-card.c-purple{background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.25);}
+.s6-pts{font-size:38px;font-weight:900;line-height:1;}
+.s6-pts-lbl{font-size:9px;color:#64748b;margin-top:2px;text-transform:uppercase;letter-spacing:.07em;}
+.s6-phase{font-size:9.5px;font-weight:700;margin-top:7px;}
+.scene[data-s="5"].active .s6-crown{animation:bounce 1.5s ease-in-out infinite,fadeIn .4s .1s both}
+.scene[data-s="5"].active .s6-title{animation:fadeUp .4s .4s both}
+.scene[data-s="5"].active .s6-card:nth-child(1){animation:scaleIn .4s .7s both}
+.scene[data-s="5"].active .s6-card:nth-child(2){animation:scaleIn .4s 1.0s both}
+
+/* ── S7 Ranking ─────────────────────── */
+.s7-live{display:flex;align-items:center;gap:7px;margin-bottom:9px;opacity:0;}
+.s7-dot{width:8px;height:8px;border-radius:50%;background:#ef4444;animation:redPulse 1.4s ease infinite;}
+.s7-live-txt{font-size:10px;font-weight:700;color:#ef4444;text-transform:uppercase;letter-spacing:.12em;}
+.s7-row{
+  width:100%;padding:9px 12px;
+  background:rgba(13,31,45,.85);border:1px solid #1e3a4a;border-radius:11px;
+  margin-bottom:6px;opacity:0;backdrop-filter:blur(4px);
+}
+.s7-row.me{border-color:rgba(74,222,128,.4);background:rgba(74,222,128,.05);}
+.s7-top{display:flex;align-items:center;gap:9px;}
+.s7-rank{font-size:13px;font-weight:900;width:22px;text-align:center;flex-shrink:0;}
+.s7-avatar{width:28px;height:28px;border-radius:50%;flex-shrink:0;background:#0d2535;border:1.5px solid #1e3a4a;display:flex;align-items:center;justify-content:center;font-size:12px;}
+.s7-name{flex:1;font-size:12px;font-weight:600;color:#f1f5f9;}
+.s7-score{font-size:14px;font-weight:900;color:#4ade80;flex-shrink:0;}
+/* Picks row */
+.s7-picks{display:flex;gap:5px;margin-top:7px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.05);flex-wrap:nowrap;overflow:hidden;}
+.s7-pick{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  flex:1;min-width:0;
+}
+.s7-pick-flags{font-size:10px;white-space:nowrap;letter-spacing:-1px;}
+.s7-pick-choice{
+  font-size:9px;font-weight:800;padding:1px 5px;border-radius:4px;
+  letter-spacing:.04em;
+}
+.s7-pick-choice.ok {background:rgba(74,222,128,.15);color:#4ade80;}
+.s7-pick-choice.no {background:rgba(239,68,68,.12);color:#f87171;}
+.s7-pick-choice.pending {background:rgba(148,163,184,.1);color:#64748b;}
+
+.scene[data-s="6"].active .s7-live{animation:fadeIn .4s .1s both}
+.scene[data-s="6"].active .s7-row:nth-child(2){animation:rankIn .38s .22s both}
+.scene[data-s="6"].active .s7-row:nth-child(3){animation:rankIn .38s .42s both}
+.scene[data-s="6"].active .s7-row:nth-child(4){animation:rankIn .38s .62s both}
+.scene[data-s="6"].active .s7-row:nth-child(5){animation:rankIn .38s .82s both}
+.scene[data-s="6"].active .s7-row:nth-child(6){animation:rankIn .38s 1.02s both}
+
+/* ── S8 Pozo ────────────────────────── */
+.s8-label{font-size:10.5px;color:#64748b;text-align:center;text-transform:uppercase;letter-spacing:.1em;opacity:0;margin-bottom:3px;}
+.s8-amount{font-size:44px;font-weight:900;color:#fbbf24;text-align:center;line-height:1;opacity:0;text-shadow:0 0 30px rgba(251,191,36,.5);}
+.s8-grow{font-size:11px;font-weight:700;color:#4ade80;text-align:center;margin-top:5px;opacity:0;}
+.s8-people{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-top:14px;opacity:0;}
+.s8-person{width:35px;height:35px;border-radius:50%;background:rgba(13,31,45,.8);border:1.5px solid #1e3a4a;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.s8-person.new{border-color:#4ade80;background:rgba(74,222,128,.1);animation:pulse 1.5s ease infinite;}
+.s8-info{width:100%;margin-top:12px;background:rgba(13,31,45,.8);border:1px solid #1e3a4a;border-radius:12px;padding:11px 13px;opacity:0;backdrop-filter:blur(4px);}
+.s8-info div{font-size:10px;color:#94a3b8;line-height:1.9;}
+.s8-info strong{color:#fbbf24;}
+.scene[data-s="7"].active .s8-label{animation:fadeIn .4s .1s both}
+.scene[data-s="7"].active .s8-amount{animation:scaleIn .6s .25s both}
+.scene[data-s="7"].active .s8-grow{animation:fadeUp .4s .65s both}
+.scene[data-s="7"].active .s8-people{animation:fadeIn .5s .95s both}
+.scene[data-s="7"].active .s8-info{animation:fadeUp .4s 1.35s both}
+
+/* ── S9 Premio ──────────────────────── */
+.s9-trophy{font-size:64px;display:block;text-align:center;opacity:0;}
+.s9-title{font-size:20px;font-weight:900;color:#f1f5f9;text-align:center;margin-top:9px;opacity:0;}
+.s9-prize{font-size:38px;font-weight:900;text-align:center;margin:6px 0;opacity:0;background:linear-gradient(135deg,#fbbf24,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.s9-card{width:100%;margin-top:13px;opacity:0;background:linear-gradient(135deg,rgba(251,191,36,.1),rgba(217,119,6,.05));border:1px solid rgba(251,191,36,.28);border-radius:14px;padding:13px;backdrop-filter:blur(4px);}
+.s9-rule{font-size:10.5px;color:#94a3b8;line-height:1.8;}
+.s9-rule span{color:#fbbf24;font-weight:700;}
+.s9-rule em{color:#4ade80;font-style:normal;font-weight:700;}
+.scene[data-s="8"].active .s9-trophy{animation:starBurst .6s .1s both}
+.scene[data-s="8"].active .s9-title{animation:fadeUp .4s .55s both}
+.scene[data-s="8"].active .s9-prize{animation:scaleIn .5s .85s both}
+.scene[data-s="8"].active .s9-card{animation:fadeUp .4s 1.2s both}
+
+/* ── S10 CTA ────────────────────────── */
+.s10-ball{display:block;text-align:center;opacity:0;margin:6px 0;}
+.s10-ball img{width:84px;height:84px;object-fit:contain;filter:drop-shadow(0 0 24px rgba(74,222,128,0.55));}
+.s10-title{font-size:27px;font-weight:900;line-height:1.15;text-align:center;opacity:0;background:linear-gradient(135deg,#f1f5f9 35%,#4ade80);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.s10-url{font-size:14px;font-weight:800;color:#4ade80;text-align:center;margin-top:7px;opacity:0;letter-spacing:.02em;animation:glow 2.5s ease-in-out infinite;}
+.s10-cta{display:block;width:100%;margin-top:16px;opacity:0;background:linear-gradient(135deg,#4ade80,#22d3ee);border:none;border-radius:14px;padding:16px;font-size:14px;font-weight:900;color:#060d18;letter-spacing:.07em;text-transform:uppercase;cursor:pointer;box-shadow:0 6px 24px rgba(74,222,128,.35);}
+.s10-sub{font-size:9px;color:#475569;text-align:center;margin-top:8px;opacity:0;line-height:1.5;}
+.scene[data-s="9"].active .s10-ball{animation:ballBounce 1.8s ease-in-out infinite,scaleIn .5s .4s both}
+.scene[data-s="9"].active .s10-title{animation:fadeUp .4s .75s both}
+.scene[data-s="9"].active .s10-url{animation:fadeUp .4s .95s both,glow 2.5s 1.4s ease-in-out infinite}
+.scene[data-s="9"].active .s10-cta{animation:scaleIn .45s 1.2s both}
+.scene[data-s="9"].active .s10-sub{animation:fadeIn .4s 1.55s both}
+
+.stage-label{color:#222;font-size:10px;margin-top:10px;text-align:center;}
+</style>
+</head>
+<body>
+
+<div class="frame" id="frame">
+
+  <!-- Fondo -->
+  <div class="frame-bg"></div>
+  <div class="frame-bg-overlay"></div>
+
+  <!-- Progress bar -->
+  <div class="prog-track"><div class="prog-fill" id="pBar"></div></div>
+
+  <!-- Dots -->
+  <div class="dots" id="dots"></div>
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <img src="/logo.png" class="logo-img" alt="SiempreDeLocal" onerror="this.style.display='none'">
+    <div class="scene-counter" id="sceneCounter">1 / 10</div>
+  </div>
+
+  <!-- Subtítulos -->
+  <div class="subtitle-bar">
+    <div class="subtitle-text" id="subtitle"></div>
+  </div>
+
+  <!-- ═══ SPLASH ═══ -->
+  <div id="splash" style="
+    position:absolute;inset:0;z-index:500;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  ">
+    <img src="/logo.png" alt="" style="width:72px;height:72px;object-fit:contain;margin-bottom:6px;filter:drop-shadow(0 0 20px rgba(74,222,128,0.45));" onerror="this.style.display='none'">
+    <div style="color:#f1f5f9;font-size:19px;font-weight:900;text-align:center;line-height:1.25;">Polla Mundial<br><span style="color:#fbbf24;">2026</span></div>
+    <button id="btnExplain" style="
+      margin-top:8px;
+      background:linear-gradient(135deg,#4ade80,#22d3ee);
+      border:none;border-radius:50px;padding:13px 28px;
+      font-size:14px;font-weight:900;color:#060d18;
+      letter-spacing:.03em;cursor:pointer;width:220px;
+      box-shadow:0 4px 20px rgba(74,222,128,0.35);
+    ">▶ Te explico cómo jugar</button>
+    <button id="btnSkipSplash" style="
+      background:rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.15);
+      border-radius:50px;padding:11px 28px;
+      font-size:13px;font-weight:700;color:#94a3b8;
+      cursor:pointer;width:220px;
+    ">Saltar →</button>
+  </div>
+
+  <!-- ═══ ESCENA 1 — HERO ═══ -->
+  <div class="scene" data-s="0">
+    <span class="s1-ball"><img src="/logo.png" alt="SiempreDeLocal" onerror="this.style.display='none'"></span>
+    <div class="s1-title">POLLA<br>MUNDIAL</div>
+    <div class="s1-year">2026</div>
+    <div class="s1-stats">
+      <div class="s1-stat"><div class="s1-stat-val">$1M+</div><div class="s1-stat-label">Premio</div></div>
+      <div class="s1-stat"><div class="s1-stat-val">104</div><div class="s1-stat-label">Partidos</div></div>
+      <div class="s1-stat"><div class="s1-stat-val">$40K</div><div class="s1-stat-label">Inscripción</div></div>
+    </div>
+  </div>
+
+  <!-- ═══ ESCENA 2 — REGÍSTRATE ═══ -->
+  <div class="scene" data-s="1">
+    <div class="badge">📋 Cómo participar</div>
+    <div class="h2">3 pasos para entrar</div>
+    <div class="s2-step">
+      <div class="s2-num">1</div>
+      <div class="s2-body"><strong>Créate una cuenta</strong><span>Regístrate gratis en siempredelocal.com</span></div>
+    </div>
+    <div class="s2-step">
+      <div class="s2-num">2</div>
+      <div class="s2-body"><strong>Recarga créditos vía Nequi</strong><span>El admin aprueba tu recarga en minutos</span><div class="s2-tag">💳 8 créditos = $40.000 COP</div></div>
+    </div>
+    <div class="s2-step">
+      <div class="s2-num">3</div>
+      <div class="s2-body"><strong>¡Inscríbete en la Polla!</strong><span>Predice los 104 partidos del Mundial 2026</span></div>
+    </div>
+  </div>
+
+  <!-- ═══ ESCENA 3 — PREDICE L/E/V ═══ -->
+  <div class="scene" data-s="2">
+    <div class="badge">⚡ Cómo predecir</div>
+    <div class="h2">Elige el resultado</div>
+    <div class="s3-wrap">
+      <div class="s3-card">
+        <div class="s3-header">🏆 Fase de Grupos · Grupo A · Jornada 1</div>
+        <div class="s3-teams">
+          <div class="s3-team"><span class="s3-flag">🇨🇴</span><div class="s3-tname">Colombia</div></div>
+          <div class="s3-vs">VS</div>
+          <div class="s3-team"><span class="s3-flag">🇧🇷</span><div class="s3-tname">Brasil</div></div>
+        </div>
+        <div class="s3-btns">
+          <div class="s3-btn" id="bL"><span class="s3-lbl">Local</span><span class="s3-val">L</span></div>
+          <div class="s3-btn" id="bE"><span class="s3-lbl">Empate</span><span class="s3-val">E</span></div>
+          <div class="s3-btn" id="bV"><span class="s3-lbl">Visitante</span><span class="s3-val">V</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="s3-pts-row"><div class="s3-chip">✓ Si aciertas → <strong style="margin-left:3px">+1 punto</strong></div></div>
+  </div>
+
+  <!-- ═══ ESCENA 4 — PUNTOS POR FASE ═══ -->
+  <div class="scene" data-s="3">
+    <div class="badge">🎯 Sistema de puntos</div>
+    <div class="h2">Más fase = más puntos</div>
+    <div class="s4-row"><div class="s4-dot" style="background:#3b82f6"></div><div class="s4-info"><div class="s4-phase">Fase de Grupos</div><div class="s4-detail">72 partidos · Predice L / E / V</div></div><div class="s4-pts blue">+1 pt</div></div>
+    <div class="s4-row"><div class="s4-dot" style="background:#8b5cf6"></div><div class="s4-info"><div class="s4-phase">Ronda de 32</div><div class="s4-detail">16 partidos · ¿Quién avanza?</div></div><div class="s4-pts purple">+2 pts</div></div>
+    <div class="s4-row"><div class="s4-dot" style="background:#8b5cf6"></div><div class="s4-info"><div class="s4-phase">Octavos de Final</div><div class="s4-detail">8 partidos · ¿Quién avanza?</div></div><div class="s4-pts purple">+2 pts</div></div>
+    <div class="s4-row"><div class="s4-dot" style="background:#f59e0b"></div><div class="s4-info"><div class="s4-phase">Cuartos · Semis</div><div class="s4-detail">6 partidos · ¿Quién avanza?</div></div><div class="s4-pts gold">+3 pts</div></div>
+    <div class="s4-row"><div class="s4-dot" style="background:#22c55e"></div><div class="s4-info"><div class="s4-phase">3er Puesto · Final</div><div class="s4-detail">2 partidos · ¿Quién gana?</div></div><div class="s4-pts green">+3 pts</div></div>
+  </div>
+
+  <!-- ═══ ESCENA 5 — RACHA ═══ -->
+  <div class="scene" data-s="4">
+    <div class="badge">🔥 Bonificación</div>
+    <div class="h2">Racha de aciertos</div>
+    <div class="sub">3 predicciones correctas seguidas en la misma fase</div>
+    <div class="s5-checks">
+      <div class="s5-check">✓</div>
+      <div class="s5-check">✓</div>
+      <div class="s5-check">✓</div>
+    </div>
+    <div class="s5-plus">+1 PT</div>
+    <div class="s5-label">¡Punto extra garantizado!</div>
+    <div class="s5-sub">Una vez por fase · Se reinicia si fallas</div>
+  </div>
+
+  <!-- ═══ ESCENA 6 — MEJOR DE FASE ═══ -->
+  <div class="scene" data-s="5">
+    <div class="badge">⭐ Bonificación élite</div>
+    <span class="s6-crown">👑</span>
+    <div class="s6-title">Mejor predictor de la fase</div>
+    <div class="sub">El que más aciertos logre en toda una fase recibe:</div>
+    <div class="s6-cards">
+      <div class="s6-card c-blue"><div class="s6-pts blue">+5</div><div class="s6-pts-lbl">puntos extra</div><div class="s6-phase blue">Grupos · R32</div></div>
+      <div class="s6-card c-purple"><div class="s6-pts purple">+3</div><div class="s6-pts-lbl">puntos extra</div><div class="s6-phase purple">Octavos en adelante</div></div>
+    </div>
+    <div class="sub" style="margin-top:11px">Si hay empate, <strong style="color:#f1f5f9">todos los empatados</strong> reciben el bonus</div>
+  </div>
+
+  <!-- ═══ ESCENA 7 — RANKING + PICKS ═══ -->
+  <div class="scene" data-s="6">
+    <div class="s7-live"><div class="s7-dot"></div><span class="s7-live-txt">En vivo — últimas predicciones</span></div>
+    <div class="h2" style="margin-bottom:9px">Tabla de posiciones</div>
+
+    <!-- 1° -->
+    <div class="s7-row">
+      <div class="s7-top">
+        <div class="s7-rank gold">🥇</div>
+        <div class="s7-avatar">😎</div>
+        <div class="s7-name">Carlos M.</div>
+        <div class="s7-score">47 pts</div>
+      </div>
+      <div class="s7-picks">
+        <div class="s7-pick"><div class="s7-pick-flags">🇦🇷🆚🇫🇷</div><div class="s7-pick-choice ok">L ✓</div></div>
+        <div class="s7-pick"><div class="s7-pick-flags">🇩🇪🆚🇪🇸</div><div class="s7-pick-choice ok">V ✓</div></div>
+        <div class="s7-pick"><div class="s7-pick-flags">🇧🇷🆚🇵🇹</div><div class="s7-pick-choice no">E ✗</div></div>
+        <div class="s7-pick"><div class="s7-pick-flags">🇨🇴🆚🇺🇾</div><div class="s7-pick-choice pending">L ?</div></div>
+      </div>
+    </div>
+
+    <!-- 2° -->
+    <div class="s7-row">
+      <div class="s7-top">
+        <div class="s7-rank" style="color:#94a3b8">🥈</div>
+        <div class="s7-avatar">🦁</div>
+        <div class="s7-name">Valentina R.</div>
+        <div class="s7-score" style="color:#94a3b8">44 pts</div>
+      </div>
+      <div class="s7-picks">
+        <div class="s7-pick"><div class="s7-pick-flags">🇦🇷🆚🇫🇷</div><div class="s7-pick-choice ok">L ✓</div></div>
+        <div class="s7-pick"><div class="s7-pick-flags">🇩🇪🆚🇪🇸</div><div class="s7-pick-choice no">L ✗</div></div>
+        <div class="s7-pick"><div class="s7-pick-flags">🇧🇷🆚🇵🇹</div><div class="s7-pick-choice ok">L ✓</div></div>
+        <div class="s7-pick"><div class="s7-pick-flags">🇨🇴🆚🇺🇾</div><div class="s7-pick-choice pending">V ?</div></div>
+      </div>
+    </div>
+
+    <!-- 3° -->
+    <div class="s7-row">
+      <div class="s7-top">
+        <div class="s7-rank" style="color:#b45309">🥉</div>
+        <div class="s7-avatar">⚡</div>
+        <div class="s7-name">Andrés P.</div>
+        <div class="s7-score" style="color:#94a3b8">41 pts</div>
+      </div>
+      <div class="s7-picks">
+        <div class="s7-pick"><div class="s7-pick-flags">🇦🇷🆚🇫🇷</div><div class="s7-pick-choice no">E ✗</div></div>
+        <div class="s7-pick"><div class="s7-pick-flags">🇩🇪🆚🇪🇸</div><div class="s7-pick-choice ok">V ✓</div></div>
+        <div class="s7-pick"><div class="s7-pick-flags">🇧🇷🆚🇵🇹</div><div class="s7-pick-choice ok">L ✓</div></div>
+        <div class="s7-pick"><div class="s7-pick-flags">🇨🇴🆚🇺🇾</div><div class="s7-pick-choice pending">E ?</div></div>
+      </div>
+    </div>
+
+    <!-- TÚ -->
+    <div class="s7-row me">
+      <div class="s7-top">
+        <div class="s7-rank gray">5</div>
+        <div class="s7-avatar" style="border-color:#4ade80">👤</div>
+        <div class="s7-name green">Tú</div>
+        <div class="s7-score green">36 pts</div>
+      </div>
+      <div class="s7-picks">
+        <div class="s7-pick"><div class="s7-pick-flags">🇦🇷🆚🇫🇷</div><div class="s7-pick-choice ok">L ✓</div></div>
+        <div class="s7-pick"><div class="s7-pick-flags">🇩🇪🆚🇪🇸</div><div class="s7-pick-choice ok">V ✓</div></div>
+        <div class="s7-pick"><div class="s7-pick-flags">🇧🇷🆚🇵🇹</div><div class="s7-pick-choice ok">L ✓</div></div>
+        <div class="s7-pick"><div class="s7-pick-flags">🇨🇴🆚🇺🇾</div><div class="s7-pick-choice pending">L ?</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ ESCENA 8 — POZO ═══ -->
+  <div class="scene" data-s="7">
+    <div class="s8-label">Pozo acumulado</div>
+    <div class="s8-amount" id="prizeVal">$1.000.000</div>
+    <div class="s8-grow">↑ Cada inscripción lo hace crecer</div>
+    <div class="s8-people">
+      <div class="s8-person">😀</div><div class="s8-person">😊</div><div class="s8-person">😃</div>
+      <div class="s8-person">🙂</div><div class="s8-person">😁</div><div class="s8-person">😄</div>
+      <div class="s8-person new">➕</div>
+    </div>
+    <div class="s8-info">
+      <div>📌 Mínimo garantizado: <strong>$1.000.000 COP</strong></div>
+      <div>📌 Con cada inscripción el pozo sube</div>
+      <div>📌 Sin límite — crece sin techo</div>
+    </div>
+  </div>
+
+  <!-- ═══ ESCENA 9 — PREMIO ═══ -->
+  <div class="scene" data-s="8">
+    <span class="s9-trophy">🏆</span>
+    <div class="s9-title">¡Los líderes ganan todo!</div>
+    <div class="s9-prize" id="finalPrize">$1.000.000+</div>
+    <div class="s9-card">
+      <div class="s9-rule">
+        🥇 <span>El líder al final del Mundial</span> se lleva el pozo completo.<br><br>
+        🤝 Si hay empate, el premio se <span>divide en partes iguales</span>.<br><br>
+        💸 El premio llega directo a tu <em>saldo en la app</em>.
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ ESCENA 10 — CTA ═══ -->
+  <div class="scene" data-s="9">
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse 90% 70% at 50% 50%,rgba(74,222,128,.07),transparent);pointer-events:none;z-index:0"></div>
+    <span class="s10-ball"><img src="/logo.png" alt="SiempreDeLocal" onerror="this.style.display='none'"></span>
+    <div class="s10-title">¡Inscríbete<br>y gana el Mundial!</div>
+    <div class="s10-url">siempredelocal.com</div>
+    <button class="s10-cta">Jugar por $40.000 COP</button>
+    <div class="s10-sub">8 créditos · 104 partidos · Premio mínimo $1.000.000 COP</div>
+  </div>
+
+  <!-- Audio toggle -->
+  <button id="audioBtn" title="Silenciar">🔊</button>
+
+
+  <!-- ═══ PANTALLA FINAL ═══ -->
+  <div id="endScreen" style="
+    position:absolute;inset:0;z-index:500;
+    display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+    background:rgba(6,13,24,0.92);
+  ">
+    <img src="/logo.png" alt="" style="width:72px;height:72px;object-fit:contain;margin-bottom:6px;filter:drop-shadow(0 0 20px rgba(74,222,128,0.45));" onerror="this.style.display='none'">
+    <div style="color:#f1f5f9;font-size:19px;font-weight:900;text-align:center;line-height:1.25;">¿Listo para<br><span style="color:#fbbf24;">jugar?</span></div>
+    <button id="btnReplay" style="
+      margin-top:8px;
+      background:linear-gradient(135deg,#4ade80,#22d3ee);
+      border:none;border-radius:50px;padding:13px 28px;
+      font-size:14px;font-weight:900;color:#060d18;
+      letter-spacing:.03em;cursor:pointer;width:220px;
+      box-shadow:0 4px 20px rgba(74,222,128,0.35);
+    ">↺ Volver a ver</button>
+    <button id="btnEndSkip" style="
+      background:rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.15);
+      border-radius:50px;padding:11px 28px;
+      font-size:13px;font-weight:700;color:#94a3b8;
+      cursor:pointer;width:220px;
+    ">Saltar →</button>
+  </div>
+
+</div>
+
+<div class="stage-label">360×640 · Espacio=pausa · ←→=navegar · 🔊=narrador</div>
+
+<script>
+/* ── Config ─────────────────── */
+const N        = 10;
+const DURATION = 15000; // 15 segundos por escena
+
+/* ── Narración alegre, femenina, colombiana ── */
+const NARRATION = [
+  'Bienvenidos a la Polla Mundial de SiempreDeLocal, ¡ya está disponible!, el torneo de predicciones más emocionante para compartir entre amigos. Predice los partidos, acumula puntos y gana un gran acumulado. Arranca desde millón de pesos.',
+
+  '¡Participar es muy fácil! Primero, crea tu cuenta gratis en SiempreDeLocal punto com. Segundo, recarga ocho créditos a través de Nequi. Y tercero, ¡inscríbete en la Polla y a predecir! Todo desde el celular, ¡es fácil!',
+
+  '¡Así se juega! Una hora antes de cada partido elige el resultado: L si gana el equipo Local, E si termina en empate, o V si gana el visitante. ¡No te quedes sin jugar! Sino juegas perderás los puntos de ese partido.',
+
+  '¡El sistema de puntos es progresivo! En la fase de grupos, un punto por cada acierto. En la ronda de treinta y dos avos, y octavos de final, dos puntos. Y en cuartos, semifinales, tercer puesto y la gran final, ¡tres puntos por predicción!',
+
+  '¡Atención que hay bonificaciones! Si aciertas tres predicciones consecutivas dentro de la misma fase, ¡recibes un punto extra de bonificación automáticamente! Se reinicia si fallas, así que mantén la racha. ¡Tú puedes lograrlo!',
+
+  '¡Y si eres la mejor de la fase, hay más premios! Los jugadores con más aciertos en toda una fase reciben puntos extra: cinco puntos en grupos y ronda de treinta y dos avos, y tres puntos en octavos de final en adelante.',
+
+  '¡Transparencia total! Sigue la tabla de posiciones en tiempo real después de cada partido. Puedes ver los puntos de cada jugador y también sus predicciones, partido a partido. ¿Quién apostó a quién? ¿Quién acertó? ¡Todo visible!',
+
+  '¡El pozo es increíble! Arranca con un mínimo garantizado de un millón de pesos, y crece con cada nueva inscripción. Aquí lo ves en tiempo real, creciendo solito. ¡Sin límite máximo, puede llegar muy lejos!',
+
+  '¡Al final del Mundial llega el momento de la verdad! El jugador con más puntos se lleva el acumulado completo. Si hay empate en el primer lugar, el premio se divide en partes iguales entre todos los ganadores. ¡El dinero llega directo a tu saldo en la aplicación!',
+
+  '¡No te lo pierdas! Entra ahora a SiempreDeLocal punto com, inscríbete en la Polla Mundial dos mil veintiséis y demuestra que tú sí sabes de fútbol. Por solo cuarenta mil pesos tienes acceso completo a los ciento cuatro partidos del Mundial.'
+];
+
+/* ── Subtítulos por escena ─── */
+const SUBTITLES = [
+  '⚽ Polla Mundial 2026 · Premio mín. $1.000.000 COP · 104 partidos',
+  '1️⃣ Regístrate  2️⃣ Recarga 8 créditos ($40.000)  3️⃣ ¡Inscríbete!',
+  'Elige L (local gana), E (empate) o V (visitante gana) · Cierra 1h antes',
+  'Grupos +1pt · R32/Octavos +2pts · Cuartos/Semis/Final +3pts',
+  '3 aciertos consecutivos en la misma fase = +1 punto de bonificación 🔥',
+  'Mejor predictor de la fase = +5pts (Grupos/R32) o +3pts (Octavos+) 👑',
+  'Puntos y predicciones de todos los participantes · visibles en tiempo real',
+  'Pozo acumulado · mínimo $1.000.000 COP · crece con cada inscripción 💰',
+  'El líder al final del Mundial gana el pozo · Empates = división del premio',
+  '🏆 Juega en siempredelocal.com · Solo $40.000 COP · ¡Inscríbete hoy!'
+];
+
+/* ── Elements ────────────────── */
+const scenes   = document.querySelectorAll('.scene');
+const pBar     = document.getElementById('pBar');
+const counter  = document.getElementById('sceneCounter');
+const subEl    = document.getElementById('subtitle');
+const dotsEl   = document.getElementById('dots');
+
+/* ── Build dots ──────────────── */
+for (let i = 0; i < N; i++) {
+  const d = document.createElement('div');
+  d.className = 'dot';
+  dotsEl.appendChild(d);
+}
+const dots = [...dotsEl.querySelectorAll('.dot')];
+
+/* ── State ───────────────────── */
+let cur     = 0;
+let paused  = false;
+let muted   = false;
+let rafId   = null;
+let elapsed = 0;
+let t0      = 0;
+let s3Timer = null;
+let s8Timer = null;
+
+/* ── Speech synthesis ────────── */
+const synth = window.speechSynthesis;
+let voices         = [];
+let speechUnlocked = false;
+let pendingText    = null;
+
+function loadVoices() {
+  voices = synth.getVoices();
+}
+loadVoices();
+synth.onvoiceschanged = loadVoices;
+
+/* Desbloquear audio en el primer gesto del usuario */
+function unlockSpeech() {
+  if (speechUnlocked) return;
+  speechUnlocked = true;
+  if (pendingText) { speak(pendingText); pendingText = null; }
+}
+
+/* Selección de voz: femenina colombiana > femenina española > cualquier español */
+function pickVoice() {
+  if (!voices.length) return null;
+
+  const FEMALE_HINTS = ['female','femenin','woman','helena','mónica','monica','paulina','google español','es-co','es-419','sabina','valeria','luciana','camila'];
+  const score = (v) => {
+    let s = 0;
+    const name = v.name.toLowerCase();
+    const lang = v.lang.toLowerCase();
+    if (lang === 'es-co') s += 100;
+    if (lang.startsWith('es-419') || lang.startsWith('es-us') || lang.startsWith('es-mx')) s += 40;
+    if (lang.startsWith('es')) s += 20;
+    if (FEMALE_HINTS.some(h => name.includes(h))) s += 50;
+    if (v.localService) s += 5;
+    return s;
+  };
+
+  const ranked = [...voices].filter(v => v.lang.toLowerCase().startsWith('es')).sort((a,b) => score(b)-score(a));
+  return ranked[0] || voices.find(v => v.lang.startsWith('es')) || null;
+}
+
+function speak(text) {
+  if (muted || !synth) return;
+  if (!speechUnlocked) { pendingText = text; return; }
+  synth.cancel();
+  setTimeout(() => {
+    const utt = new SpeechSynthesisUtterance(text);
+    utt.lang  = 'es-CO';
+    utt.rate  = 1.35;
+    utt.pitch = 1.25;
+    utt.volume = 1.0;
+    const voice = pickVoice();
+    if (voice) utt.voice = voice;
+    synth.speak(utt);
+  }, 80);
+}
+
+/* ── Subtitle ────────────────── */
+function showSub(idx) {
+  subEl.classList.remove('show');
+  setTimeout(() => {
+    subEl.textContent = SUBTITLES[idx];
+    subEl.classList.add('show');
+  }, 300);
+}
+
+/* ── S3 cycle L/E/V ──────────── */
+function clearS3() {
+  clearTimeout(s3Timer);
+  ['bL','bE','bV'].forEach(id => { const e = document.getElementById(id); if(e) e.className='s3-btn'; });
+}
+function runS3() {
+  clearS3();
+  [
+    {id:'bL',cls:'aL',t:700},
+    {id:'bE',cls:'aE',t:2800},
+    {id:'bV',cls:'aV',t:4900},
+    {id:'bL',cls:'aL',t:7000},
+    {id:'bE',cls:'aE',t:9100},
+    {id:'bV',cls:'aV',t:11200},
+    {id:'bL',cls:'aL',t:13300},
+  ].forEach(({id,cls,t}) => {
+    s3Timer = setTimeout(() => {
+      ['bL','bE','bV'].forEach(x => { const e=document.getElementById(x); if(e) e.className='s3-btn'; });
+      const e = document.getElementById(id);
+      if (e) e.className = 's3-btn '+cls;
+    }, t);
+  });
+}
+
+/* ── S8 prize counter ($32K por inscripción) ── */
+// Genera valores desde $1.000.000 subiendo de $32.000 en $32.000
+const BASE_PRIZE = 1_000_000;
+const PRIZE_STEP = 32_000;
+const PRIZES = Array.from({length: 14}, (_,i) =>
+  '$' + (BASE_PRIZE + i * PRIZE_STEP).toLocaleString('es-CO')
+);
+let s8idx = 0;
+function clearS8() { clearTimeout(s8Timer); s8idx = 0; }
+function runS8() {
+  clearS8();
+  // 14 valores en ~13 segundos → cada ~900ms
+  function tick() {
+    const e = document.getElementById('prizeVal');
+    const f = document.getElementById('finalPrize');
+    if (e) e.textContent = PRIZES[s8idx];
+    if (f) f.textContent = PRIZES[s8idx] + ' +';
+    s8idx = (s8idx + 1) % PRIZES.length;
+    s8Timer = setTimeout(tick, 900);
+  }
+  s8Timer = setTimeout(tick, 1000);
+}
+
+/* ── Restart CSS anims ───────── */
+function restartScene(el) {
+  el.classList.remove('active');
+  void el.offsetWidth;
+  el.classList.add('active');
+}
+
+/* ── Go to scene ─────────────── */
+function go(idx) {
+  if (cur===2) clearS3();
+  if (cur===7) clearS8();
+  scenes[cur].classList.remove('active');
+  dots[cur].classList.remove('on');
+  dots[cur].classList.add('done');
+
+  cur = Math.max(0, Math.min(idx, N - 1));
+
+  dots.forEach((d,i) => { d.className='dot'+(i===cur?' on':i<cur?' done':''); });
+  counter.textContent = (cur+1)+' / '+N;
+
+  restartScene(scenes[cur]);
+  showSub(cur);
+  speak(NARRATION[cur]);
+
+  if (cur===2) setTimeout(runS3, 250);
+  if (cur===7) setTimeout(runS8, 950);
+
+  startProgress();
+}
+
+/* ── Progress ────────────────── */
+function startProgress() {
+  cancelAnimationFrame(rafId);
+  elapsed=0; t0=performance.now();
+  pBar.style.transition='none'; pBar.style.width='0%';
+  function tick(now) {
+    if (paused) return;
+    elapsed = now - t0;
+    pBar.style.width = Math.min(100,(elapsed/DURATION)*100)+'%';
+    if (elapsed >= DURATION) { if (cur < N-1) go(cur+1); else showEndScreen(); }
+    else rafId = requestAnimationFrame(tick);
+  }
+  rafId = requestAnimationFrame(tick);
+}
+
+function pause() {
+  paused=true; cancelAnimationFrame(rafId);
+  synth.pause();
+}
+function resume() {
+  paused=false;
+  synth.resume();
+  t0 = performance.now()-elapsed;
+  function tick(now) {
+    if(paused) return;
+    elapsed=now-t0;
+    pBar.style.width=Math.min(100,(elapsed/DURATION)*100)+'%';
+    if(elapsed>=DURATION) { if(cur<N-1) go(cur+1); else showEndScreen(); }
+    else rafId=requestAnimationFrame(tick);
+  }
+  rafId=requestAnimationFrame(tick);
+}
+
+
+const audioBtn = document.getElementById('audioBtn');
+audioBtn.addEventListener('click', () => {
+  muted = !muted;
+  audioBtn.textContent = muted ? '🔇' : '🔊';
+  audioBtn.title = muted ? 'Activar audio' : 'Silenciar';
+  if (muted) synth.cancel();
+  else speak(NARRATION[cur]);
+});
+
+
+document.addEventListener('keydown', e => {
+  if (e.code==='Space')      { e.preventDefault(); paused ? resume() : pause(); }
+  if (e.code==='ArrowLeft')  go(cur-1);
+  if (e.code==='ArrowRight') go(cur+1);
+  if (e.code==='KeyM')       audioBtn.click();
+});
+
+/* ── Pantalla final ── */
+const endScreen = document.getElementById('endScreen');
+
+function showEndScreen() {
+  synth.cancel();
+  endScreen.style.display = 'flex';
+  endScreen.style.opacity = '0';
+  endScreen.style.transition = 'opacity .4s';
+  setTimeout(() => endScreen.style.opacity = '1', 20);
+}
+
+document.getElementById('btnReplay').addEventListener('click', () => {
+  endScreen.style.display = 'none';
+  go(0);
+});
+
+document.getElementById('btnEndSkip').addEventListener('click', () => {
+  synth.cancel();
+  if (window.parent !== window) window.parent.postMessage('promo-skip', '*');
+  else window.location.href = '/mundial';
+});
+
+/* ── Splash ── */
+const splash = document.getElementById('splash');
+
+function hideSplash() {
+  splash.style.transition = 'opacity .2s';
+  splash.style.opacity = '0';
+  setTimeout(() => splash.style.display = 'none', 220);
+}
+
+document.getElementById('btnExplain').addEventListener('click', () => {
+  hideSplash();
+  speechUnlocked = true;
+  muted = false;
+  audioBtn.textContent = '🔊';
+  audioBtn.title = 'Silenciar';
+  paused = false;
+  go(0);
+});
+
+document.getElementById('btnSkipSplash').addEventListener('click', () => {
+  synth.cancel();
+  if (window.parent !== window) window.parent.postMessage('promo-skip', '*');
+  else window.location.href = '/mundial';
+});
+</script>
+</body>
+</html>
