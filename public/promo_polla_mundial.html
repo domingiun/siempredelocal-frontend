@@ -649,7 +649,7 @@ body{
 <script>
 /* ── Config ─────────────────── */
 const N        = 10;
-const DURATION = 15000; // 15 segundos por escena
+const MUTED_DURATION = 15000; // fallback cuando está silenciado
 
 /* ── Narración alegre, femenina, colombiana ── */
 const NARRATION = [
@@ -710,8 +710,9 @@ let muted   = false;
 let rafId   = null;
 let elapsed = 0;
 let t0      = 0;
-let s3Timer = null;
-let s8Timer = null;
+let s3Timer   = null;
+let s8Timer   = null;
+let autoTimer = null;
 
 /* ── Speech synthesis ────────── */
 const synth = window.speechSynthesis;
@@ -754,19 +755,37 @@ function pickVoice() {
 }
 
 function speak(text) {
-  if (muted || !synth) return;
+  if (!synth) return;
   if (!speechUnlocked) { pendingText = text; return; }
   synth.cancel();
+  clearTimeout(autoTimer);
+
+  if (muted) {
+    autoTimer = setTimeout(onNarrationEnd, MUTED_DURATION);
+    startProgress(MUTED_DURATION);
+    return;
+  }
+
   setTimeout(() => {
     const utt = new SpeechSynthesisUtterance(text);
-    utt.lang  = 'es-CO';
-    utt.rate  = 1.35;
-    utt.pitch = 1.25;
+    utt.lang   = 'es-CO';
+    utt.rate   = 1.0;
+    utt.pitch  = 1.25;
     utt.volume = 1.0;
     const voice = pickVoice();
     if (voice) utt.voice = voice;
+    utt.onend = () => { clearTimeout(autoTimer); onNarrationEnd(); };
+    autoTimer = setTimeout(onNarrationEnd, 45000); // seguro si onend no dispara
     synth.speak(utt);
+    startProgress(45000);
   }, 80);
+}
+
+function onNarrationEnd() {
+  if (paused) return;
+  cancelAnimationFrame(rafId);
+  if (cur < N - 1) go(cur + 1);
+  else showEndScreen();
 }
 
 /* ── Subtitle ────────────────── */
@@ -834,6 +853,8 @@ function restartScene(el) {
 
 /* ── Go to scene ─────────────── */
 function go(idx) {
+  clearTimeout(autoTimer);
+  cancelAnimationFrame(rafId);
   if (cur===2) clearS3();
   if (cur===7) clearS8();
   scenes[cur].classList.remove('active');
@@ -851,39 +872,39 @@ function go(idx) {
 
   if (cur===2) setTimeout(runS3, 250);
   if (cur===7) setTimeout(runS8, 950);
-
-  startProgress();
 }
 
 /* ── Progress ────────────────── */
-function startProgress() {
+function startProgress(duration) {
   cancelAnimationFrame(rafId);
   elapsed=0; t0=performance.now();
   pBar.style.transition='none'; pBar.style.width='0%';
   function tick(now) {
     if (paused) return;
     elapsed = now - t0;
-    pBar.style.width = Math.min(100,(elapsed/DURATION)*100)+'%';
-    if (elapsed >= DURATION) { if (cur < N-1) go(cur+1); else showEndScreen(); }
-    else rafId = requestAnimationFrame(tick);
+    pBar.style.width = Math.min(100,(elapsed/duration)*100)+'%';
+    if (elapsed < duration) rafId = requestAnimationFrame(tick);
   }
   rafId = requestAnimationFrame(tick);
 }
 
 function pause() {
-  paused=true; cancelAnimationFrame(rafId);
+  paused=true;
+  cancelAnimationFrame(rafId);
+  clearTimeout(autoTimer);
   synth.pause();
 }
 function resume() {
   paused=false;
   synth.resume();
+  const dur = muted ? MUTED_DURATION : 45000;
+  if (muted) autoTimer = setTimeout(onNarrationEnd, Math.max(0, dur - elapsed));
   t0 = performance.now()-elapsed;
   function tick(now) {
     if(paused) return;
     elapsed=now-t0;
-    pBar.style.width=Math.min(100,(elapsed/DURATION)*100)+'%';
-    if(elapsed>=DURATION) { if(cur<N-1) go(cur+1); else showEndScreen(); }
-    else rafId=requestAnimationFrame(tick);
+    pBar.style.width=Math.min(100,(elapsed/dur)*100)+'%';
+    if(elapsed < dur) rafId=requestAnimationFrame(tick);
   }
   rafId=requestAnimationFrame(tick);
 }
@@ -894,8 +915,14 @@ audioBtn.addEventListener('click', () => {
   muted = !muted;
   audioBtn.textContent = muted ? '🔇' : '🔊';
   audioBtn.title = muted ? 'Activar audio' : 'Silenciar';
-  if (muted) synth.cancel();
-  else speak(NARRATION[cur]);
+  if (muted) {
+    synth.cancel();
+    clearTimeout(autoTimer);
+    autoTimer = setTimeout(onNarrationEnd, MUTED_DURATION);
+    startProgress(MUTED_DURATION);
+  } else {
+    speak(NARRATION[cur]);
+  }
 });
 
 
