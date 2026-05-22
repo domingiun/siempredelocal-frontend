@@ -337,7 +337,6 @@ const BetDateInfo = ({ betDateId }) => {
                 ((betDate.prize_PTS || 0) + (betDate.accumulated_prize || 0)) ||
                 (betDate.prize_cop || 0)
               }
-              prefix={<DollarOutlined />}
               prefix="$"
               styles={{ content: { color: '#52c41a' } }}
             />

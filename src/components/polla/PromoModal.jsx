@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 
-export { }; // mantiene compatibilidad de módulo
 export default function PromoModal({ onClose }) {
   const iframeRef = useRef(null);
   const [visible, setVisible] = useState(false);
