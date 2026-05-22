@@ -8,7 +8,7 @@ import {
 } from '@ant-design/icons';
 import { useAuth } from '../../context/AuthContext';
 import pollaService from '../../services/pollaService';
-import PromoModal, { STORAGE_KEY } from '../../components/polla/PromoModal';
+import PromoModal from '../../components/polla/PromoModal';
 import './PollaLandingPage.css';
 
 const POLLA_ID = 1; // ID de la Polla Mundial 2026 en la BD
@@ -47,7 +47,7 @@ export default function PollaLandingPage() {
   const [myStatus, setMyStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState(false);
-  const [showPromo, setShowPromo] = useState(!localStorage.getItem(STORAGE_KEY));
+  const [showPromo, setShowPromo] = useState(true);
   const autoJoinFired = useRef(false);
 
   const autoJoin = searchParams.get('join') === 'true';

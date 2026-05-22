@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-const STORAGE_KEY = 'promo_polla_2026_seen';
-
+export { }; // mantiene compatibilidad de módulo
 export default function PromoModal({ onClose }) {
   const iframeRef = useRef(null);
   const [visible, setVisible] = useState(false);
@@ -16,7 +15,6 @@ export default function PromoModal({ onClose }) {
   }, []);
 
   const close = () => {
-    localStorage.setItem(STORAGE_KEY, '1');
     setVisible(false);
     setTimeout(onClose, 300);
   };
