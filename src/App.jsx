@@ -1,104 +1,92 @@
 // frontend/src/App.jsx
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { ConfigProvider, theme as antdTheme } from 'antd';
+import { ConfigProvider, theme as antdTheme, Spin } from 'antd';
 import esES from 'antd/locale/es_ES';
 import './antd-theme.css';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 
-// Layout
+// Layout y contextos — siempre cargados
 import MainLayout from './components/layout/MainLayout';
-
-// Context Providers
 import { AuthProvider } from './context/AuthContext';
 import { CompetitionProvider } from './context/CompetitionContext';
 import { WalletProvider } from './context/WalletContext';
-
-// Páginas de Autenticación
-import Login from './components/auth/Login';
-import Register from './components/auth/Register';
-import ForgotPassword from './components/auth/ForgotPassword';
-import ResetPassword from './components/auth/ResetPassword';
-
-// Páginas Principales
-import Dashboard from './components/Dashboard';
-import HomePage from './pages/HomePage';
-
-// Páginas de Competencias
-import CompetitionList from './components/competitions/CompetitionList';
-import CompetitionDetail from './components/competitions/CompetitionDetail';
-import CompetitionForm from './components/competitions/CompetitionForm';
-import CompetitionDashboard from './components/competitions/CompetitionDashboard';
-
-// Páginas de Equipos
-import TeamList from './components/teams/TeamList';
-import TeamDetail from './components/teams/TeamDetail';
-import TeamForm from './components/teams/TeamForm';
-
-// Páginas de Partidos
-import MatchesPage from './pages/matches/MatchesPage';
-import MatchDetail from './components/matches/MatchDetail';
-import CreateMatchPage from './pages/matches/CreateMatchPage';
-import EditMatchPage from './pages/matches/EditMatchPage';
-import MatchesTodayPage from './pages/matches/MatchesTodayPage';
-import MatchManagementPage from './pages/matches/MatchManagementPage';
-
-// Páginas de Jornadas
-import RoundManagementPage from './pages/rounds/RoundManagementPage';
-import CompetitionRoundsPage from './pages/rounds/CompetitionRoundsPage';
-import CreateRoundPage from './pages/rounds/CreateRoundPage';
-import EditRoundPage from './pages/rounds/EditRoundPage';
-import RoundDetail from './components/rounds/RoundDetail';
-
-// Páginas de Administración
-import AdminUsersPage from './pages/admin/AdminUsersPage';
-import AdminSystemPage from './pages/admin/AdminSystemPage';
-
-// Páginas de Clasificación
-import StandingsPage from './pages/StandingsPage';
-
-// ¡NUEVAS PÁGINAS DE APUESTAS!
-// Páginas de Usuario
-import ProfilePage from './pages/user/ProfilePage';
-import CalendarPage from './pages/CalendarPage';
-
-// Páginas de Pronósticos
-import BetPage from './pages/bets/BetPage';
-import BetDateDetail from './pages/bets/BetDateDetail';
-import ActiveBets from './pages/bets/ActiveBets';
-import BetRankingPage from './pages/bets/BetRankingPage';
-import CommunityPredictionsPage from './pages/bets/CommunityPredictionsPage';
-
-// Páginas de Mi Cuenta
-import WalletPage from './pages/wallet/WalletPage';
-import PurchaseCreditPage from './pages/wallet/PurchaseCreditsPage';
-import TransactionHistoryPage from './pages/wallet/TransactionHistoryPage';
-import SecurityPolicyPage from './pages/help/SecurityPolicyPage';
-import HelpPage from './pages/help/HelpPage';
-import PerformanceReportPage from './pages/reports/PerformanceReportPage';
-import FinancialReportPage from './pages/reports/FinancialReportPage';
-import AttendanceReportPage from './pages/reports/AttendanceReportPage';
-
-// Páginas de Administración de Pronósticos
-import BetAdminPage from './pages/admin/bets/BetAdminPage';
-import CreateBetDatePage from './pages/admin/bets/CreateBetDatePage';
-
-// Artículos
-import ArticlePage from './pages/articles/ArticlePage';
-import AdminArticlesPage from './pages/admin/articles/AdminArticlesPage';
-
-// Polla Mundial
-import PollaLandingPage from './pages/polla/PollaLandingPage';
-import PollaDashboardPage from './pages/polla/PollaDashboardPage';
-import PollaPredictionsPage from './pages/polla/PollaPredictionsPage';
-import PollaCheckoutPage from './pages/polla/PollaCheckoutPage';
-import PollaAdminPage from './pages/admin/polla/PollaAdminPage';
-
-// Componentes comunes
 import PrivateRoute from './components/common/PrivateRoute';
 import AdminRoute from './components/common/AdminRoute';
 
+// Páginas — lazy: solo se descargan cuando el usuario navega a esa ruta
+const Login               = lazy(() => import('./components/auth/Login'));
+const Register            = lazy(() => import('./components/auth/Register'));
+const ForgotPassword      = lazy(() => import('./components/auth/ForgotPassword'));
+const ResetPassword       = lazy(() => import('./components/auth/ResetPassword'));
+
+const Dashboard           = lazy(() => import('./components/Dashboard'));
+const HomePage            = lazy(() => import('./pages/HomePage'));
+
+const CompetitionList     = lazy(() => import('./components/competitions/CompetitionList'));
+const CompetitionDetail   = lazy(() => import('./components/competitions/CompetitionDetail'));
+const CompetitionForm     = lazy(() => import('./components/competitions/CompetitionForm'));
+const CompetitionDashboard= lazy(() => import('./components/competitions/CompetitionDashboard'));
+
+const TeamList            = lazy(() => import('./components/teams/TeamList'));
+const TeamDetail          = lazy(() => import('./components/teams/TeamDetail'));
+const TeamForm            = lazy(() => import('./components/teams/TeamForm'));
+
+const MatchesPage         = lazy(() => import('./pages/matches/MatchesPage'));
+const MatchDetail         = lazy(() => import('./components/matches/MatchDetail'));
+const CreateMatchPage     = lazy(() => import('./pages/matches/CreateMatchPage'));
+const EditMatchPage       = lazy(() => import('./pages/matches/EditMatchPage'));
+const MatchesTodayPage    = lazy(() => import('./pages/matches/MatchesTodayPage'));
+const MatchManagementPage = lazy(() => import('./pages/matches/MatchManagementPage'));
+
+const RoundManagementPage = lazy(() => import('./pages/rounds/RoundManagementPage'));
+const CompetitionRoundsPage=lazy(() => import('./pages/rounds/CompetitionRoundsPage'));
+const CreateRoundPage     = lazy(() => import('./pages/rounds/CreateRoundPage'));
+const EditRoundPage       = lazy(() => import('./pages/rounds/EditRoundPage'));
+const RoundDetail         = lazy(() => import('./components/rounds/RoundDetail'));
+
+const AdminUsersPage      = lazy(() => import('./pages/admin/AdminUsersPage'));
+const AdminSystemPage     = lazy(() => import('./pages/admin/AdminSystemPage'));
+const StandingsPage       = lazy(() => import('./pages/StandingsPage'));
+
+const ProfilePage         = lazy(() => import('./pages/user/ProfilePage'));
+const CalendarPage        = lazy(() => import('./pages/CalendarPage'));
+
+const BetPage             = lazy(() => import('./pages/bets/BetPage'));
+const BetDateDetail       = lazy(() => import('./pages/bets/BetDateDetail'));
+const ActiveBets          = lazy(() => import('./pages/bets/ActiveBets'));
+const BetRankingPage      = lazy(() => import('./pages/bets/BetRankingPage'));
+const CommunityPredictionsPage = lazy(() => import('./pages/bets/CommunityPredictionsPage'));
+
+const WalletPage          = lazy(() => import('./pages/wallet/WalletPage'));
+const PurchaseCreditPage  = lazy(() => import('./pages/wallet/PurchaseCreditsPage'));
+const TransactionHistoryPage = lazy(() => import('./pages/wallet/TransactionHistoryPage'));
+const SecurityPolicyPage  = lazy(() => import('./pages/help/SecurityPolicyPage'));
+const HelpPage            = lazy(() => import('./pages/help/HelpPage'));
+const PerformanceReportPage = lazy(() => import('./pages/reports/PerformanceReportPage'));
+const FinancialReportPage = lazy(() => import('./pages/reports/FinancialReportPage'));
+const AttendanceReportPage= lazy(() => import('./pages/reports/AttendanceReportPage'));
+
+const BetAdminPage        = lazy(() => import('./pages/admin/bets/BetAdminPage'));
+const CreateBetDatePage   = lazy(() => import('./pages/admin/bets/CreateBetDatePage'));
+
+const ArticlePage         = lazy(() => import('./pages/articles/ArticlePage'));
+const AdminArticlesPage   = lazy(() => import('./pages/admin/articles/AdminArticlesPage'));
+
+const PollaLandingPage    = lazy(() => import('./pages/polla/PollaLandingPage'));
+const PollaDashboardPage  = lazy(() => import('./pages/polla/PollaDashboardPage'));
+const PollaPredictionsPage= lazy(() => import('./pages/polla/PollaPredictionsPage'));
+const PollaCheckoutPage   = lazy(() => import('./pages/polla/PollaCheckoutPage'));
+const PollaAdminPage      = lazy(() => import('./pages/admin/polla/PollaAdminPage'));
+
 const POLLA_MODE = import.meta.env.VITE_POLLA_MODE === 'true';
+
+const PageLoader = () => (
+  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center',
+    height: '100vh', background: '#060d18' }}>
+    <Spin size="large" />
+  </div>
+);
 
 const ThemedConfigProvider = ({ children }) => {
   const { mode } = useTheme();
@@ -143,6 +131,7 @@ function App() {
           <AuthProvider>
             <WalletProvider> {/* ¡NUEVO! Envolver todo con WalletProvider */}
               <CompetitionProvider>
+                <Suspense fallback={<PageLoader />}>
                 <Routes>
                 {/* Rutas públicas */}
                 <Route path="/" element={POLLA_MODE ? <Navigate to="/mundial" replace /> : <HomePage />} />
@@ -261,6 +250,7 @@ function App() {
                   </div>
                 } />
                 </Routes>
+                </Suspense>
               </CompetitionProvider>
             </WalletProvider>
           </AuthProvider>
