@@ -43,52 +43,62 @@ export default function PollaPredictionsPage() {
   const [pollaId, setPollaId] = useState(null);
   const [matches, setMatches] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
   const [current, setCurrent] = useState(0);
   const [predictions, setPredictions] = useState({});  // polla_match_id → { prediction_result, predicted_winner_id }
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState({});               // polla_match_id → true si guardado
 
-  useEffect(() => {
-    (async () => {
+  const loadData = async () => {
+    setLoading(true);
+    setLoadError(null);
+    try {
+      const list = await pollaService.listPollas();
+      const paramId = searchParams.get('id');
+      const active = paramId
+        ? (list.find(p => p.id === Number(paramId)) || pickMundialPolla(list))
+        : pickMundialPolla(list);
+      if (!active) { setLoading(false); return; }
+      setPollaId(active.id);
+
+      let nextMatches;
       try {
-        const list = await pollaService.listPollas();
-        const paramId = searchParams.get('id');
-        const active = paramId
-          ? (list.find(p => p.id === Number(paramId)) || pickMundialPolla(list))
-          : pickMundialPolla(list);
-        if (!active) { setLoading(false); return; }
-        setPollaId(active.id);
-
-        const [nextMatches, myPreds] = await Promise.all([
-          pollaService.getNextMatches(active.id, 104),
-          pollaService.getMyPredictions(active.id).catch(() => []),
-        ]);
-
-        setMatches(nextMatches);
-
-        // Pre-fill existing predictions
-        const prefill = {};
-        const savedInit = {};
-        for (const pred of myPreds) {
-          prefill[pred.polla_match_id] = {
-            prediction_result: pred.prediction_result,
-            predicted_winner_id: pred.predicted_winner_id,
-          };
-          savedInit[pred.polla_match_id] = true;
-        }
-        setPredictions(prefill);
-        setSaved(savedInit);
-
-        // Saltar al primer partido sin predicción guardada
-        const firstUnpredicted = nextMatches.findIndex(m => !savedInit[m.id]);
-        setCurrent(firstUnpredicted >= 0 ? firstUnpredicted : 0);
-      } catch (e) {
-        // silent
-      } finally {
+        nextMatches = await pollaService.getNextMatches(active.id, 104);
+      } catch (err) {
+        const detail = err?.response?.data?.detail || err?.message || 'Error desconocido';
+        setLoadError(`No se pudieron cargar los partidos: ${detail}`);
         setLoading(false);
+        return;
       }
-    })();
-  }, []);
+
+      const myPreds = await pollaService.getMyPredictions(active.id).catch(() => []);
+
+      setMatches(nextMatches);
+
+      // Pre-fill existing predictions
+      const prefill = {};
+      const savedInit = {};
+      for (const pred of myPreds) {
+        prefill[pred.polla_match_id] = {
+          prediction_result: pred.prediction_result,
+          predicted_winner_id: pred.predicted_winner_id,
+        };
+        savedInit[pred.polla_match_id] = true;
+      }
+      setPredictions(prefill);
+      setSaved(savedInit);
+
+      // Saltar al primer partido sin predicción guardada
+      const firstUnpredicted = nextMatches.findIndex(m => !savedInit[m.id]);
+      setCurrent(firstUnpredicted >= 0 ? firstUnpredicted : 0);
+    } catch (e) {
+      setLoadError(e?.response?.data?.detail || e?.message || 'Error al cargar la página');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { loadData(); }, []);
 
   const currentMatch = matches[current];
 
@@ -137,6 +147,22 @@ export default function PollaPredictionsPage() {
     return (
       <div className="polla-predict-loading">
         <Spin size="large" />
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="polla-predict-empty">
+        <span style={{ fontSize: 40 }}>⚠️</span>
+        <h2 style={{ color: '#f59e0b' }}>Error al cargar</h2>
+        <p style={{ color: '#94a3b8', maxWidth: 320, textAlign: 'center' }}>{loadError}</p>
+        <Button type="primary" onClick={loadData} style={{ marginBottom: 8 }}>
+          Reintentar
+        </Button>
+        <Button type="text" style={{ color: '#64748b' }} onClick={() => navigate(`/mundial/dashboard${pollaId ? `?id=${pollaId}` : ''}`)}>
+          Volver al dashboard
+        </Button>
       </div>
     );
   }
