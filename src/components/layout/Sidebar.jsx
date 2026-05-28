@@ -41,6 +41,8 @@ import { useWallet } from '../../context/WalletContext'; // ¡NUEVO!
 import './Sidebar.css';
 import logo from '../../assets/logo.png';
 
+const POLLA_MODE = import.meta.env.VITE_POLLA_MODE === 'true';
+
 const { Sider } = Layout;
 const { Text } = Typography;
 
@@ -109,124 +111,94 @@ const Sidebar = ({ collapsed, onCollapse, isMobile }) => {
         icon: <span style={{ fontSize: 14 }}>⚽</span>,
         label: 'Polla Mundial',
       },
-      // 4. Pronósticos
-      {
-        key: 'bets-submenu',
-        icon: <FireOutlined />,
-        label: 'Pronósticos',
-        children: [
-          {
-            key: '/bets',
-            icon: <FireOutlined />,
-            label: 'Hacer Pronósticos',
-            badge: wallet?.credits > 0 ? (
-              <Badge count={wallet.credits} size="small"
-                style={{ backgroundColor: '#52c41a', marginLeft: 8 }} />
-            ) : null,
-          },
-          {
-            key: '/active-bets',
-            icon: <HistoryOutlined />,
-            label: 'Mis Pronósticos',
-          },
-          {
-            key: '/bets/ranking',
-            icon: <TrophyOutlined />,
-            label: 'Ranking',
-          },
-          {
-            key: '/bets/community',
-            icon: <TeamOutlined />,
-            label: 'Ver Pronósticos',
-          },
-          {
-            key: '/transactions',
-            icon: <CreditCardOutlined />,
-            label: 'Mi Historial',
-          },
-        ],
-      },
-      // 5. Partidos — 3 items para todos, gestión solo admin
-      {
-        key: 'matches-submenu',
-        icon: <CalendarOutlined />,
-        label: 'Partidos',
-        children: [
-          {
-            key: '/matches/calendar',
-            icon: <CalendarOutlined />,
-            label: 'Calendario',
-          },
-          {
-            key: '/matches/today',
-            icon: <FireOutlined />,
-            label: 'Partidos de Hoy',
-          },
-          {
-            key: '/matches',
-            icon: <AppstoreOutlined />,
-            label: 'Todos los Partidos',
-          },
-          ...(user?.role === 'admin' ? [
+      ...(!POLLA_MODE ? [
+        // 4. Pronósticos
+        {
+          key: 'bets-submenu',
+          icon: <FireOutlined />,
+          label: 'Pronósticos',
+          children: [
             {
-              key: '/matches/new',
-              icon: <PlusOutlined />,
-              label: 'Nuevo Partido',
+              key: '/bets',
+              icon: <FireOutlined />,
+              label: 'Hacer Pronósticos',
+              badge: wallet?.credits > 0 ? (
+                <Badge count={wallet.credits} size="small"
+                  style={{ backgroundColor: '#52c41a', marginLeft: 8 }} />
+              ) : null,
             },
-            {
-              key: '/matches/management',
-              icon: <ScheduleOutlined />,
-              label: 'Gestión Avanzada',
-            },
-          ] : []),
-        ],
-      },
+            { key: '/active-bets',    icon: <HistoryOutlined />,    label: 'Mis Pronósticos' },
+            { key: '/bets/ranking',   icon: <TrophyOutlined />,     label: 'Ranking' },
+            { key: '/bets/community', icon: <TeamOutlined />,       label: 'Ver Pronósticos' },
+            { key: '/transactions',   icon: <CreditCardOutlined />, label: 'Mi Historial' },
+          ],
+        },
+        // 5. Partidos
+        {
+          key: 'matches-submenu',
+          icon: <CalendarOutlined />,
+          label: 'Partidos',
+          children: [
+            { key: '/matches/calendar', icon: <CalendarOutlined />, label: 'Calendario' },
+            { key: '/matches/today',    icon: <FireOutlined />,     label: 'Partidos de Hoy' },
+            { key: '/matches',          icon: <AppstoreOutlined />, label: 'Todos los Partidos' },
+            ...(user?.role === 'admin' ? [
+              { key: '/matches/new',        icon: <PlusOutlined />,    label: 'Nuevo Partido' },
+              { key: '/matches/management', icon: <ScheduleOutlined />, label: 'Gestión Avanzada' },
+            ] : []),
+          ],
+        },
+      ] : []),
     ];
 
     // Solo admin: Competencias, Equipos, Reportes, Administración
     if (user?.role === 'admin') {
       items.push(
-        {
-          key: 'competitions-submenu',
-          icon: <TrophyOutlined />,
-          label: 'Competencias',
-          children: [
-            { key: '/competitions',      icon: <AppstoreOutlined />, label: 'Todas las Competencias' },
-            { key: '/competitions/new',  icon: <PlusOutlined />,     label: 'Nueva Competencia' },
-            { key: '/rounds/management', icon: <ScheduleOutlined />, label: 'Gestión de Jornadas' },
-            { key: '/rounds/new',        icon: <FlagOutlined />,     label: 'Nueva Jornada' },
-          ],
-        },
-        {
-          key: 'teams-submenu',
-          icon: <TeamOutlined />,
-          label: 'Equipos',
-          children: [
-            { key: '/teams',     icon: <TeamOutlined />, label: 'Todos los Equipos' },
-            { key: '/teams/new', icon: <PlusOutlined />, label: 'Nuevo Equipo' },
-          ],
-        },
-        {
-          key: 'reports-submenu',
-          icon: <LineChartOutlined />,
-          label: 'Reportes',
-          children: [
-            { key: '/reports/performance', icon: <LineChartOutlined />, label: 'Rendimiento' },
-            { key: '/reports/financial',   icon: <ContainerOutlined />, label: 'Financiero' },
-            { key: '/reports/attendance',  icon: <UserOutlined />,      label: 'Asistencia' },
-          ],
-        },
+        ...(!POLLA_MODE ? [
+          {
+            key: 'competitions-submenu',
+            icon: <TrophyOutlined />,
+            label: 'Competencias',
+            children: [
+              { key: '/competitions',      icon: <AppstoreOutlined />, label: 'Todas las Competencias' },
+              { key: '/competitions/new',  icon: <PlusOutlined />,     label: 'Nueva Competencia' },
+              { key: '/rounds/management', icon: <ScheduleOutlined />, label: 'Gestión de Jornadas' },
+              { key: '/rounds/new',        icon: <FlagOutlined />,     label: 'Nueva Jornada' },
+            ],
+          },
+          {
+            key: 'teams-submenu',
+            icon: <TeamOutlined />,
+            label: 'Equipos',
+            children: [
+              { key: '/teams',     icon: <TeamOutlined />, label: 'Todos los Equipos' },
+              { key: '/teams/new', icon: <PlusOutlined />, label: 'Nuevo Equipo' },
+            ],
+          },
+          {
+            key: 'reports-submenu',
+            icon: <LineChartOutlined />,
+            label: 'Reportes',
+            children: [
+              { key: '/reports/performance', icon: <LineChartOutlined />, label: 'Rendimiento' },
+              { key: '/reports/financial',   icon: <ContainerOutlined />, label: 'Financiero' },
+              { key: '/reports/attendance',  icon: <UserOutlined />,      label: 'Asistencia' },
+            ],
+          },
+        ] : []),
         {
           key: 'admin-submenu',
           icon: <SettingOutlined />,
           label: 'Administración',
           children: [
-            { key: '/admin/users',          icon: <UserOutlined />,       label: 'Usuarios' },
-            { key: '/admin/system',         icon: <SettingOutlined />,    label: 'Configuración' },
-            { key: '/admin/bets',           icon: <ControlOutlined />,    label: 'Admin Recargas' },
-            { key: '/admin/create-betdate', icon: <PlusCircleOutlined />, label: 'Nueva Fecha' },
-            { key: '/admin/articles',       icon: <FileTextOutlined />,   label: 'Artículos' },
-            { key: '/admin/polla',          icon: <span style={{ fontSize: 14 }}>⚽</span>, label: 'Polla Mundial' },
+            { key: '/admin/users',    icon: <UserOutlined />,    label: 'Usuarios' },
+            { key: '/admin/system',   icon: <SettingOutlined />, label: 'Configuración' },
+            { key: '/admin/bets',     icon: <ControlOutlined />, label: 'Admin Recargas' },
+            ...(!POLLA_MODE ? [
+              { key: '/admin/create-betdate', icon: <PlusCircleOutlined />, label: 'Nueva Fecha' },
+            ] : []),
+            { key: '/admin/articles', icon: <FileTextOutlined />, label: 'Artículos' },
+            { key: '/admin/polla',    icon: <span style={{ fontSize: 14 }}>⚽</span>, label: 'Polla Mundial' },
           ],
         },
       );
@@ -492,15 +464,17 @@ const Sidebar = ({ collapsed, onCollapse, isMobile }) => {
             </Tooltip>
 
             {/* Pronósticos */}
-            <Tooltip title="Pronósticos" placement="right">
-              <Button
-                type="dashed"
-                icon={<FireOutlined />}
-                onClick={() => navigate('/bets')}
-                className="quick-btn"
-                style={{ marginBottom: 8, borderColor: '#ff4d4f', color: '#ff4d4f' }}
-              />
-            </Tooltip>
+            {!POLLA_MODE && (
+              <Tooltip title="Pronósticos" placement="right">
+                <Button
+                  type="dashed"
+                  icon={<FireOutlined />}
+                  onClick={() => navigate('/bets')}
+                  className="quick-btn"
+                  style={{ marginBottom: 8, borderColor: '#ff4d4f', color: '#ff4d4f' }}
+                />
+              </Tooltip>
+            )}
             
             {/* Recargar créditos si tiene pocos */}
             {wallet?.credits < 3 && (

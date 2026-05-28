@@ -98,6 +98,8 @@ import PollaAdminPage from './pages/admin/polla/PollaAdminPage';
 import PrivateRoute from './components/common/PrivateRoute';
 import AdminRoute from './components/common/AdminRoute';
 
+const POLLA_MODE = import.meta.env.VITE_POLLA_MODE === 'true';
+
 const ThemedConfigProvider = ({ children }) => {
   const { mode } = useTheme();
   const isDark = mode === 'dark';
@@ -143,8 +145,8 @@ function App() {
               <CompetitionProvider>
                 <Routes>
                 {/* Rutas públicas */}
-                <Route path="/" element={<HomePage />} />
-                <Route path="/home" element={<HomePage />} />
+                <Route path="/" element={POLLA_MODE ? <Navigate to="/mundial" replace /> : <HomePage />} />
+                <Route path="/home" element={POLLA_MODE ? <Navigate to="/mundial" replace /> : <HomePage />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -158,7 +160,7 @@ function App() {
                 <Route element={<PrivateRoute />}>
                   <Route element={<MainLayout />}>
                     {/* Dashboard */}
-                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/dashboard" element={POLLA_MODE ? <Navigate to="/mundial/dashboard" replace /> : <Dashboard />} />
 
                     {/* Ayuda */}
                     <Route path="/help" element={<HelpPage />} />
