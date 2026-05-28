@@ -55,14 +55,25 @@
 }
 
 .polla-predict-dot {
-  width: 14px;
-  height: 14px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   border: 2px solid rgba(255,255,255,0.15);
   background: rgba(255,255,255,0.05);
   cursor: pointer;
   transition: all 0.15s;
   padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.polla-dot-letter {
+  font-size: 7px;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1;
+  pointer-events: none;
 }
 
 .polla-predict-dot.active {
@@ -71,10 +82,11 @@
   transform: scale(1.3);
 }
 
-.polla-predict-dot.saved {
-  background: #16a34a;
-  border-color: #16a34a;
-}
+/* L = azul, E = ámbar, V = rojo, eliminatorias = verde */
+.polla-predict-dot.saved-L      { background: #3b82f6; border-color: #3b82f6; }
+.polla-predict-dot.saved-E      { background: #f59e0b; border-color: #f59e0b; }
+.polla-predict-dot.saved-V      { background: #ef4444; border-color: #ef4444; }
+.polla-predict-dot.saved-winner { background: #16a34a; border-color: #16a34a; }
 
 .polla-predict-dot.local {
   background: rgba(34,197,94,0.3);
@@ -292,8 +304,9 @@
   /* Página */
   .polla-predict { padding: 16px 12px 60px; }
 
-  /* Dots más pequeños en mobile */
-  .polla-predict-dot { width: 10px; height: 10px; }
+  /* Dots en mobile: más pequeños, sin letra */
+  .polla-predict-dot { width: 12px; height: 12px; }
+  .polla-dot-letter  { display: none; }
   .polla-predict-nav { gap: 4px; margin-bottom: 20px; }
 
   /* Header compacto */

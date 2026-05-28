@@ -78,6 +78,10 @@ export default function PollaPredictionsPage() {
         }
         setPredictions(prefill);
         setSaved(savedInit);
+
+        // Saltar al primer partido sin predicción guardada
+        const firstUnpredicted = nextMatches.findIndex(m => !savedInit[m.id]);
+        setCurrent(firstUnpredicted >= 0 ? firstUnpredicted : 0);
       } catch (e) {
         // silent
       } finally {
@@ -182,17 +186,19 @@ export default function PollaPredictionsPage() {
         {matches.map((pm, i) => {
           const isSaved = saved[pm.id];
           const hasLocal = !!predictions[pm.id];
+          const result = predictions[pm.id]?.prediction_result;
+          const savedClass = isSaved
+            ? (result ? `saved-${result}` : 'saved-winner')
+            : hasLocal ? 'local' : '';
           return (
             <button
               key={pm.id}
-              className={[
-                'polla-predict-dot',
-                i === current ? 'active' : '',
-                isSaved ? 'saved' : hasLocal ? 'local' : '',
-              ].join(' ')}
+              className={['polla-predict-dot', i === current ? 'active' : '', savedClass].join(' ')}
               onClick={() => setCurrent(i)}
               title={`${pm.home_team} vs ${pm.away_team}`}
-            />
+            >
+              {isSaved && result && <span className="polla-dot-letter">{result}</span>}
+            </button>
           );
         })}
       </div>
