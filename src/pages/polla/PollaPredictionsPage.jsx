@@ -266,10 +266,14 @@ function MatchCard({
   onPrev, onNext, matchIndex, matchTotal,
 }) {
   const isGroups = pm.phase === 'groups';
-  const closeAt = pm.close_at ? new Date(pm.close_at) : null;
+  const closeAtRaw = pm.close_at;
+  const closeAt = closeAtRaw
+    ? new Date(closeAtRaw.endsWith('Z') || closeAtRaw.includes('+') ? closeAtRaw : closeAtRaw + 'Z')
+    : null;
   const countdown = closeAt ? formatCountdown(closeAt) : null;
   const matchDate = pm.match_date
-    ? new Date(pm.match_date).toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short' })
+    ? new Date(pm.match_date.endsWith('Z') || pm.match_date.includes('+') ? pm.match_date : pm.match_date + 'Z')
+        .toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'America/Bogota' })
     : null;
 
   const selectedResult = prediction?.prediction_result;
