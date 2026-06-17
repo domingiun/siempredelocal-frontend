@@ -268,12 +268,15 @@ function PollaDashboard({ pollaId }) {
         const [detail, status, matches] = await Promise.all([
           pollaService.getPolla(pollaId),
           pollaService.getMyStatus(pollaId).catch(() => ({ is_participant: false })),
-          pollaService.getPollaMatches(pollaId),
+          pollaService.getPollaMatches(pollaId).catch(() => []),
         ]);
         setPolla(detail);
         setMyStatus(status);
         setPollaMatches(matches);
-      } catch {}
+      } catch (err) {
+        // Solo llega aquí si getPolla falla (polla inexistente o error red)
+        // polla queda null → muestra "Polla no encontrada"
+      }
       finally { setLoading(false); }
     })();
   }, [pollaId]);

@@ -61,17 +61,18 @@ export default function PollaPredictionsPage() {
       if (!active) { setLoading(false); return; }
       setPollaId(active.id);
 
-      let nextMatches;
+      let nextMatches, myPreds;
       try {
-        nextMatches = await pollaService.getNextMatches(active.id, 104);
+        [nextMatches, myPreds] = await Promise.all([
+          pollaService.getNextMatches(active.id, 104),
+          pollaService.getMyPredictions(active.id).catch(() => []),
+        ]);
       } catch (err) {
         const detail = err?.response?.data?.detail || err?.message || 'Error desconocido';
         setLoadError(`No se pudieron cargar los partidos: ${detail}`);
         setLoading(false);
         return;
       }
-
-      const myPreds = await pollaService.getMyPredictions(active.id).catch(() => []);
 
       setMatches(nextMatches);
 

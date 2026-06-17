@@ -28,8 +28,11 @@ const pollaService = {
     fromCache(`polla_${pollaId}`, () => api.get(`${BASE}/${pollaId}`).then(r => r.data)),
 
   getPollaMatches: (pollaId, phase = null) => {
-    const params = phase ? { phase } : {};
-    return api.get(`${BASE}/${pollaId}/matches`, { params }).then(r => r.data);
+    const key = phase ? `matches_${pollaId}_${phase}` : `matches_${pollaId}`;
+    return fromCache(key, () => {
+      const params = phase ? { phase } : {};
+      return api.get(`${BASE}/${pollaId}/matches`, { params }).then(r => r.data);
+    });
   },
 
   // ── Autenticados ────────────────────────────────────────────────────────
@@ -69,14 +72,20 @@ const pollaService = {
     }),
 
   adminAddMatch: (pollaId, data) =>
-    api.post(`${BASE}/admin/${pollaId}/add-match`, data).then(r => r.data),
+    api.post(`${BASE}/admin/${pollaId}/add-match`, data).then(r => {
+      bust(`matches_${pollaId}`);
+      return r.data;
+    }),
 
   adminRemoveMatch: (pollaId, pmId) =>
-    api.delete(`${BASE}/admin/${pollaId}/match/${pmId}`).then(r => r.data),
+    api.delete(`${BASE}/admin/${pollaId}/match/${pmId}`).then(r => {
+      bust(`matches_${pollaId}`);
+      return r.data;
+    }),
 
   adminScoreMatch: (pollaId, pmId, data) =>
     api.post(`${BASE}/admin/${pollaId}/score-match/${pmId}`, data).then(r => {
-      bust(`polla_${pollaId}`, `status_${pollaId}`);
+      bust(`polla_${pollaId}`, `status_${pollaId}`, `matches_${pollaId}`);
       return r.data;
     }),
 
@@ -97,13 +106,13 @@ const pollaService = {
 
   adminRescoreMatch: (pollaId, pmId, data = {}) =>
     api.post(`${BASE}/admin/${pollaId}/rescore-match/${pmId}`, data).then(r => {
-      bust(`polla_${pollaId}`, `status_${pollaId}`);
+      bust(`polla_${pollaId}`, `status_${pollaId}`, `matches_${pollaId}`);
       return r.data;
     }),
 
   adminRescoreFinished: (pollaId) =>
     api.post(`${BASE}/admin/${pollaId}/rescore-finished`).then(r => {
-      bust(`polla_${pollaId}`);
+      bust(`polla_${pollaId}`, `matches_${pollaId}`);
       return r.data;
     }),
 
