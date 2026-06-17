@@ -9,6 +9,7 @@ import {
   PlusOutlined, DeleteOutlined, TrophyOutlined, TeamOutlined,
   SettingOutlined, UnorderedListOutlined, ReloadOutlined,
   CheckCircleOutlined, ClockCircleOutlined, CalendarOutlined,
+  RetweetOutlined,
 } from '@ant-design/icons';
 import pollaService from '../../../services/pollaService';
 import { competitionsAPI, matchesAPI } from '../../../services/api';
@@ -184,6 +185,17 @@ export default function PollaAdminPage() {
       message.success('Rankings actualizados');
       loadParticipants();
     } catch { message.error('Error al actualizar rankings'); }
+  };
+
+  const handleRescoreMatch = async (pmId, data = {}) => {
+    try {
+      const res = await pollaService.adminRescoreMatch(polla.id, pmId, data);
+      message.success(`Recálculo completo · ${res.rescored_matches} partido(s) re-puntuados`);
+      loadPollaMatches();
+      loadParticipants();
+    } catch (err) {
+      message.error(err?.response?.data?.detail || 'Error al recalcular');
+    }
   };
 
   const [rescoring, setRescoring] = useState(false);
@@ -373,6 +385,7 @@ export default function PollaAdminPage() {
                 loading={loadingPM}
                 onRemove={handleRemove}
                 onReload={loadPollaMatches}
+                onRescoreMatch={handleRescoreMatch}
               />
             ),
           },
@@ -744,8 +757,111 @@ function AddMatchesTab({
 
 // ── Tab: Partidos en la polla ──────────────────────────────────────────
 
-function PollaMatchesTab({ pollaMatches, loading, onRemove, onReload }) {
+function RescoreModal({ pm, open, onConfirm, onCancel }) {
+  const [selectedResult, setSelectedResult] = useState(null);
+  const [rescoring, setRescoring] = useState(false);
+
+  const isGroups = pm?.phase === 'groups';
+  const homeScore = pm?.home_score;
+  const awayScore = pm?.away_score;
+  const hasScore = homeScore !== null && homeScore !== undefined && awayScore !== null && awayScore !== undefined;
+
+  let derivedResult = null;
+  if (hasScore && isGroups) {
+    if (homeScore > awayScore) derivedResult = 'L';
+    else if (awayScore > homeScore) derivedResult = 'V';
+    else derivedResult = 'E';
+  }
+
+  const handleOk = async () => {
+    setRescoring(true);
+    try {
+      // Si hay override manual, enviarlo; si no, dejar que el backend re-derive
+      const data = selectedResult ? { actual_result: selectedResult } : {};
+      await onConfirm(pm.id, data);
+    } finally {
+      setRescoring(false);
+      setSelectedResult(null);
+    }
+  };
+
+  const handleCancel = () => {
+    setSelectedResult(null);
+    onCancel();
+  };
+
+  if (!pm) return null;
+
+  return (
+    <Modal
+      open={open}
+      title={<span><RetweetOutlined style={{ color: '#f59e0b', marginRight: 8 }} />Corregir puntuación</span>}
+      onCancel={handleCancel}
+      onOk={handleOk}
+      okText="Confirmar recálculo"
+      cancelText="Cancelar"
+      confirmLoading={rescoring}
+      width={440}
+      styles={{
+        content: { background: '#0c1525', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16 },
+        header: { background: '#0c1525', borderBottom: '1px solid rgba(255,255,255,0.07)' },
+      }}
+    >
+      <div style={{ marginBottom: 16 }}>
+        <div style={{ color: '#64748b', fontSize: '0.78rem', marginBottom: 6 }}>Partido</div>
+        <div style={{ color: '#f1f5f9', fontWeight: 600 }}>
+          {pm.home_team} vs {pm.away_team}
+        </div>
+        {hasScore && (
+          <div style={{ color: '#94a3b8', fontSize: '0.88rem', marginTop: 4 }}>
+            Marcador en sistema: <strong style={{ color: '#fff' }}>{homeScore} — {awayScore}</strong>
+          </div>
+        )}
+      </div>
+
+      <div style={{ display: 'flex', gap: 16, marginBottom: 16 }}>
+        <div style={{ flex: 1, background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: 10, padding: '10px 14px' }}>
+          <div style={{ color: '#64748b', fontSize: '0.72rem', marginBottom: 4 }}>Resultado incorrecto (actual)</div>
+          <div style={{ color: '#ef4444', fontWeight: 700 }}>{pm.actual_result || '—'}</div>
+        </div>
+        {derivedResult && (
+          <div style={{ flex: 1, background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.25)', borderRadius: 10, padding: '10px 14px' }}>
+            <div style={{ color: '#64748b', fontSize: '0.72rem', marginBottom: 4 }}>Resultado correcto (derivado)</div>
+            <div style={{ color: '#22c55e', fontWeight: 700 }}>{derivedResult}</div>
+          </div>
+        )}
+      </div>
+
+      {isGroups && (
+        <div>
+          <div style={{ color: '#64748b', fontSize: '0.78rem', marginBottom: 8 }}>
+            Override manual (opcional — si el marcador en sistema ya es correcto, deja vacío)
+          </div>
+          <Select
+            allowClear
+            placeholder="L / E / V (dejar vacío para auto-derivar)"
+            style={{ width: '100%' }}
+            value={selectedResult}
+            onChange={setSelectedResult}
+            options={[
+              { value: 'L', label: 'L — Local gana' },
+              { value: 'E', label: 'E — Empate' },
+              { value: 'V', label: 'V — Visitante gana' },
+            ]}
+          />
+        </div>
+      )}
+
+      <div style={{ marginTop: 16, background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 10, padding: '10px 14px', fontSize: '0.8rem', color: '#fbbf24' }}>
+        ⚠️ Este proceso resetea y recalcula los puntos de TODOS los partidos ya puntuados en la polla, incluyendo bonificaciones de fase.
+      </div>
+    </Modal>
+  );
+}
+
+function PollaMatchesTab({ pollaMatches, loading, onRemove, onReload, onRescoreMatch }) {
   const [phaseFilter, setPhaseFilter] = useState(null);
+  const [rescoreTarget, setRescoreTarget] = useState(null);
 
   const filtered = phaseFilter
     ? pollaMatches.filter(pm => pm.phase === phaseFilter)
@@ -801,20 +917,32 @@ function PollaMatchesTab({ pollaMatches, loading, onRemove, onReload }) {
     },
     {
       title: '',
-      width: 50,
+      width: 110,
       render: (_, r) => (
-        <Tooltip title={r.is_scored ? 'Ya puntuado' : 'Quitar de la polla'}>
-          <Button
-            danger size="small" icon={<DeleteOutlined />}
-            disabled={r.is_scored}
-            style={{ opacity: r.is_scored ? 0.4 : 1 }}
-            onClick={() => Modal.confirm({
-              title: '¿Quitar este partido de la polla?',
-              content: `${r.home_team} vs ${r.away_team}`,
-              onOk: () => onRemove(r.id),
-            })}
-          />
-        </Tooltip>
+        <Space size={4}>
+          {r.is_scored && (
+            <Tooltip title="Corregir resultado y recalcular puntos">
+              <Button
+                size="small"
+                icon={<RetweetOutlined />}
+                style={{ background: 'rgba(245,158,11,0.12)', borderColor: 'rgba(245,158,11,0.3)', color: '#f59e0b' }}
+                onClick={() => setRescoreTarget(r)}
+              />
+            </Tooltip>
+          )}
+          <Tooltip title={r.is_scored ? 'Ya puntuado' : 'Quitar de la polla'}>
+            <Button
+              danger size="small" icon={<DeleteOutlined />}
+              disabled={r.is_scored}
+              style={{ opacity: r.is_scored ? 0.4 : 1 }}
+              onClick={() => Modal.confirm({
+                title: '¿Quitar este partido de la polla?',
+                content: `${r.home_team} vs ${r.away_team}`,
+                onOk: () => onRemove(r.id),
+              })}
+            />
+          </Tooltip>
+        </Space>
       ),
     },
   ];
@@ -853,6 +981,16 @@ function PollaMatchesTab({ pollaMatches, loading, onRemove, onReload }) {
         loading={loading}
         size="small"
         pagination={{ pageSize: 20, showSizeChanger: false }}
+      />
+
+      <RescoreModal
+        pm={rescoreTarget}
+        open={!!rescoreTarget}
+        onConfirm={async (pmId, data) => {
+          await onRescoreMatch(pmId, data);
+          setRescoreTarget(null);
+        }}
+        onCancel={() => setRescoreTarget(null)}
       />
     </Card>
   );

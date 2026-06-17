@@ -95,6 +95,12 @@ const pollaService = {
   getParticipantPredictions: (pollaId, userId) =>
     api.get(`${BASE}/${pollaId}/participant/${userId}/predictions`).then(r => r.data),
 
+  adminRescoreMatch: (pollaId, pmId, data = {}) =>
+    api.post(`${BASE}/admin/${pollaId}/rescore-match/${pmId}`, data).then(r => {
+      bust(`polla_${pollaId}`, `status_${pollaId}`);
+      return r.data;
+    }),
+
   adminRescoreFinished: (pollaId) =>
     api.post(`${BASE}/admin/${pollaId}/rescore-finished`).then(r => {
       bust(`polla_${pollaId}`);
