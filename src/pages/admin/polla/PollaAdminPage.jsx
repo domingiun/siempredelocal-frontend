@@ -212,6 +212,20 @@ export default function PollaAdminPage() {
     }
   };
 
+  const [recomputingBonuses, setRecomputingBonuses] = useState(false);
+  const handleRecomputeBonuses = async () => {
+    setRecomputingBonuses(true);
+    try {
+      const res = await pollaService.adminRecomputeBonuses(polla.id);
+      message.success(`Bonos recalculados para fases: ${res.phases_recomputed.join(', ') || 'ninguna'}`);
+      loadParticipants();
+    } catch (err) {
+      message.error(err?.response?.data?.detail || 'Error al recalcular bonos');
+    } finally {
+      setRecomputingBonuses(false);
+    }
+  };
+
   const [finalizing, setFinalizing] = useState(false);
   const handleFinalizePolla = async () => {
     setFinalizing(true);
@@ -400,6 +414,8 @@ export default function PollaAdminPage() {
                 onUpdateRankings={handleUpdateRankings}
                 onRescoreFinished={handleRescoreFinished}
                 rescoring={rescoring}
+                onRecomputeBonuses={handleRecomputeBonuses}
+                recomputingBonuses={recomputingBonuses}
                 onReload={loadParticipants}
                 onFinalize={handleFinalizePolla}
                 finalizing={finalizing}
@@ -1001,6 +1017,7 @@ function PollaMatchesTab({ pollaMatches, loading, onRemove, onReload, onRescoreM
 function ParticipantsTab({
   participants, polla, loading,
   onUpdateRankings, onRescoreFinished, rescoring,
+  onRecomputeBonuses, recomputingBonuses,
   onReload, onFinalize, finalizing,
 }) {
   const [showFinalizeModal, setShowFinalizeModal] = useState(false);
@@ -1084,6 +1101,17 @@ function ParticipantsTab({
             style={{ background: '#1d4ed8', borderColor: '#1d4ed8', color: '#fff' }}
           >
             Puntuar partidos finalizados
+          </Button>
+        </Tooltip>
+        <Tooltip title="Resetea y recalcula los bonos (racha + más aciertos) para todas las fases ya completadas">
+          <Button
+            icon={<TrophyOutlined />}
+            onClick={onRecomputeBonuses}
+            loading={recomputingBonuses}
+            disabled={isFinished}
+            style={{ background: '#7c3aed', borderColor: '#7c3aed', color: '#fff' }}
+          >
+            Recalcular bonos
           </Button>
         </Tooltip>
         <Button

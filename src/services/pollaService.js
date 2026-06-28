@@ -116,6 +116,12 @@ const pollaService = {
       return r.data;
     }),
 
+  adminRecomputeBonuses: (pollaId) =>
+    api.post(`${BASE}/admin/${pollaId}/recompute-bonuses`).then(r => {
+      bust(`polla_${pollaId}`, `status_${pollaId}`);
+      return r.data;
+    }),
+
   adminFinalizePolla: (pollaId) =>
     api.post(`${BASE}/admin/${pollaId}/finalize`).then(r => {
       bust('listPollas', `polla_${pollaId}`);
