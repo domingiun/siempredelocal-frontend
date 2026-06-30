@@ -398,7 +398,16 @@ const MatchDetail = () => {
                   </>
                 )}
               </div>
-              
+
+              {/* Penaltis */}
+              {match.penalty_home != null && match.penalty_away != null && (
+                <div style={{ textAlign: 'center', marginTop: 4 }}>
+                  <Text style={{ fontSize: 13, color: '#94a3b8' }}>
+                    pen. {match.penalty_home} — {match.penalty_away}
+                  </Text>
+                </div>
+              )}
+
               {/* Acciones de marcador */}
               {isAdmin && editingScore ? (
                 <Space>

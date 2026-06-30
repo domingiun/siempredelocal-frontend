@@ -260,10 +260,15 @@ const MatchCard = ({ match, roundName, size = 'default', showActions = true }) =
           <Col className="vs-container">
             <Text style={{ color: '#666', fontSize: 14 }}>VS</Text>
             <Text strong style={{ fontSize: 18, color: '#1890ff' }}>
-              {match.status === 'scheduled' || !match.status 
+              {match.status === 'scheduled' || !match.status
                 ? '0 - 0'
                 : `${match.home_score || 0} - ${match.away_score || 0}`}
             </Text>
+            {match.penalty_home != null && match.penalty_away != null && (
+              <Text style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>
+                pen. {match.penalty_home} — {match.penalty_away}
+              </Text>
+            )}
           </Col>
 
           <Col>{renderTeam(awayTeam)}</Col>
