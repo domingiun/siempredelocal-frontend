@@ -158,6 +158,8 @@ const MatchForm = ({
         postponed_date: parseDate(initialData.postponed_date),
         home_score: initialData.home_score ?? 0,
         away_score: initialData.away_score ?? 0,
+        penalty_home: initialData.penalty_home ?? null,
+        penalty_away: initialData.penalty_away ?? null,
         // 🔥 CONVERTIR ESTADO
         status: backendToFrontendStatus[initialData.status] || 'scheduled',
         competition_id: allowFullEdit && mode === 'edit' ? initialData.competition_id : undefined
@@ -387,6 +389,8 @@ const MatchForm = ({
         away_team_id: Number(values.away_team_id),
         home_score: Number(values.home_score) || 0,
         away_score: Number(values.away_score) || 0,
+        penalty_home: values.penalty_home != null ? Number(values.penalty_home) : null,
+        penalty_away: values.penalty_away != null ? Number(values.penalty_away) : null,
         // Guardar en UTC para mantener consistencia con fechas históricas del sistema.
         match_date: values.match_date ? values.match_date.toISOString() : null,
         postponed_date: null,
@@ -1163,6 +1167,40 @@ const MatchForm = ({
               </Space>
             </Card>
           </Col>
+
+          {/* Penaltis — solo si el partido finalizó y hay empate o ya tienen valor */}
+          {status === 'finished' && allowFullEdit && (
+            <Col span={24}>
+              <Card
+                size="small"
+                style={{ background: '#1a1f2e', border: '1px solid #374151' }}
+                title={
+                  <Text style={{ color: '#a78bfa', fontWeight: 600 }}>
+                    Penaltis (si aplica)
+                  </Text>
+                }
+              >
+                <Text type="secondary" style={{ display: 'block', marginBottom: 12, fontSize: 12 }}>
+                  Completa solo si el partido fue definido por penaltis. Se usa para determinar el ganador en la polla.
+                </Text>
+                <Row gutter={[16, 0]}>
+                  <Col span={10}>
+                    <Form.Item name="penalty_home" label="Penaltis Local" style={{ marginBottom: 0 }}>
+                      <InputNumber min={0} max={30} style={{ width: '100%' }} placeholder="ej. 5" />
+                    </Form.Item>
+                  </Col>
+                  <Col span={4} style={{ textAlign: 'center', paddingTop: 30 }}>
+                    <Text strong style={{ fontSize: 16 }}>vs</Text>
+                  </Col>
+                  <Col span={10}>
+                    <Form.Item name="penalty_away" label="Penaltis Visitante" style={{ marginBottom: 0 }}>
+                      <InputNumber min={0} max={30} style={{ width: '100%' }} placeholder="ej. 3" />
+                    </Form.Item>
+                  </Col>
+                </Row>
+              </Card>
+            </Col>
+          )}
 
           {/* Botones */}
           <Col span={24} style={{ textAlign: 'right' }}>
