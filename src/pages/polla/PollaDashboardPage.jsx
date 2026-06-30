@@ -650,6 +650,11 @@ function PredMatchCard({ pred, compact = false }) {
               <div style={{ fontSize: compact ? '1rem' : '1.15rem', fontWeight: 900, color: '#f1f5f9', lineHeight: 1 }}>
                 {m.home_score} – {m.away_score}
               </div>
+              {m.penalty_home != null && m.penalty_away != null && (
+                <div style={{ fontSize: '0.60rem', color: '#94a3b8', marginTop: 1 }}>
+                  pen. {m.penalty_home} — {m.penalty_away}
+                </div>
+              )}
               {matchResultLabel && (
                 <div style={{ fontSize: '0.60rem', color: '#64748b', marginTop: 2 }}>
                   {matchResultLabel}
