@@ -60,6 +60,13 @@ const MatchCard = ({ match, roundName, size = 'default', showActions = true }) =
     // Cargar información de jornada si no está disponible
     if (match.round && typeof match.round === 'object') {
       setRoundInfo(match.round);
+    } else if (match.round_name) {
+      // Ya viene como campo plano desde la API — no hacer fetch extra
+      setRoundInfo({
+        id: match.round_id,
+        name: match.round_name,
+        round_number: match.round_number || match.round_id
+      });
     } else if (match.round_id && !roundName) {
       if (match.competition_id) {
         fetchRoundInfo(match.competition_id, match.round_id);
