@@ -32,19 +32,22 @@ const RoundManagementPage = () => {
       // Aquí necesitarías una API específica para obtener todas las rondas
       // Por ahora, obtenemos competencias y luego sus rondas
       const compsResponse = await competitionService.getCompetitions({ limit: 10 });
-      let allRounds = [];
-      
-      for (const comp of compsResponse.data || []) {
-        const roundsResponse = await competitionService.getRounds(comp.id, { limit: 100 });
-        const roundsWithCompetition = (roundsResponse.data || []).map(round => ({
-          ...round,
-          competition_name: comp.name,
-          competition_id: comp.id,
-        }));
-        allRounds = [...allRounds, ...roundsWithCompetition];
-      }
-      
-      setRounds(allRounds);
+      const comps = compsResponse.data || [];
+
+      // Paralelo en lugar de secuencial — evita N requests en serie
+      const results = await Promise.all(
+        comps.map(comp =>
+          competitionService.getRounds(comp.id, { limit: 100 }).then(r =>
+            (r.data || []).map(round => ({
+              ...round,
+              competition_name: comp.name,
+              competition_id: comp.id,
+            }))
+          )
+        )
+      );
+
+      setRounds(results.flat());
     } catch (error) {
       message.error('Error al cargar jornadas');
     } finally {
