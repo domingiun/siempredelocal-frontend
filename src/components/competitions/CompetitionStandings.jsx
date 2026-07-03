@@ -517,93 +517,101 @@ const CompetitionStandings = ({ competitionId }) => {
                   Provisional: se calcula con la posición actual de los grupos.
                 </Text>
               )}
-              <Table
-                size="small"
-                pagination={false}
-                dataSource={playoffBracket.round_of_32 || []}
-                rowKey="match_number"
-                columns={[
-                  { title: 'Partido', dataIndex: 'match_number', width: 90, align: 'center' },
+
+              {/* Columnas reutilizables para todas las fases del bracket */}
+              {(() => {
+                const statusColor = { 'Finalizado': 'green', 'En curso': 'blue', 'Programado': 'default' };
+
+                const renderTeam = (team, side) => {
+                  if (!team || team.type === 'pending') {
+                    return <Text type="secondary" style={{ fontSize: 13 }}>{team?.label || 'Pendiente'}</Text>;
+                  }
+                  const logo = team.logo_url
+                    ? <Avatar src={team.logo_url} size={24} style={{ minWidth: 24, flexShrink: 0 }} />
+                    : <Avatar size={24} style={{ minWidth: 24, fontSize: 10, flexShrink: 0 }}>{team.name?.charAt(0)}</Avatar>;
+                  return (
+                    <Space size={6} style={{ flexWrap: 'nowrap', justifyContent: side === 'away' ? 'flex-end' : 'flex-start' }}>
+                      {side === 'home' && logo}
+                      <Text style={{ fontSize: 13, fontWeight: 500 }}>{team.name}</Text>
+                      {side === 'away' && logo}
+                    </Space>
+                  );
+                };
+
+                const bracketColumns = [
+                  {
+                    title: '#',
+                    dataIndex: 'match_number',
+                    width: 50,
+                    align: 'center',
+                    render: n => <Text style={{ fontWeight: 600, fontSize: 13 }}>{n}</Text>
+                  },
                   {
                     title: 'Local',
-                    render: (_, row) => playoffBracket.provisional ? (row.home?.label || 'Pendiente') : (row.home?.name || row.home?.label || 'Pendiente')
+                    render: (_, r) => renderTeam(r.home, 'home'),
+                  },
+                  {
+                    title: 'Marcador',
+                    align: 'center',
+                    width: 80,
+                    render: (_, r) => (r.home_score !== null && r.home_score !== undefined && r.away_score !== null && r.away_score !== undefined)
+                      ? <Text strong style={{ fontSize: 15, letterSpacing: 1 }}>{r.home_score} - {r.away_score}</Text>
+                      : <Text type="secondary">vs</Text>
                   },
                   {
                     title: 'Visitante',
-                    render: (_, row) => playoffBracket.provisional ? (row.away?.label || 'Pendiente') : (row.away?.name || row.away?.label || 'Pendiente')
+                    align: 'right',
+                    render: (_, r) => renderTeam(r.away, 'away'),
+                  },
+                  {
+                    title: 'Estado',
+                    width: 100,
+                    align: 'center',
+                    render: (_, r) => r.status
+                      ? <Tag color={statusColor[r.status] || 'default'} style={{ margin: 0, fontSize: 11 }}>{r.status}</Tag>
+                      : null
                   }
-                ]}
-              />
+                ];
 
-              <Divider style={{ margin: '16px 0' }} />
-              <Text strong>Octavos de final</Text>
-              <Table
-                size="small"
-                pagination={false}
-                dataSource={playoffBracket.round_of_16 || []}
-                rowKey="match_number"
-                columns={[
-                  { title: 'Partido', dataIndex: 'match_number', width: 90, align: 'center' },
-                  { title: 'Local',     render: (_, r) => r.home?.name || r.home?.label || 'Pendiente' },
-                  { title: 'Visitante', render: (_, r) => r.away?.name || r.away?.label || 'Pendiente' }
-                ]}
-              />
+                const BracketTable = ({ data }) => (
+                  <Table
+                    size="small"
+                    pagination={false}
+                    dataSource={data || []}
+                    rowKey="match_number"
+                    columns={bracketColumns}
+                    scroll={{ x: 500 }}
+                    style={{ marginTop: 8 }}
+                  />
+                );
 
-              <Divider style={{ margin: '16px 0' }} />
-              <Text strong>Cuartos de final</Text>
-              <Table
-                size="small"
-                pagination={false}
-                dataSource={playoffBracket.quarterfinals || []}
-                rowKey="match_number"
-                columns={[
-                  { title: 'Partido', dataIndex: 'match_number', width: 90, align: 'center' },
-                  { title: 'Local',     render: (_, r) => r.home?.name || r.home?.label || 'Pendiente' },
-                  { title: 'Visitante', render: (_, r) => r.away?.name || r.away?.label || 'Pendiente' }
-                ]}
-              />
+                return (
+                  <>
+                    <Text strong style={{ fontSize: 14 }}>16avos de Final</Text>
+                    <BracketTable data={playoffBracket.round_of_32} />
 
-              <Divider style={{ margin: '16px 0' }} />
-              <Text strong>Semifinales</Text>
-              <Table
-                size="small"
-                pagination={false}
-                dataSource={playoffBracket.semifinals || []}
-                rowKey="match_number"
-                columns={[
-                  { title: 'Partido', dataIndex: 'match_number', width: 90, align: 'center' },
-                  { title: 'Local',     render: (_, r) => r.home?.name || r.home?.label || 'Pendiente' },
-                  { title: 'Visitante', render: (_, r) => r.away?.name || r.away?.label || 'Pendiente' }
-                ]}
-              />
+                    <Divider style={{ margin: '16px 0' }} />
+                    <Text strong style={{ fontSize: 14 }}>Octavos de Final</Text>
+                    <BracketTable data={playoffBracket.round_of_16} />
 
-              <Divider style={{ margin: '16px 0' }} />
-              <Text strong>Tercer puesto</Text>
-              <Table
-                size="small"
-                pagination={false}
-                dataSource={playoffBracket.third_place || []}
-                rowKey="match_number"
-                columns={[
-                  { title: 'Partido', dataIndex: 'match_number', width: 90, align: 'center' },
-                  { title: 'Local',     render: (_, r) => r.home?.name || r.home?.label || 'Pendiente' },
-                  { title: 'Visitante', render: (_, r) => r.away?.name || r.away?.label || 'Pendiente' }
-                ]}
-              />
+                    <Divider style={{ margin: '16px 0' }} />
+                    <Text strong style={{ fontSize: 14 }}>Cuartos de Final</Text>
+                    <BracketTable data={playoffBracket.quarterfinals} />
 
-              <Divider style={{ margin: '16px 0' }} />
-              <Text strong>Final</Text>
-              <Table
-                size="small"
-                pagination={false}
-                dataSource={playoffBracket.final || []}
-                rowKey="match_number"
-                columns={[
-                  { title: 'Partido', dataIndex: 'match_number', width: 90, align: 'center' },
-                  { title: 'Local',     render: (_, r) => r.home?.name || r.home?.label || 'Pendiente' },
-                  { title: 'Visitante', render: (_, r) => r.away?.name || r.away?.label || 'Pendiente' }
-                ]}
-              />
+                    <Divider style={{ margin: '16px 0' }} />
+                    <Text strong style={{ fontSize: 14 }}>Semifinales</Text>
+                    <BracketTable data={playoffBracket.semifinals} />
+
+                    <Divider style={{ margin: '16px 0' }} />
+                    <Text strong style={{ fontSize: 14 }}>Tercer Puesto</Text>
+                    <BracketTable data={playoffBracket.third_place} />
+
+                    <Divider style={{ margin: '16px 0' }} />
+                    <Text strong style={{ fontSize: 14 }}>🏆 Final</Text>
+                    <BracketTable data={playoffBracket.final} />
+                  </>
+                );
+              })()}
             </>
           )}
         </div>
