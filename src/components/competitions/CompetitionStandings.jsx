@@ -507,112 +507,86 @@ const CompetitionStandings = ({ competitionId }) => {
 
       {playoffBracket && (
         <div style={{ padding: '0 16px 16px' }}>
-          <Divider orientation="left">Playoff (Dieciseisavos)</Divider>
+          <Divider orientation="left">Fases Eliminatorias</Divider>
           {!playoffBracket.ready ? (
-            <Text type="secondary">{playoffBracket.reason || 'Fase de grupos no finalizada.'}</Text>
+            <Text type="secondary">{playoffBracket.reason || 'No hay rondas de eliminatoria cargadas.'}</Text>
           ) : (
-            <>
-              {playoffBracket.provisional && (
-                <Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>
-                  Provisional: se calcula con la posición actual de los grupos.
-                </Text>
-              )}
+            (() => {
+              const statusColor = { 'Finalizado': 'green', 'En curso': 'blue', 'Programado': 'default' };
 
-              {/* Columnas reutilizables para todas las fases del bracket */}
-              {(() => {
-                const statusColor = { 'Finalizado': 'green', 'En curso': 'blue', 'Programado': 'default' };
+              const renderTeam = (team, side) => {
+                if (!team || team.type === 'pending') {
+                  return <Text type="secondary" style={{ fontSize: 13 }}>Por definir</Text>;
+                }
+                const logo = team.logo_url
+                  ? <Avatar src={team.logo_url} size={24} style={{ minWidth: 24, flexShrink: 0 }} />
+                  : <Avatar size={24} style={{ minWidth: 24, fontSize: 10, flexShrink: 0 }}>{team.name?.charAt(0)}</Avatar>;
+                return (
+                  <Space size={6} style={{ flexWrap: 'nowrap', justifyContent: side === 'away' ? 'flex-end' : 'flex-start' }}>
+                    {side === 'home' && logo}
+                    <Text style={{ fontSize: 13, fontWeight: 500 }}>{team.name}</Text>
+                    {side === 'away' && logo}
+                  </Space>
+                );
+              };
 
-                const renderTeam = (team, side) => {
-                  if (!team || team.type === 'pending') {
-                    return <Text type="secondary" style={{ fontSize: 13 }}>{team?.label || 'Pendiente'}</Text>;
+              const bracketColumns = [
+                {
+                  title: '#',
+                  dataIndex: 'match_number',
+                  width: 50,
+                  align: 'center',
+                  render: n => <Text style={{ fontWeight: 600, fontSize: 13 }}>{n}</Text>
+                },
+                {
+                  title: 'Local',
+                  render: (_, r) => renderTeam(r.home, 'home'),
+                },
+                {
+                  title: 'Marcador',
+                  align: 'center',
+                  width: 90,
+                  render: (_, r) => {
+                    const finished = r.status === 'Finalizado' || r.status === 'En curso';
+                    if (!finished) return <Text type="secondary">vs</Text>;
+                    const score = `${r.home_score ?? 0} - ${r.away_score ?? 0}`;
+                    const pen = (r.penalty_home != null && r.penalty_away != null)
+                      ? ` (${r.penalty_home}-${r.penalty_away} pen)`
+                      : '';
+                    return <Text strong style={{ fontSize: 14, letterSpacing: 1 }}>{score}<span style={{ fontSize: 11, fontWeight: 400 }}>{pen}</span></Text>;
                   }
-                  const logo = team.logo_url
-                    ? <Avatar src={team.logo_url} size={24} style={{ minWidth: 24, flexShrink: 0 }} />
-                    : <Avatar size={24} style={{ minWidth: 24, fontSize: 10, flexShrink: 0 }}>{team.name?.charAt(0)}</Avatar>;
-                  return (
-                    <Space size={6} style={{ flexWrap: 'nowrap', justifyContent: side === 'away' ? 'flex-end' : 'flex-start' }}>
-                      {side === 'home' && logo}
-                      <Text style={{ fontSize: 13, fontWeight: 500 }}>{team.name}</Text>
-                      {side === 'away' && logo}
-                    </Space>
-                  );
-                };
+                },
+                {
+                  title: 'Visitante',
+                  align: 'right',
+                  render: (_, r) => renderTeam(r.away, 'away'),
+                },
+                {
+                  title: 'Estado',
+                  width: 100,
+                  align: 'center',
+                  render: (_, r) => r.status
+                    ? <Tag color={statusColor[r.status] || 'default'} style={{ margin: 0, fontSize: 11 }}>{r.status}</Tag>
+                    : null
+                }
+              ];
 
-                const bracketColumns = [
-                  {
-                    title: '#',
-                    dataIndex: 'match_number',
-                    width: 50,
-                    align: 'center',
-                    render: n => <Text style={{ fontWeight: 600, fontSize: 13 }}>{n}</Text>
-                  },
-                  {
-                    title: 'Local',
-                    render: (_, r) => renderTeam(r.home, 'home'),
-                  },
-                  {
-                    title: 'Marcador',
-                    align: 'center',
-                    width: 80,
-                    render: (_, r) => (r.home_score !== null && r.home_score !== undefined && r.away_score !== null && r.away_score !== undefined)
-                      ? <Text strong style={{ fontSize: 15, letterSpacing: 1 }}>{r.home_score} - {r.away_score}</Text>
-                      : <Text type="secondary">vs</Text>
-                  },
-                  {
-                    title: 'Visitante',
-                    align: 'right',
-                    render: (_, r) => renderTeam(r.away, 'away'),
-                  },
-                  {
-                    title: 'Estado',
-                    width: 100,
-                    align: 'center',
-                    render: (_, r) => r.status
-                      ? <Tag color={statusColor[r.status] || 'default'} style={{ margin: 0, fontSize: 11 }}>{r.status}</Tag>
-                      : null
-                  }
-                ];
-
-                const BracketTable = ({ data }) => (
+              return (playoffBracket.phases || []).map((phase, idx) => (
+                <div key={phase.round_id}>
+                  {idx > 0 && <Divider style={{ margin: '16px 0' }} />}
+                  <Text strong style={{ fontSize: 14 }}>{phase.round_name}</Text>
                   <Table
                     size="small"
                     pagination={false}
-                    dataSource={data || []}
+                    dataSource={phase.matches || []}
                     rowKey="match_number"
                     columns={bracketColumns}
                     scroll={{ x: 500 }}
                     style={{ marginTop: 8 }}
                   />
-                );
-
-                return (
-                  <>
-                    <Text strong style={{ fontSize: 14 }}>16avos de Final</Text>
-                    <BracketTable data={playoffBracket.round_of_32} />
-
-                    <Divider style={{ margin: '16px 0' }} />
-                    <Text strong style={{ fontSize: 14 }}>Octavos de Final</Text>
-                    <BracketTable data={playoffBracket.round_of_16} />
-
-                    <Divider style={{ margin: '16px 0' }} />
-                    <Text strong style={{ fontSize: 14 }}>Cuartos de Final</Text>
-                    <BracketTable data={playoffBracket.quarterfinals} />
-
-                    <Divider style={{ margin: '16px 0' }} />
-                    <Text strong style={{ fontSize: 14 }}>Semifinales</Text>
-                    <BracketTable data={playoffBracket.semifinals} />
-
-                    <Divider style={{ margin: '16px 0' }} />
-                    <Text strong style={{ fontSize: 14 }}>Tercer Puesto</Text>
-                    <BracketTable data={playoffBracket.third_place} />
-
-                    <Divider style={{ margin: '16px 0' }} />
-                    <Text strong style={{ fontSize: 14 }}>🏆 Final</Text>
-                    <BracketTable data={playoffBracket.final} />
-                  </>
-                );
-              })()}
-            </>
+                </div>
+              ));
+            })()
           )}
         </div>
       )}
