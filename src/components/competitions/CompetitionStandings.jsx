@@ -544,8 +544,8 @@ const CompetitionStandings = ({ competitionId }) => {
                 rowKey="match_number"
                 columns={[
                   { title: 'Partido', dataIndex: 'match_number', width: 90, align: 'center' },
-                  { title: 'Local', dataIndex: 'home_label' },
-                  { title: 'Visitante', dataIndex: 'away_label' }
+                  { title: 'Local',     render: (_, r) => r.home?.name || r.home?.label || 'Pendiente' },
+                  { title: 'Visitante', render: (_, r) => r.away?.name || r.away?.label || 'Pendiente' }
                 ]}
               />
 
@@ -558,8 +558,8 @@ const CompetitionStandings = ({ competitionId }) => {
                 rowKey="match_number"
                 columns={[
                   { title: 'Partido', dataIndex: 'match_number', width: 90, align: 'center' },
-                  { title: 'Local', dataIndex: 'home_label' },
-                  { title: 'Visitante', dataIndex: 'away_label' }
+                  { title: 'Local',     render: (_, r) => r.home?.name || r.home?.label || 'Pendiente' },
+                  { title: 'Visitante', render: (_, r) => r.away?.name || r.away?.label || 'Pendiente' }
                 ]}
               />
 
@@ -572,8 +572,8 @@ const CompetitionStandings = ({ competitionId }) => {
                 rowKey="match_number"
                 columns={[
                   { title: 'Partido', dataIndex: 'match_number', width: 90, align: 'center' },
-                  { title: 'Local', dataIndex: 'home_label' },
-                  { title: 'Visitante', dataIndex: 'away_label' }
+                  { title: 'Local',     render: (_, r) => r.home?.name || r.home?.label || 'Pendiente' },
+                  { title: 'Visitante', render: (_, r) => r.away?.name || r.away?.label || 'Pendiente' }
                 ]}
               />
 
@@ -586,8 +586,8 @@ const CompetitionStandings = ({ competitionId }) => {
                 rowKey="match_number"
                 columns={[
                   { title: 'Partido', dataIndex: 'match_number', width: 90, align: 'center' },
-                  { title: 'Local', dataIndex: 'home_label' },
-                  { title: 'Visitante', dataIndex: 'away_label' }
+                  { title: 'Local',     render: (_, r) => r.home?.name || r.home?.label || 'Pendiente' },
+                  { title: 'Visitante', render: (_, r) => r.away?.name || r.away?.label || 'Pendiente' }
                 ]}
               />
 
@@ -600,8 +600,8 @@ const CompetitionStandings = ({ competitionId }) => {
                 rowKey="match_number"
                 columns={[
                   { title: 'Partido', dataIndex: 'match_number', width: 90, align: 'center' },
-                  { title: 'Local', dataIndex: 'home_label' },
-                  { title: 'Visitante', dataIndex: 'away_label' }
+                  { title: 'Local',     render: (_, r) => r.home?.name || r.home?.label || 'Pendiente' },
+                  { title: 'Visitante', render: (_, r) => r.away?.name || r.away?.label || 'Pendiente' }
                 ]}
               />
             </>
