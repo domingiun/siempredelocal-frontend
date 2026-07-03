@@ -46,6 +46,9 @@ const MatchForm = ({
   const [competitionRounds, setCompetitionRounds] = useState([]);
   const status = Form.useWatch('status', form);
   const homeTeamId = Form.useWatch('home_team_id', form);
+  const watchedHomeScore = Form.useWatch('home_score', form);
+  const watchedAwayScore = Form.useWatch('away_score', form);
+  const isDraw = status === 'finished' && watchedHomeScore != null && watchedAwayScore != null && Number(watchedHomeScore) === Number(watchedAwayScore);
   const selectedCompetitionId = Form.useWatch('competition_id', form) || competitionId;
   const worldCupStadiums = [
     'Estadio Azteca',
@@ -83,6 +86,13 @@ const MatchForm = ({
     'Área de la Bahía (San Francisco)',
     'Seattle'
   ];
+
+  // Limpiar penaltis cuando el marcador deja de ser empate
+  useEffect(() => {
+    if (!isDraw) {
+      form.setFieldsValue({ penalty_home: null, penalty_away: null });
+    }
+  }, [isDraw, form]);
 
   // 🔥 NUEVO: Observador para validación de estado FINALIZADO
   useEffect(() => {
@@ -430,9 +440,9 @@ const MatchForm = ({
         });
       }
 
-      // Callback
-      onSuccess?.(result.data);
+      // Callback — resetFields primero para evitar errores de componente desmontado
       form.resetFields();
+      onSuccess?.(result.data);
 
     } catch (error) {
       console.error('Error completo:', error);
@@ -1181,12 +1191,18 @@ const MatchForm = ({
                 }
               >
                 <Text type="secondary" style={{ display: 'block', marginBottom: 12, fontSize: 12 }}>
-                  Completa solo si el partido fue definido por penaltis. Se usa para determinar el ganador en la polla.
+                  {isDraw
+                    ? 'Marcador empatado — completa el resultado de la tanda de penaltis.'
+                    : 'Solo disponible cuando el marcador está empatado (definición por penaltis).'}
                 </Text>
                 <Row gutter={[16, 0]}>
                   <Col span={10}>
                     <Form.Item name="penalty_home" label="Penaltis Local" style={{ marginBottom: 0 }}>
-                      <InputNumber min={0} max={30} style={{ width: '100%' }} placeholder="ej. 5" />
+                      <InputNumber
+                        min={0} max={30} style={{ width: '100%' }} placeholder="ej. 5"
+                        disabled={!isDraw}
+                        onChange={() => { if (!isDraw) { form.setFieldsValue({ penalty_home: null, penalty_away: null }); } }}
+                      />
                     </Form.Item>
                   </Col>
                   <Col span={4} style={{ textAlign: 'center', paddingTop: 30 }}>
@@ -1194,7 +1210,10 @@ const MatchForm = ({
                   </Col>
                   <Col span={10}>
                     <Form.Item name="penalty_away" label="Penaltis Visitante" style={{ marginBottom: 0 }}>
-                      <InputNumber min={0} max={30} style={{ width: '100%' }} placeholder="ej. 3" />
+                      <InputNumber
+                        min={0} max={30} style={{ width: '100%' }} placeholder="ej. 3"
+                        disabled={!isDraw}
+                      />
                     </Form.Item>
                   </Col>
                 </Row>
