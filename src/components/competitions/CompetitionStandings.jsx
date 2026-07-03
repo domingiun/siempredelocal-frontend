@@ -530,13 +530,20 @@ const CompetitionStandings = ({ competitionId }) => {
                 );
               };
 
+              const fmtDate = (iso) => {
+                if (!iso) return '';
+                const d = new Date(iso);
+                return d.toLocaleDateString('es-CO', { day: '2-digit', month: 'short' })
+                  + ' ' + d.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+              };
+
               const bracketColumns = [
                 {
-                  title: '#',
-                  dataIndex: 'match_number',
-                  width: 50,
+                  title: 'Fecha',
+                  dataIndex: 'match_date',
+                  width: 100,
                   align: 'center',
-                  render: n => <Text style={{ fontWeight: 600, fontSize: 13 }}>{n}</Text>
+                  render: v => <Text style={{ fontSize: 11, color: '#8c9aad' }}>{fmtDate(v)}</Text>
                 },
                 {
                   title: 'Local',
@@ -578,8 +585,8 @@ const CompetitionStandings = ({ competitionId }) => {
                   <Table
                     size="small"
                     pagination={false}
-                    dataSource={phase.matches || []}
-                    rowKey="match_number"
+                    dataSource={(phase.matches || []).map((m, i) => ({ ...m, _key: `${phase.round_id}-${i}` }))}
+                    rowKey="_key"
                     columns={bracketColumns}
                     scroll={{ x: 500 }}
                     style={{ marginTop: 8 }}
