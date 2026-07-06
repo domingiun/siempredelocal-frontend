@@ -543,6 +543,16 @@ function PollaDashboard({ pollaId }) {
 }
 
 // ── Tarjeta visual compartida ──────────────────────────────────────────────
+const PHASE_META = {
+  groups: { label: 'Fase de Grupos',  color: '#94a3b8', bg: 'rgba(148,163,184,0.10)' },
+  r32:    { label: 'Ronda de 32',     color: '#60a5fa', bg: 'rgba(96,165,250,0.10)'  },
+  r16:    { label: '16avos de Final', color: '#60a5fa', bg: 'rgba(96,165,250,0.10)'  },
+  qf:     { label: 'Cuartos de Final',color: '#c084fc', bg: 'rgba(192,132,252,0.10)' },
+  sf:     { label: 'Semifinal',       color: '#f59e0b', bg: 'rgba(245,158,11,0.10)'  },
+  third:  { label: 'Tercer Puesto',   color: '#94a3b8', bg: 'rgba(148,163,184,0.10)' },
+  final:  { label: 'Final',           color: '#fbbf24', bg: 'rgba(251,191,36,0.12)'  },
+};
+
 const MATCH_STATUS_META = {
   'Finalizado':  { label: 'Finalizado',  color: '#22c55e', bg: 'rgba(34,197,94,0.10)',   border: 'rgba(34,197,94,0.25)' },
   'En curso':    { label: 'En curso',    color: '#f59e0b', bg: 'rgba(245,158,11,0.10)',  border: 'rgba(245,158,11,0.3)' },
@@ -601,9 +611,20 @@ function PredMatchCard({ pred, compact = false }) {
       padding: compact ? '10px 14px' : '14px 18px',
       transition: 'border-color 0.2s',
     }}>
-      {/* Header: fecha · estado partido · badge resultado usuario */}
+      {/* Header: fase · fecha · estado partido · badge resultado usuario */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, gap: 8, flexWrap: 'wrap' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+          {/* Fase / Jornada */}
+          {pred.phase && PHASE_META[pred.phase] && (
+            <span style={{
+              background: PHASE_META[pred.phase].bg,
+              color: PHASE_META[pred.phase].color,
+              borderRadius: 20, padding: '1px 8px',
+              fontSize: '0.60rem', fontWeight: 700, letterSpacing: '0.03em',
+            }}>
+              {PHASE_META[pred.phase].label}
+            </span>
+          )}
           <span style={{ fontSize: '0.68rem', color: '#475569' }}>
             {m.match_date ? formatDate(m.match_date) : '—'}
           </span>
