@@ -772,9 +772,15 @@ function ParticipantPicksModal({ data }) {
         ))}
       </div>
 
-      {/* Cards */}
+      {/* Cards — de más reciente a más antigua */}
       <div style={{ maxHeight: 420, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {scored.map((pred, i) => <PredMatchCard key={i} pred={pred} compact />)}
+        {[...scored]
+          .sort((a, b) => {
+            const da = a.match?.match_date ? new Date(a.match.match_date) : 0;
+            const db = b.match?.match_date ? new Date(b.match.match_date) : 0;
+            return db - da;
+          })
+          .map((pred, i) => <PredMatchCard key={i} pred={pred} compact />)}
       </div>
     </div>
   );
