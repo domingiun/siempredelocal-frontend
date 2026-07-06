@@ -87,6 +87,25 @@ const MatchForm = ({
     'Seattle'
   ];
 
+  const CITY_STADIUM_MAP = {
+    'Ciudad de México': 'Estadio Azteca',
+    'Guadalajara': 'Estadio Akron',
+    'Monterrey': 'Estadio BBVA',
+    'Toronto': 'BMO Field',
+    'Vancouver': 'BC Place',
+    'Atlanta': 'Mercedes-Benz Stadium',
+    'Boston': 'Gillette Stadium',
+    'Dallas': 'AT&T Stadium',
+    'Houston': 'NRG Stadium',
+    'Kansas City': 'Arrowhead Stadium',
+    'Los Ángeles': 'SoFi Stadium',
+    'Miami': 'Hard Rock Stadium',
+    'Nueva York / Nueva Jersey': 'MetLife Stadium',
+    'Filadelfia': 'Lincoln Financial Field',
+    'Área de la Bahía (San Francisco)': "Levi's Stadium",
+    'Seattle': 'Lumen Field',
+  };
+
   // Limpiar penaltis cuando el marcador deja de ser empate
   useEffect(() => {
     if (!isDraw) {
@@ -492,6 +511,13 @@ const MatchForm = ({
   };
 
   // 🔥 CORREGIDO: handleStatusChange con lógica mejorada
+  const handleCityChange = (value) => {
+    const stadium = CITY_STADIUM_MAP[value];
+    if (stadium) {
+      form.setFieldsValue({ stadium });
+    }
+  };
+
   const handleStatusChange = (value) => {
     console.log('🔄 Cambio de estado:', value);
     
@@ -939,44 +965,54 @@ const MatchForm = ({
             </Form.Item>
             </Col>
 
-          {/* Estadio y Ciudad - NUEVO: Siempre editable en modo completo */}
+          {/* Estadio y Ciudad - Siempre editable en modo completo */}
           {(isWorldCup || allowFullEdit) ? (
             <>
               <Col span={12}>
-                <Form.Item 
-                  name="stadium" 
-                  label={
-                    <Space>
-                      <EnvironmentOutlined />
-                      <span>Estadio</span>
-                      {allowFullEdit && <Tag size="small">Editable</Tag>}
-                    </Space>
-                  }
-                  rules={isWorldCup ? [{ required: true, message: 'Ingrese el estadio' }] : []}
-                >
-                <Input 
-                  className="dark-input"
-                  placeholder={isWorldCup ? "Estadio del mundial" : "Nombre del estadio"} 
-                  list="worldcup-stadiums"
-                  />
-                </Form.Item>
-              </Col>
-              <Col span={12}>
-                <Form.Item 
-                  name="city" 
+                <Form.Item
+                  name="city"
                   label={
                     <Space>
                       <EnvironmentOutlined />
                       <span>Ciudad</span>
-                      {allowFullEdit && <Tag size="small">Editable</Tag>}
+                      {allowFullEdit && !isWorldCup && <Tag size="small">Editable</Tag>}
                     </Space>
                   }
-                  rules={isWorldCup ? [{ required: true, message: 'Ingrese la ciudad' }] : []}
+                  rules={isWorldCup ? [{ required: true, message: 'Seleccione la ciudad' }] : []}
                 >
-                <Input 
-                  className="dark-input"
-                  placeholder={isWorldCup ? "Ciudad sede" : "Nombre de la ciudad"} 
-                  list="worldcup-cities"
+                  {isWorldCup ? (
+                    <Select
+                      className="dark-select"
+                      placeholder="Seleccionar ciudad sede"
+                      showSearch
+                      onChange={handleCityChange}
+                      options={worldCupCities.map(c => ({ value: c, label: c }))}
+                    />
+                  ) : (
+                    <Input
+                      className="dark-input"
+                      placeholder="Nombre de la ciudad"
+                      list="worldcup-cities"
+                    />
+                  )}
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item
+                  name="stadium"
+                  label={
+                    <Space>
+                      <EnvironmentOutlined />
+                      <span>Estadio</span>
+                      {allowFullEdit && !isWorldCup && <Tag size="small">Editable</Tag>}
+                    </Space>
+                  }
+                  rules={isWorldCup ? [{ required: true, message: 'Ingrese el estadio' }] : []}
+                >
+                  <Input
+                    className="dark-input"
+                    placeholder={isWorldCup ? "Se completa al seleccionar ciudad" : "Nombre del estadio"}
+                    list="worldcup-stadiums"
                   />
                 </Form.Item>
               </Col>
@@ -985,11 +1021,13 @@ const MatchForm = ({
                   <option key={stadium} value={stadium} />
                 ))}
               </datalist>
-              <datalist id="worldcup-cities">
-                {worldCupCities.map((city) => (
-                  <option key={city} value={city} />
-                ))}
-              </datalist>
+              {!isWorldCup && (
+                <datalist id="worldcup-cities">
+                  {worldCupCities.map((city) => (
+                    <option key={city} value={city} />
+                  ))}
+                </datalist>
+              )}
             </>
           ) : (
             // Mostrar solo información del estadio (no editable)
