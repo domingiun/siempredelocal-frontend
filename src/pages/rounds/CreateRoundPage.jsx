@@ -377,8 +377,7 @@ const CreateRoundPage = () => {
                       <Select size="large">
                         <Option value="regular">Regular</Option>
                         <Option value="group_stage">Fase de Grupos</Option>
-                        <Option value="round_of">Ronda de Eliminación</Option>
-                        <Option value="quarterfinal">Cuartos de Final</Option>
+                        <Option value="round_of">Ronda Eliminatoria (16avos, 8avos, Cuartos)</Option>
                         <Option value="semifinal">Semifinal</Option>
                         <Option value="final">Final</Option>
                         <Option value="third_place">Tercer Lugar</Option>
