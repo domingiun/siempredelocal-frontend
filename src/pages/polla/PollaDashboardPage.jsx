@@ -810,11 +810,17 @@ function MyPredictionsTab({ pollaId }) {
         ))}
       </div>
 
-      {/* Tarjetas por partido */}
+      {/* Tarjetas por partido — ordenadas de más reciente a más antigua */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        {predictions.map(pred => (
-          <PredMatchCard key={pred.id} pred={pred} />
-        ))}
+        {[...predictions]
+          .sort((a, b) => {
+            const da = a.match?.match_date ? new Date(a.match.match_date) : 0;
+            const db = b.match?.match_date ? new Date(b.match.match_date) : 0;
+            return db - da;
+          })
+          .map(pred => (
+            <PredMatchCard key={pred.id} pred={pred} />
+          ))}
       </div>
     </div>
   );
