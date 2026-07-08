@@ -36,9 +36,13 @@ const STATUS_OPTIONS = [
   { value: 'cancelled',   label: 'Cancelada',    cls: 'cancelled' },
 ];
 
-const fmtDate = (d) => d
-  ? new Date(d).toLocaleString('es-CO', { dateStyle: 'short', timeStyle: 'short' })
-  : '—';
+const fmtDate = (d) => {
+  if (!d) return '—';
+  const utc = d.endsWith('Z') || d.includes('+') ? d : `${d}Z`;
+  return new Date(utc).toLocaleString('es-CO', {
+    dateStyle: 'short', timeStyle: 'short', timeZone: 'America/Bogota',
+  });
+};
 
 const fmtCOP = (n) =>
   new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(n);
