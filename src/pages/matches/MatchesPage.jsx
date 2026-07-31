@@ -1,14 +1,13 @@
 // frontend/src/pages/matches/MatchesPage.jsx
 import React, { useState, useEffect } from 'react';
-import { Button, Typography, Empty, Spin, message } from 'antd';
+import { Button, Empty, Spin, message } from 'antd';
+import { TrophyOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import competitionService from '../../services/competitionService';
-import MatchCard from '../../components/matches/MatchCard';
+import CompactMatchRow from '../../components/matches/CompactMatchRow';
 import { formatForInputUTC } from '../../utils/dateFormatter';
 import './MatchesPage.css';
-
-const { Text } = Typography;
 
 const FINISHED_PAGE_SIZE = 30;
 
@@ -58,6 +57,22 @@ const sortDesc = (list) => [...list].sort((a, b) => {
   const bTime = formatForInputUTC(b.match_date)?.valueOf() ?? 0;
   return bTime - aTime;
 });
+
+// Sub-agrupa una lista (ya ordenada) por liga/competencia, preservando el orden.
+const groupByLeague = (list) => {
+  const groups = [];
+  const byName = new Map();
+  list.forEach((match) => {
+    const name = match.competition_name || 'Sin competencia';
+    if (!byName.has(name)) {
+      const group = { name, matches: [] };
+      byName.set(name, group);
+      groups.push(group);
+    }
+    byName.get(name).matches.push(match);
+  });
+  return groups;
+};
 
 const MatchesPage = () => {
   const navigate = useNavigate();
@@ -129,15 +144,23 @@ const MatchesPage = () => {
 
   const isEmpty = !loading && scheduled.length === 0 && live.length === 0 && finished.length === 0;
 
-  const renderCards = (list) => (
-    <div className="matches-day-cards">
-      {list.map((match) => (
-        <div
-          key={match.id}
-          className="matches-card-click"
-          onClick={() => navigate(`/matches/${match.id}`)}
-        >
-          <MatchCard match={match} roundName={match.round_name} showActions={false} />
+  const renderMatchList = (list) => (
+    <div className="matches-league-groups">
+      {groupByLeague(list).map((leagueGroup) => (
+        <div key={leagueGroup.name} className="matches-league-group">
+          <div className="matches-league-header">
+            <TrophyOutlined />
+            <span>{leagueGroup.name}</span>
+          </div>
+          <div className="matches-league-rows">
+            {leagueGroup.matches.map((match) => (
+              <CompactMatchRow
+                key={match.id}
+                match={match}
+                onClick={() => navigate(`/matches/${match.id}`)}
+              />
+            ))}
+          </div>
         </div>
       ))}
     </div>
@@ -159,9 +182,10 @@ const MatchesPage = () => {
             <section className="matches-day-group matches-day-group--today">
               <div className="matches-day-header matches-day-header--today">
                 <span className="matches-day-badge">HOY</span>
-                <Text strong>{capitalize(dayjs().format('dddd D [de] MMMM'))}</Text>
+                <span>{capitalize(dayjs().format('dddd D [de] MMMM'))}</span>
+                <span className="matches-day-count">({today.length} Partido{today.length !== 1 ? 's' : ''})</span>
               </div>
-              {renderCards(today)}
+              {renderMatchList(today)}
             </section>
           )}
 
@@ -171,9 +195,10 @@ const MatchesPage = () => {
               {programados.map((group) => (
                 <section key={`p-${group.key}`} className="matches-day-group">
                   <div className="matches-day-header">
-                    <Text strong>{getGroupLabel(group.date)}</Text>
+                    <span>{getGroupLabel(group.date)}</span>
+                    <span className="matches-day-count">({group.matches.length} Partido{group.matches.length !== 1 ? 's' : ''})</span>
                   </div>
-                  {renderCards(group.matches)}
+                  {renderMatchList(group.matches)}
                 </section>
               ))}
             </>
@@ -185,9 +210,10 @@ const MatchesPage = () => {
               {resultados.map((group) => (
                 <section key={`r-${group.key}`} className="matches-day-group">
                   <div className="matches-day-header">
-                    <Text strong>{getGroupLabel(group.date)}</Text>
+                    <span>{getGroupLabel(group.date)}</span>
+                    <span className="matches-day-count">({group.matches.length} Partido{group.matches.length !== 1 ? 's' : ''})</span>
                   </div>
-                  {renderCards(group.matches)}
+                  {renderMatchList(group.matches)}
                 </section>
               ))}
             </>

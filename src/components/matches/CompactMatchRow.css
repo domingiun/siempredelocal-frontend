@@ -1,0 +1,126 @@
+/* frontend/src/components/matches/CompactMatchRow.css */
+.compact-match-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-left: 3px solid #1677ff;
+  border-bottom: 1px solid #1f2b3a;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.compact-match-row:last-child {
+  border-bottom: none;
+}
+
+.compact-match-row:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.cmr-team {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.cmr-team--home {
+  justify-content: flex-end;
+}
+
+.cmr-team--away {
+  justify-content: flex-start;
+}
+
+.cmr-team-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #e6edf3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cmr-team--home .cmr-team-name {
+  text-align: right;
+}
+
+.cmr-team--away .cmr-team-name {
+  text-align: left;
+}
+
+.cmr-logo {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.cmr-logo--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1f2b3a;
+  color: #9fb0c2;
+  font-size: 11px;
+}
+
+.cmr-center {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 68px;
+  justify-content: center;
+}
+
+.cmr-center-text {
+  font-size: 12px;
+  font-weight: 700;
+  color: #9fb0c2;
+  white-space: nowrap;
+}
+
+.cmr-center-text.cmr-score {
+  font-size: 13px;
+  color: #e6edf3;
+}
+
+.cmr-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #f59e0b;
+  animation: cmr-pulse 1.4s infinite;
+}
+
+@keyframes cmr-pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.35; }
+  100% { opacity: 1; }
+}
+
+/* Light theme fallback (app defaults to dark, but keep readable if not) */
+body:not([data-theme="dark"]) .compact-match-row {
+  border-bottom-color: #eef1f4;
+}
+
+body:not([data-theme="dark"]) .cmr-team-name {
+  color: #1f2937;
+}
+
+body:not([data-theme="dark"]) .cmr-center-text {
+  color: #64748b;
+}
+
+body:not([data-theme="dark"]) .cmr-center-text.cmr-score {
+  color: #1f2937;
+}
+
+body:not([data-theme="dark"]) .cmr-logo--placeholder {
+  background: #eef1f4;
+  color: #94a3b8;
+}
