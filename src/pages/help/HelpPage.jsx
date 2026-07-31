@@ -9,10 +9,12 @@ import {
 } from '@ant-design/icons';
 import './HelpPage.css';
 
+const POLLA_MODE = import.meta.env.VITE_POLLA_MODE === 'true';
+
 const SECTIONS = [
   { id: 'creditos',     label: 'Créditos',      icon: <CreditCardOutlined /> },
   { id: 'pronosticos',  label: 'Pronósticos',   icon: <FireOutlined /> },
-  { id: 'polla',        label: 'Polla Mundial', icon: <TrophyOutlined /> },
+  ...(POLLA_MODE ? [{ id: 'polla', label: 'Polla Mundial', icon: <TrophyOutlined /> }] : []),
   { id: 'faq',          label: 'Preguntas',     icon: <QuestionCircleOutlined /> },
 ];
 
@@ -237,7 +239,8 @@ export default function HelpPage() {
           </div>
         </section>
 
-        {/* ── Polla Mundial ─────────────────────────────────────── */}
+        {/* ── Polla Mundial — solo mientras esté activo un campeonato ── */}
+        {POLLA_MODE && (
         <section id="polla" className="help-section">
           <div className="help-section-header">
             <TrophyOutlined className="help-section-icon green" />
@@ -348,6 +351,7 @@ export default function HelpPage() {
             </div>
           </div>
         </section>
+        )}
 
         {/* ── FAQ ──────────────────────────────────────────────── */}
         <section id="faq" className="help-section">
@@ -385,9 +389,11 @@ export default function HelpPage() {
             <button className="help-cta-btn orange" onClick={() => navigate('/bets')}>
               <FireOutlined /> Ir a Pronósticos
             </button>
-            <button className="help-cta-btn green" onClick={() => navigate('/mundial/dashboard')}>
-              <TrophyOutlined /> Ir a Polla Mundial
-            </button>
+            {POLLA_MODE && (
+              <button className="help-cta-btn green" onClick={() => navigate('/mundial/dashboard')}>
+                <TrophyOutlined /> Ir a Polla Mundial
+              </button>
+            )}
           </div>
         </div>
 

@@ -10,6 +10,8 @@ import { useNavigate } from 'react-router-dom';
 import logo from '../assets/logo.png';
 import './HomePage.css';
 
+const POLLA_MODE = import.meta.env.VITE_POLLA_MODE === 'true';
+
 const publicApi = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
   headers: { 'Content-Type': 'application/json' }
@@ -223,20 +225,22 @@ const HomePage = () => {
             </Button>
           </div>
 
-          {/* Polla Mundial CTA */}
-          <div className="hp__polla-cta">
-            <button
-              className="hp__polla-btn"
-              onClick={() => navigate('/mundial')}
-            >
-              <span className="hp__polla-emoji">⚽</span>
-              <span className="hp__polla-text">
-                <span className="hp__polla-label">Polla Mundial 2026</span>
-                <span className="hp__polla-sub">Predice los 104 partidos · Premio desde $1.000.000</span>
-              </span>
-              <span className="hp__polla-arrow">→</span>
-            </button>
-          </div>
+          {/* Polla Mundial CTA — solo mientras esté activo un campeonato */}
+          {POLLA_MODE && (
+            <div className="hp__polla-cta">
+              <button
+                className="hp__polla-btn"
+                onClick={() => navigate('/mundial')}
+              >
+                <span className="hp__polla-emoji">⚽</span>
+                <span className="hp__polla-text">
+                  <span className="hp__polla-label">Polla Mundial 2026</span>
+                  <span className="hp__polla-sub">Predice los 104 partidos · Premio desde $1.000.000</span>
+                </span>
+                <span className="hp__polla-arrow">→</span>
+              </button>
+            </div>
+          )}
         </div>
       </header>
 

@@ -20,6 +20,8 @@ import { useTheme } from '../context/ThemeContext';
 
 const { Title, Text } = Typography;
 
+const POLLA_MODE = import.meta.env.VITE_POLLA_MODE === 'true';
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -891,26 +893,28 @@ const Dashboard = () => {
         </Col>
       </Row>
 
-      {/* ── Polla Mundial ── */}
-      <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
-        <Col xs={24}>
-          <Button
-            size="large"
-            block
-            onClick={() => navigate('/mundial/dashboard')}
-            style={{
-              fontWeight: 700,
-              background: 'linear-gradient(135deg, #16a34a, #22c55e)',
-              borderColor: '#22c55e',
-              color: '#fff',
-              height: 48,
-              fontSize: isMobile ? '0.9rem' : '1rem',
-            }}
-          >
-            ⚽ {isMobile ? 'Polla Mundial 2026' : 'Polla Mundial 2026 — Ver mi dashboard'}
-          </Button>
-        </Col>
-      </Row>
+      {/* ── Polla Mundial — solo mientras esté activo un campeonato ── */}
+      {POLLA_MODE && (
+        <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
+          <Col xs={24}>
+            <Button
+              size="large"
+              block
+              onClick={() => navigate('/mundial/dashboard')}
+              style={{
+                fontWeight: 700,
+                background: 'linear-gradient(135deg, #16a34a, #22c55e)',
+                borderColor: '#22c55e',
+                color: '#fff',
+                height: 48,
+                fontSize: isMobile ? '0.9rem' : '1rem',
+              }}
+            >
+              ⚽ {isMobile ? 'Polla Mundial 2026' : 'Polla Mundial 2026 — Ver mi dashboard'}
+            </Button>
+          </Col>
+        </Row>
+      )}
 
       <Row gutter={[16, 16]}>
 

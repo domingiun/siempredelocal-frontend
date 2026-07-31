@@ -28,6 +28,8 @@ const PLAN_AMOUNTS = {
 
 const formatCop = (value) => `$${Number(value || 0).toLocaleString('es-CO')}`;
 
+const POLLA_MODE = import.meta.env.VITE_POLLA_MODE === 'true';
+
 const getPlanAmount = (plan) => PLAN_AMOUNTS[Number(plan?.credits)] || Number(plan?.final_price || 0);
 
 const buildPaymentText = (plan, user, transactionId) => {
@@ -59,7 +61,7 @@ const PurchaseCreditsPage = () => {
 
   useEffect(() => {
     fetchPlans();
-    fetchActivePolla();
+    if (POLLA_MODE) fetchActivePolla();
   }, []);
 
   const fetchPlans = async () => {

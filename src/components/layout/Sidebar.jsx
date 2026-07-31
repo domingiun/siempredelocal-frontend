@@ -105,12 +105,12 @@ const Sidebar = ({ collapsed, onCollapse, isMobile }) => {
             style={{ backgroundColor: '#1890ff', marginLeft: 8 }} />
         ) : null,
       },
-      // 3. Polla Mundial — todos los usuarios
-      {
+      // 3. Polla Mundial — todos los usuarios, solo mientras esté activo un campeonato
+      ...(POLLA_MODE ? [{
         key: '/mundial/dashboard',
         icon: <span style={{ fontSize: 14 }}>⚽</span>,
         label: 'Polla Mundial',
-      },
+      }] : []),
       ...(!POLLA_MODE ? [
         // 4. Pronósticos
         {
@@ -198,7 +198,9 @@ const Sidebar = ({ collapsed, onCollapse, isMobile }) => {
               { key: '/admin/create-betdate', icon: <PlusCircleOutlined />, label: 'Nueva Fecha' },
             ] : []),
             { key: '/admin/articles', icon: <FileTextOutlined />, label: 'Artículos' },
-            { key: '/admin/polla',    icon: <span style={{ fontSize: 14 }}>⚽</span>, label: 'Polla Mundial' },
+            ...(POLLA_MODE ? [
+              { key: '/admin/polla', icon: <span style={{ fontSize: 14 }}>⚽</span>, label: 'Polla Mundial' },
+            ] : []),
           ],
         },
       );
@@ -452,16 +454,18 @@ const Sidebar = ({ collapsed, onCollapse, isMobile }) => {
               />
             </Tooltip>
 
-            {/* Polla Mundial */}
-            <Tooltip title="Polla Mundial" placement="right">
-              <Button
-                type="dashed"
-                icon={<TrophyOutlined />}
-                onClick={() => navigate('/mundial/dashboard')}
-                className="quick-btn"
-                style={{ marginBottom: 8, borderColor: '#22c55e', color: '#22c55e' }}
-              />
-            </Tooltip>
+            {/* Polla Mundial — solo mientras esté activo un campeonato */}
+            {POLLA_MODE && (
+              <Tooltip title="Polla Mundial" placement="right">
+                <Button
+                  type="dashed"
+                  icon={<TrophyOutlined />}
+                  onClick={() => navigate('/mundial/dashboard')}
+                  className="quick-btn"
+                  style={{ marginBottom: 8, borderColor: '#22c55e', color: '#22c55e' }}
+                />
+              </Tooltip>
+            )}
 
             {/* Pronósticos */}
             {!POLLA_MODE && (
