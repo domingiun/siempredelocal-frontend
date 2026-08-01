@@ -115,3 +115,37 @@ body[data-theme="dark"] .matches-page .ant-btn:hover {
 .matches-league-rows {
   background: #0f1724;
 }
+
+/* ── Escritorio: todo un poco más grande y feed centrado ── */
+@media (min-width: 768px) {
+  .matches-page {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 24px !important;
+  }
+
+  .matches-section-label {
+    font-size: 0.85rem;
+    margin: 28px 4px 14px;
+  }
+
+  .matches-day-header {
+    font-size: 15px;
+    padding: 10px 16px;
+    gap: 9px;
+  }
+
+  .matches-day-badge {
+    font-size: 12px;
+    padding: 3px 12px;
+  }
+
+  .matches-day-count {
+    font-size: 13px;
+  }
+
+  .matches-league-header {
+    font-size: 13px;
+    padding: 8px 16px;
+  }
+}

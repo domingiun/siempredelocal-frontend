@@ -124,3 +124,47 @@ body:not([data-theme="dark"]) .cmr-logo--placeholder {
   background: #eef1f4;
   color: #94a3b8;
 }
+
+/* ── Escritorio: filas más grandes y respiradas ── */
+@media (min-width: 768px) {
+  .compact-match-row {
+    gap: 14px;
+    padding: 14px 20px;
+    border-left-width: 4px;
+  }
+
+  .cmr-team {
+    gap: 10px;
+  }
+
+  .cmr-team-name {
+    font-size: 15px;
+  }
+
+  .cmr-logo {
+    width: 30px;
+    height: 30px;
+  }
+
+  .cmr-logo--placeholder {
+    font-size: 14px;
+  }
+
+  .cmr-center {
+    gap: 8px;
+    min-width: 96px;
+  }
+
+  .cmr-center-text {
+    font-size: 14px;
+  }
+
+  .cmr-center-text.cmr-score {
+    font-size: 17px;
+  }
+
+  .cmr-live-dot {
+    width: 8px;
+    height: 8px;
+  }
+}
