@@ -8,7 +8,7 @@ import {
 } from 'antd';
 import {
   FireOutlined, TeamOutlined, CheckCircleOutlined,
-  ClockCircleOutlined, TrophyOutlined, StarOutlined
+  ClockCircleOutlined, TrophyOutlined
 } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useWallet } from '../../context/WalletContext';
@@ -24,7 +24,7 @@ const { Title, Text } = Typography;
 const PlaceBetForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { wallet, placeBet, hasEnoughCredits } = useWallet();
+  const { placeBet } = useWallet();
   
   const [betDate, setBetDate] = useState(null);
   const [matches, setMatches] = useState([]);
@@ -126,12 +126,6 @@ const PlaceBetForm = () => {
       return false;
     }
     
-    // Verificar créditos
-    if (!hasEnoughCredits()) {
-      message.error('No tienes créditos suficientes');
-      return false;
-    }
-    
     // Validar predicciones
     const predictionArray = Object.values(predictions);
     const validationErrors = validatePredictions(predictionArray);
@@ -162,7 +156,6 @@ const PlaceBetForm = () => {
           <div>
             <p>¿Estás seguro de enviar esta predicción?</p>
             <ul>
-              <li>Se descontará <strong>1 crédito</strong> de tu saldo</li>
               <li>No podrás modificar la predicción después</li>
               <li>El premio potencial es: <strong>${((betDate.total_prize || 0) || ((betDate.prize_PTS || 0) + (betDate.accumulated_prize || 0)) || (betDate.prize_cop || 0)).toLocaleString()}</strong></li>
             </ul>
@@ -181,7 +174,6 @@ const PlaceBetForm = () => {
         onOk: async () => {
           const result = await placeBet(id, predictionArray);
           if (result.success) {
-            const creditsLeft = result.data?.credits_remaining ?? (wallet?.credits - 1);
             notification.success({
               message: (
                 <span style={{ fontSize: 16, fontWeight: 700, color: '#15803d' }}>
@@ -196,9 +188,6 @@ const PlaceBetForm = () => {
                   <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                     <Tag color="green" icon={<CheckCircleOutlined />}>
                       10 pronósticos guardados
-                    </Tag>
-                    <Tag color="blue" icon={<StarOutlined />}>
-                      {creditsLeft} crédito{creditsLeft !== 1 ? 's' : ''} restante{creditsLeft !== 1 ? 's' : ''}
                     </Tag>
                   </div>
                 </div>
@@ -593,10 +582,6 @@ const PlaceBetForm = () => {
             <ClockCircleOutlined />
             {calculateTimeRemaining(betDate)}
           </span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: wallet.credits > 0 ? '#52c41a' : '#ff4d4f', fontWeight: 700, fontSize: 13 }}>
-            <FireOutlined />
-            {wallet.credits} credito(s)
-          </span>
         </div>
       </div>
 
@@ -665,7 +650,7 @@ const PlaceBetForm = () => {
                 icon={<CheckCircleOutlined />}
                 onClick={handleSubmit}
                 loading={submitting}
-                disabled={submitting || !hasEnoughCredits()}
+                disabled={submitting}
                 style={{
                   backgroundColor: '#0958d9',
                   borderColor: '#0958d9',
@@ -673,7 +658,7 @@ const PlaceBetForm = () => {
                   fontWeight: 600
                 }}
               >
-                {hasEnoughCredits() ? 'Enviar Pronósticos' : 'Sin Creditos'}
+                Enviar Pronósticos
               </Button>
             </div>
 
@@ -691,25 +676,19 @@ const PlaceBetForm = () => {
                 icon={<CheckCircleOutlined />}
                 onClick={handleSubmit}
                 loading={submitting}
-                disabled={submitting || !hasEnoughCredits() || completedCount < matches.length}
+                disabled={submitting || completedCount < matches.length}
                 style={{
-                  backgroundColor: !hasEnoughCredits()
-                    ? '#cf1322'
-                    : completedCount === matches.length
-                      ? '#0958d9'
-                      : '#1d4ed8',
-                  borderColor: !hasEnoughCredits() ? '#cf1322' : '#0958d9',
+                  backgroundColor: completedCount === matches.length ? '#0958d9' : '#1d4ed8',
+                  borderColor: '#0958d9',
                   color: '#ffffff',
                   fontWeight: 700,
                   minWidth: 150,
                   opacity: 1,
                 }}
               >
-                {!hasEnoughCredits()
-                  ? 'Sin Créditos'
-                  : completedCount < matches.length
-                    ? `Faltan ${matches.length - completedCount}`
-                    : 'Enviar pronósticos'
+                {completedCount < matches.length
+                  ? `Faltan ${matches.length - completedCount}`
+                  : 'Enviar pronósticos'
                 }
               </Button>
             </div>

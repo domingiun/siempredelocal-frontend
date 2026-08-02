@@ -256,29 +256,14 @@ export const WalletProvider = ({ children }) => {
     try {
       const response = await betService.placeBet(user.id, betDateId, predictions);
       console.log('🎯 Place bet response:', response.data);
-      
+
       if (response.data?.success) {
-        // Actualizar créditos (restar 1)
+        // Los pronósticos son gratuitos — no se descuentan créditos ni se registra transacción
         setWallet(prev => ({
           ...prev,
-          credits: prev.credits - 1,
           bets_placed: prev.bets_placed + 1
         }));
-        
-        // Transformar y agregar transacción al historial
-        const newTransaction = {
-          id: response.data.bet_id,
-          transaction_type: 'BET_PLACEMENT',
-          status: 'completed',
-          created_at: new Date().toISOString(),
-          description: `Pronósticos en la fecha ${betDateId}`,
-          amount: -5000, // $5,000 PTS por pronósticos
-          currency: 'PTS',
-          credits_affected: -1
-        };
-        
-        setTransactions(prev => [newTransaction, ...prev]);
-        
+
         return { success: true, data: response.data };
       }
     } catch (error) {
@@ -313,9 +298,8 @@ export const WalletProvider = ({ children }) => {
     message.success(`¡Felicidades! Ganaste $${amount.toLocaleString()}`);
   };
 
-  const hasEnoughCredits = (required = 1) => {
-    return wallet.credits >= required;
-  };
+  // Los pronósticos son gratuitos — ya no requieren créditos.
+  const hasEnoughCredits = () => true;
 
   // Función para forzar actualización de datos
   const forceRefresh = async () => {

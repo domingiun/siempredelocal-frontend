@@ -438,27 +438,15 @@ const CreateBetDateAdmin = () => {
               </Form.Item>
               
               <Row gutter={16}>
-                <Col span={12}>
+                <Col span={24}>
                   <Form.Item
-                    label="Créditos Requeridos"
-                    name="required_credits"
-                  >
-                    <Select size="large">
-                      <Option value={1}>1 crédito</Option>
-                      <Option value={2}>2 créditos</Option>
-                      <Option value={3}>3 créditos</Option>
-                    </Select>
-                  </Form.Item>
-                </Col>
-                <Col span={12}>
-                  <Form.Item
-                    label="Premio Inicial"
+                    label="Premio (los pronósticos son gratuitos — este es el premio fijo de la fecha)"
                     name="prize_PTS"
                   >
                     <Space.Compact style={{ width: '100%' }}>
-                      <Input 
-                        type="number" 
-                        placeholder="0" 
+                      <Input
+                        type="number"
+                        placeholder="0"
                         size="large"
                       />
                       <span
@@ -478,7 +466,7 @@ const CreateBetDateAdmin = () => {
                   </Form.Item>
                 </Col>
               </Row>
-              
+
               <Form.Item
                 label="Descripción (Opcional)"
                 name="description"

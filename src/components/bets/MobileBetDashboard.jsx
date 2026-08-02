@@ -1,12 +1,9 @@
 // frontend/src/components/bets/MobileBetDashboard.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from 'antd';
 import {
-  FireOutlined, WalletOutlined, RightOutlined,
-  ClockCircleOutlined, TrophyOutlined
+  ClockCircleOutlined, TrophyOutlined, RightOutlined
 } from '@ant-design/icons';
-import { useWallet } from '../../context/WalletContext';
 import { useTheme } from '../../context/ThemeContext';
 import betService from '../../services/betService';
 import { calculateTimeRemaining } from '../../utils/betCalculations';
@@ -14,13 +11,9 @@ import './MobileBetDashboard.css';
 
 const MobileBetDashboard = () => {
   const navigate = useNavigate();
-  const { wallet } = useWallet();
   const { mode } = useTheme();
   const isDark = mode === 'dark';
   const [activeBetDate, setActiveBetDate] = useState(null);
-
-  const credits = wallet?.credits ?? 0;
-  const hasCredits = credits > 0;
 
   useEffect(() => {
     betService.getBetDates()
@@ -35,39 +28,12 @@ const MobileBetDashboard = () => {
   return (
     <div className={`mbd ${isDark ? 'mbd--dark' : ''}`} aria-label="Panel rápido móvil">
 
-      {/* ── BARRA DE CRÉDITOS ── */}
-      <div className={`mbd__credits-bar ${hasCredits ? '' : 'mbd__credits-bar--empty'}`}>
-        <div className="mbd__credits-left">
-          <FireOutlined className="mbd__fire-icon" />
-          <span className="mbd__credits-num">{credits}</span>
-          <span className="mbd__credits-label">
-            crédito{credits !== 1 ? 's' : ''}
-          </span>
-        </div>
-
-        {hasCredits ? (
-          <span className="mbd__credits-ok">✓ Listo para apostar</span>
-        ) : (
-          <Button
-            type="primary"
-            danger
-            size="small"
-            icon={<WalletOutlined />}
-            onClick={() => navigate('/purchase')}
-          >
-            Recargar
-          </Button>
-        )}
-      </div>
-
-      {/* ── CTA FECHA ACTIVA ── */}
+      {/* ── CTA FECHA ACTIVA — pronósticos gratuitos ── */}
       {activeBetDate && (
         <button
           className="mbd__bet-cta"
-          onClick={() =>
-            navigate(hasCredits ? `/bets/${activeBetDate.id}/place` : '/purchase')
-          }
-          aria-label={hasCredits ? 'Ir a pronosticar' : 'Solicitar créditos'}
+          onClick={() => navigate(`/bets/${activeBetDate.id}/place`)}
+          aria-label="Ir a pronosticar"
         >
           <div className="mbd__bet-info">
             <span className="mbd__bet-prize">
@@ -88,24 +54,9 @@ const MobileBetDashboard = () => {
             </span>
           </div>
           <div className="mbd__bet-arrow">
-            <span className="mbd__bet-action-label">
-              {hasCredits ? 'Pronosticar' : 'Ver fecha'}
-            </span>
+            <span className="mbd__bet-action-label">Pronosticar</span>
             <RightOutlined />
           </div>
-        </button>
-      )}
-
-      {/* ── BANNER SIN CRÉDITOS ── */}
-      {!hasCredits && (
-        <button
-          className="mbd__no-credits-banner"
-          onClick={() => navigate('/purchase')}
-          aria-label="Solicitar créditos"
-        >
-          <WalletOutlined className="mbd__no-credits-icon" />
-          <span>Solicita créditos para participar en la fecha</span>
-          <RightOutlined className="mbd__no-credits-arrow" />
         </button>
       )}
     </div>

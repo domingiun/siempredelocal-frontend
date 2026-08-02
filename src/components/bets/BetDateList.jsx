@@ -7,10 +7,9 @@ import {
 import {
   CalendarOutlined, FireOutlined, TrophyOutlined,
   TeamOutlined, ClockCircleOutlined,
-  EyeOutlined, PlayCircleOutlined, LockOutlined, HistoryOutlined
+  EyeOutlined, PlayCircleOutlined, HistoryOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { useWallet } from '../../context/WalletContext';
 import { useTheme } from '../../context/ThemeContext';
 import betService from '../../services/betService';
 import { calculateTimeRemaining } from '../../utils/betCalculations';
@@ -21,7 +20,6 @@ const { Title, Text } = Typography;
 
 const BetDateList = () => {
   const navigate = useNavigate();
-  const { wallet, hasEnoughCredits } = useWallet();
   const [betDates, setBetDates] = useState([]);
   const [loading, setLoading] = useState(true);
   const { mode } = useTheme();
@@ -250,14 +248,6 @@ const BetDateList = () => {
   };
 
   const handlePlaceBet = (betDateId) => {
-    // Verificar créditos
-    if (!hasEnoughCredits()) {
-      message.error('No tienes créditos suficientes. Recarga créditos primero.');
-      navigate('/wallet');
-      return;
-    }
-    
-    // Navegar al formulario de apuesta
     navigate(`/bets/${betDateId}/place`);
   };
 
@@ -273,7 +263,6 @@ const BetDateList = () => {
     const isOpen = betDate.uiStatus === 'open';
     const isFinished = betDate.uiStatus === 'finished' || betDate.status === 'finished';
     const timeRemaining = calculateTimeRemaining(betDate);
-    const canBet = isOpen && hasEnoughCredits();
     const prize =
       betDate.total_prize ||
       ((betDate.prize_PTS || 0) + (betDate.accumulated_prize || 0)) ||
@@ -335,7 +324,7 @@ const BetDateList = () => {
         {/* Texto informativo */}
         <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 12 }}>
           <FireOutlined style={{ marginRight: 4 }} />
-          {betDate.matches?.length || 0} partidos · 1 crédito · Mínimo 13 pts para ganar
+          {betDate.matches?.length || 0} partidos · Gratis · Mínimo 13 pts para ganar
         </Text>
 
         {/* Tag de acumulado solo en fechas abiertas/cerradas (fechas finalizadas ya lo muestran en la línea del premio) */}
@@ -373,12 +362,11 @@ const BetDateList = () => {
           {isOpen && (
             <Button
               type="primary"
-              icon={canBet ? <PlayCircleOutlined /> : <LockOutlined />}
-              disabled={!canBet}
+              icon={<PlayCircleOutlined />}
               style={{ backgroundColor: '#0958d9', borderColor: '#0958d9', color: '#ffffff', fontWeight: 600 }}
               onClick={(e) => { e.stopPropagation(); handlePlaceBet(betDate.id); }}
             >
-              {canBet ? 'Pronósticar' : 'Sin créditos'}
+              Pronósticar
             </Button>
           )}
         </div>
@@ -643,28 +631,6 @@ const BetDateList = () => {
           }
         }
       `}</style>
-      {/* Alerta si no hay créditos */}
-      {wallet.credits === 0 && (
-        <Alert
-          title="No tienes créditos"
-          description={
-            <span>
-              Necesitas al menos 1 crédito para apostar. 
-              <Button 
-                type="link" 
-                onClick={() => navigate('/wallet')}
-                style={{ padding: 0, marginLeft: 4 }}
-              >
-                Recarga créditos aquí
-              </Button>
-            </span>
-          }
-          type="warning"
-          showIcon
-          style={{ marginBottom: 16 }}
-        />
-      )}
-
       {/* Lista de fechas */}
       {betDates.length === 0 ? (
         <Card>

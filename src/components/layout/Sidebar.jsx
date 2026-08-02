@@ -122,10 +122,6 @@ const Sidebar = ({ collapsed, onCollapse, isMobile }) => {
               key: '/bets',
               icon: <FireOutlined />,
               label: 'Hacer Pronósticos',
-              badge: wallet?.credits > 0 ? (
-                <Badge count={wallet.credits} size="small"
-                  style={{ backgroundColor: '#52c41a', marginLeft: 8 }} />
-              ) : null,
             },
             { key: '/active-bets',    icon: <HistoryOutlined />,    label: 'Mis Pronósticos' },
             { key: '/bets/ranking',   icon: <TrophyOutlined />,     label: 'Ranking' },
@@ -253,28 +249,6 @@ const Sidebar = ({ collapsed, onCollapse, isMobile }) => {
       });
     }
 
-    // Agregar opción de recargar créditos si el usuario tiene pocos
-    if (wallet?.credits < 3) {
-      items.unshift({
-        key: '/purchase',
-        icon: <DollarOutlined />,
-        label: (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span>Recargar Créditos</span>
-            <Badge 
-              count="¡OFERTA!" 
-              size="small" 
-              style={{ 
-                backgroundColor: '#ff4d4f',
-                marginLeft: 8
-              }}
-            />
-          </div>
-        ),
-        onClick: () => navigate('/purchase'),
-      });
-    }
-
     items.push({
       key: 'logout',
       icon: <LogoutOutlined />,
@@ -378,9 +352,6 @@ const Sidebar = ({ collapsed, onCollapse, isMobile }) => {
         />
       </div>
 
-      {/* Widget de créditos (solo cuando está expandido) */}
-      {!collapsed && <CreditsWidget />}
-
       {/* Menú principal */}
       <div className="sidebar-menu-container">
         <Menu
@@ -476,20 +447,6 @@ const Sidebar = ({ collapsed, onCollapse, isMobile }) => {
                   onClick={() => navigate('/bets')}
                   className="quick-btn"
                   style={{ marginBottom: 8, borderColor: '#ff4d4f', color: '#ff4d4f' }}
-                />
-              </Tooltip>
-            )}
-            
-            {/* Recargar créditos si tiene pocos */}
-            {wallet?.credits < 3 && (
-              <Tooltip title="Recargar Créditos" placement="right">
-                <Button
-                  type="dashed"
-                  danger
-                  icon={<DollarOutlined />}
-                  onClick={() => navigate('/purchase')}
-                  className="quick-btn"
-                  style={{ marginBottom: 8 }}
                 />
               </Tooltip>
             )}
