@@ -25,7 +25,7 @@ const FAQ = [
   },
   {
     q: '¿Qué pasa si hay empate en puntos al final?',
-    a: 'En Pronósticos, si dos o más jugadores terminan con el mismo puntaje máximo (y al menos 13 puntos), el premio se divide en partes iguales entre ellos. Lo mismo aplica para la Polla Mundial.',
+    a: 'En Pronósticos, si dos o más jugadores terminan con el mismo puntaje máximo (y al menos 8 puntos), el premio se divide en partes iguales entre ellos. Lo mismo aplica para la Polla Mundial.',
   },
   {
     q: '¿Puedo cambiar mi predicción después de enviarla?',
@@ -166,9 +166,9 @@ export default function HelpPage() {
           <div className="help-steps">
             {[
               { n: '1', title: 'Inscríbete a la fecha', desc: 'Cada fecha cuesta 1 crédito ($5.000 COP). Puedes inscribirte desde que abre hasta 1 hora antes del primer partido.' },
-              { n: '2', title: 'Predice los 10 marcadores', desc: 'Ingresa el marcador exacto que crees que tendrá cada partido. Por ejemplo: Colombia 2 – 1 Argentina.' },
+              { n: '2', title: 'Predice los 12 partidos', desc: 'Elige si crees que gana el Local, hay Empate, o gana el Visitante en cada partido.' },
               { n: '3', title: 'Espera los resultados', desc: 'Los marcadores se actualizan en tiempo real. Tus puntos se calculan automáticamente al finalizar cada partido.' },
-              { n: '4', title: 'Gana el pozo', desc: 'Quien más puntos acumule al cerrar la fecha se lleva el pozo (mínimo 13 puntos para ganar). Si hay empate en el primer lugar, el premio se divide en partes iguales.' },
+              { n: '4', title: 'Gana el pozo', desc: 'Quien más puntos acumule al cerrar la fecha se lleva el pozo (mínimo 8 puntos para ganar). Si hay empate en el primer lugar, el premio se divide en partes iguales.' },
             ].map(s => (
               <div key={s.n} className="help-step">
                 <div className="help-step-num orange">{s.n}</div>
@@ -234,7 +234,7 @@ export default function HelpPage() {
             <GiftOutlined className="help-prize-icon" />
             <div>
               <p>El pozo se forma con <strong>el 100% de las inscripciones</strong> de cada fecha. A más participantes, mayor el premio.</p>
-              <p>El jugador con más puntos al cierre de la fecha <strong>gana el pozo completo</strong>, siempre que haya alcanzado <strong>mínimo 13 puntos</strong>. Si hay empate en el primer lugar, el premio se divide en partes iguales entre los empatados.</p>
+              <p>El jugador con más puntos al cierre de la fecha <strong>gana el pozo completo</strong>, siempre que haya alcanzado <strong>mínimo 8 puntos</strong>. Si hay empate en el primer lugar, el premio se divide en partes iguales entre los empatados.</p>
             </div>
           </div>
         </section>

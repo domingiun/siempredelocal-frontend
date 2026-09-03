@@ -11,6 +11,8 @@ import { calculatePredictionPoints } from '../../utils/betCalculations';
 
 const { Title, Text } = Typography;
 
+const RESULT_LABELS = { L: 'Local', E: 'Empate', V: 'Visitante' };
+
 /* ─── helpers de color ─── */
 const betDateTagStyle = (status, isDark) => {
   const v = String(status || '').toLowerCase();
@@ -154,7 +156,7 @@ const ActiveBets = () => {
           const hasResult = isFinished && match && match.home_score !== null && match.away_score !== null;
           const points = hasResult
             ? calculatePredictionPoints(
-                { home_score: pred.predicted_home_score, away_score: pred.predicted_away_score },
+                pred.predicted_result,
                 { home_score: match.home_score, away_score: match.away_score }
               )
             : pred.points || 0;
@@ -202,7 +204,7 @@ const ActiveBets = () => {
     const match = pred.match;
     const ms = matchStatusStyle(match?.status, isDark);
     const isLast = idx === total - 1;
-    const pointColor = pred.points === 3 ? '#52c41a' : pred.points === 1 ? '#1677ff' : isDark ? '#475569' : '#94a3b8';
+    const pointColor = pred.points > 0 ? '#52c41a' : isDark ? '#475569' : '#94a3b8';
     const homeName = match?.home_team?.name || `Equipo ${pred.match_id}`;
     const awayName = match?.away_team?.name || '';
     const rowBg = idx % 2 === 0
@@ -232,7 +234,7 @@ const ActiveBets = () => {
         {/* Pronóstico / resultado */}
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: 15, fontWeight: 800, color: isDark ? '#60a5fa' : '#1677ff', lineHeight: 1 }}>
-            {pred.predicted_home_score} – {pred.predicted_away_score}
+            {RESULT_LABELS[pred.predicted_result] || '—'}
           </div>
           {pred.hasResult && (
             <div style={{ fontSize: 11, color: isDark ? '#64748b' : '#9ca3af', marginTop: 2 }}>
@@ -364,7 +366,7 @@ const ActiveBets = () => {
                                 const match = pred.match;
                                 const ms = matchStatusStyle(match?.status, isDark);
                                 const isLast = idx === sorted.length - 1;
-                                const pointColor = pred.points === 3 ? '#52c41a' : pred.points === 1 ? '#1677ff' : isDark ? '#475569' : '#94a3b8';
+                                const pointColor = pred.points > 0 ? '#52c41a' : isDark ? '#475569' : '#94a3b8';
                                 const homeName = match?.home_team?.name || '';
                                 const awayName = match?.away_team?.name || '';
                                 return (
@@ -377,7 +379,7 @@ const ActiveBets = () => {
                                       {match?.away_team?.logo_url && <img src={match.away_team.logo_url} alt="" style={{ width: 16, height: 16, borderRadius: '50%', flexShrink: 0 }} />}
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap', paddingLeft: 21 }}>
-                                      <Text style={{ fontSize: 11, fontWeight: 700, color: isDark ? '#60a5fa' : '#0958d9' }}>{pred.predicted_home_score}-{pred.predicted_away_score}</Text>
+                                      <Text style={{ fontSize: 11, fontWeight: 700, color: isDark ? '#60a5fa' : '#0958d9' }}>{RESULT_LABELS[pred.predicted_result] || '—'}</Text>
                                       {pred.hasResult && <Text style={{ fontSize: 10, color: isDark ? '#64748b' : '#9ca3af' }}>({match.home_score}-{match.away_score})</Text>}
                                       <Pill s={ms} />
                                       {pred.isFinished && <span style={{ marginLeft: 'auto', fontSize: 11, fontWeight: 800, color: pointColor }}>{pred.points}pt</span>}

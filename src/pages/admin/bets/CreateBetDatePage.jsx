@@ -120,8 +120,8 @@ const CreateBetDateAdmin = () => {
 
   // Agregar partido a selección
   const addMatch = (match) => {
-    if (selectedMatches.length >= 10) {
-      message.warning('Máximo 10 partidos por fecha');
+    if (selectedMatches.length >= 12) {
+      message.warning('Máximo 12 partidos por fecha');
       return;
     }
     
@@ -141,8 +141,8 @@ const CreateBetDateAdmin = () => {
 
   // Enviar formulario
   const handleSubmit = async (values) => {
-    if (selectedMatches.length !== 10) {
-      message.error('Debes seleccionar exactamente 10 partidos');
+    if (selectedMatches.length !== 12) {
+      message.error('Debes seleccionar exactamente 12 partidos');
       return;
     }
 
@@ -251,8 +251,8 @@ const CreateBetDateAdmin = () => {
   };
 
   const addMatchToEdit = (match) => {
-    if (editingMatchIds.length >= 10) {
-      message.warning('Máximo 10 partidos por fecha');
+    if (editingMatchIds.length >= 12) {
+      message.warning('Máximo 12 partidos por fecha');
       return;
     }
     if (editingMatchIds.includes(match.id)) {
@@ -327,7 +327,7 @@ const CreateBetDateAdmin = () => {
           size="small"
           icon={<PlusOutlined />}
           onClick={() => addMatch(record)}
-          disabled={selectedMatches.length >= 10 || selectedMatches.find(m => m.id === record.id)}
+          disabled={selectedMatches.length >= 12 || selectedMatches.find(m => m.id === record.id)}
         >
           Agregar
         </Button>
@@ -393,7 +393,7 @@ const CreateBetDateAdmin = () => {
     <div className="create-betdate-page" style={{ padding: '24px' }}>
       <Title level={2}>Crear Nueva Fecha de Pronósticos</Title>
       <Text type="secondary">
-        Crea una nueva fecha con 10 partidos para que los usuarios apuesten
+        Crea una nueva fecha con 12 partidos para que los usuarios apuesten
       </Text>
       
       <Divider />
@@ -481,11 +481,11 @@ const CreateBetDateAdmin = () => {
               
               <div style={{ marginBottom: '16px' }}>
                 <Space wrap>
-                  <Tag color={selectedMatches.length === 10 ? "success" : "warning"}>
-                    {selectedMatches.length}/10 partidos seleccionados
+                  <Tag color={selectedMatches.length === 12 ? "success" : "warning"}>
+                    {selectedMatches.length}/12 partidos seleccionados
                   </Tag>
-                  {selectedMatches.length < 10 && (
-                    <Tag color="red">Selecciona {10 - selectedMatches.length} más</Tag>
+                  {selectedMatches.length < 12 && (
+                    <Tag color="red">Selecciona {12 - selectedMatches.length} más</Tag>
                   )}
                 </Space>
                 
@@ -513,11 +513,11 @@ const CreateBetDateAdmin = () => {
                   htmlType="submit"
                   size="large"
                   loading={loading}
-                  disabled={selectedMatches.length !== 10}
+                  disabled={selectedMatches.length !== 12}
                   block
                 >
-                  {selectedMatches.length !== 10 
-                    ? `Selecciona ${10 - selectedMatches.length} partidos más`
+                  {selectedMatches.length !== 12
+                    ? `Selecciona ${12 - selectedMatches.length} partidos más`
                     : 'Crear Fecha de Pronósticos'
                   }
                 </Button>
@@ -593,7 +593,7 @@ const CreateBetDateAdmin = () => {
               title="Instrucciones"
               description={
                 <ul>
-                  <li>Selecciona exactamente <strong>10 partidos</strong></li>
+                  <li>Selecciona exactamente <strong>12 partidos</strong></li>
                   <li>Los pronósticos cerrarán automáticamente 1 hora antes del primer partido</li>
                   <li>Puedes filtrar por competencia o buscar equipos específicos</li>
                 </ul>
@@ -666,7 +666,7 @@ const CreateBetDateAdmin = () => {
           {/* Edición de partidos — solo si open y sin apuestas */}
           {editingBetDate?.status === 'open' && (editingBetDate?.bet_count || 0) === 0 ? (
             <>
-              <Divider>Partidos de esta fecha ({editingMatchIds.length}/10)</Divider>
+              <Divider>Partidos de esta fecha ({editingMatchIds.length}/12)</Divider>
 
               {/* Partidos actuales seleccionados */}
               <div style={{ marginBottom: 12 }}>
@@ -694,11 +694,11 @@ const CreateBetDateAdmin = () => {
                 </Space>
               </div>
 
-              {editingMatchIds.length < 10 && (
+              {editingMatchIds.length < 12 && (
                 <Alert
                   type="warning"
                   showIcon
-                  message={`Selecciona ${10 - editingMatchIds.length} partido(s) más para completar la fecha`}
+                  message={`Selecciona ${12 - editingMatchIds.length} partido(s) más para completar la fecha`}
                   style={{ marginBottom: 12 }}
                 />
               )}
@@ -737,7 +737,7 @@ const CreateBetDateAdmin = () => {
                           size="small"
                           type="primary"
                           icon={<PlusOutlined />}
-                          disabled={editingMatchIds.length >= 10}
+                          disabled={editingMatchIds.length >= 12}
                           onClick={() => addMatchToEdit(r)}
                         >
                           Agregar

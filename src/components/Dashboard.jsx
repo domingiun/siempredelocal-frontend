@@ -506,7 +506,7 @@ const Dashboard = () => {
             </span>
           );
         }
-        // Hay ganador con >= 13 pts → premio pagado
+        // Hay ganador que calificó (record.qualifies) → premio pagado
         return (
           <span style={{ display: 'inline-block', width: '100%', textAlign: 'right', fontSize: '12px', color: '#52c41a', fontWeight: 600 }}>
             ${Number(value || 0).toLocaleString()}

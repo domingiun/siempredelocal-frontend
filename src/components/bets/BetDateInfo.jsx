@@ -399,7 +399,7 @@ const BetDateInfo = ({ betDateId }) => {
         <Card>
           <Title level={5}>
             <CalendarOutlined style={{ marginRight: 8 }} />
-            Partidos de esta fecha ({matches.length}/10)
+            Partidos de esta fecha ({matches.length}/12)
           </Title>
           <Row gutter={[16, 16]}>
             {matches.map((match, index) => (
@@ -448,11 +448,10 @@ const BetDateInfo = ({ betDateId }) => {
       <Card style={{ marginBottom: 16 }} className="info-alert">
         <Title level={5}>Información Importante</Title>
         <Space orientation="vertical" size="small">
-          <Text>• <strong>10 partidos</strong> para pronosticar
-          • <strong>1 crédito</strong> por apuesta
-          • <strong>3 puntos</strong> por marcador exacto
-          • <strong>1 punto</strong> por ganador correcto
-          • <strong>Mínimo 13 puntos</strong> para ganar</Text>
+          <Text>• <strong>12 partidos</strong> para pronosticar (Local, Empate o Visitante)
+          • <strong>Gratis</strong> — no requiere créditos
+          • <strong>1 punto</strong> por acertar cada partido
+          • <strong>Mínimo 8 puntos</strong> para ganar</Text>
           <Text>• <strong>Premio:</strong> ${((betDate.total_prize || 0) || ((betDate.prize_PTS || 0) + (betDate.accumulated_prize || 0)) || (betDate.prize_cop || 0)).toLocaleString()}</Text>
         </Space>
       </Card>

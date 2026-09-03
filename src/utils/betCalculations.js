@@ -132,18 +132,18 @@ export const calculateTimeRemaining = (betDate) => {
   }
 };
 
-// Verificar si fecha estÃ¡ abierta
+// Verificar si fecha está abierta
 export const isBetDateOpen = (betDate) => {
   if (!betDate) return false;
-  
+
   try {
     const now = dayjs();
     const closing = dayjs(betDate.closing_time);
-    
+
     return (
-      betDate.status === 'open' && 
+      betDate.status === 'open' &&
       now.isBefore(closing) &&
-      betDate.matches?.length === 10
+      betDate.matches?.length === 12
     );
   } catch (error) {
     console.error('Error verificando fecha:', error);
@@ -151,27 +151,25 @@ export const isBetDateOpen = (betDate) => {
   }
 };
 
+const VALID_RESULTS = ['L', 'E', 'V'];
+
 // Validar predicciones antes de enviar
 export const validatePredictions = (predictions) => {
   const errors = [];
-  
-  // Debe tener 10 predicciones
-  if (!predictions || predictions.length !== 10) {
-    errors.push('Debes predecir los 10 partidos');
+
+  // Debe tener 12 predicciones
+  if (!predictions || predictions.length !== 12) {
+    errors.push('Debes predecir los 12 partidos');
     return errors;
   }
-  
-  // Cada prediccion debe tener marcador
+
+  // Cada prediccion debe tener un resultado L/E/V
   predictions.forEach((pred, index) => {
-    if (pred.home_score == null || pred.away_score == null) {
-      errors.push(`Partido ${index + 1}: Falta marcador`);
-    } else if (pred.home_score < 0 || pred.away_score < 0) {
-      errors.push(`Partido ${index + 1}: Marcador no puede ser negativo`);
-    } else if (pred.home_score > 20 || pred.away_score > 20) {
-      errors.push(`Partido ${index + 1}: Marcador mÃ¡ximo 20 goles`);
+    if (!VALID_RESULTS.includes(pred.result)) {
+      errors.push(`Partido ${index + 1}: Falta elegir Local, Empate o Visitante`);
     }
   });
-  
+
   return errors;
 };
 
@@ -186,63 +184,60 @@ export const formatPrize = (amount) => {
   return `${formatted}`;
 };
 
-// Calcular puntos por prediccion
-export const calculatePredictionPoints = (prediction, matchResult) => {
-  if (!prediction || !matchResult) return 0;
-  
-  const { home_score: predHome, away_score: predAway } = prediction;
-  const { home_score: resultHome, away_score: resultAway } = matchResult;
-  
-  // Marcador exacto
-  if (predHome === resultHome && predAway === resultAway) {
-    return 3;
-  }
-  
-  // Ganador correcto
-  const predWinner = predHome > predAway ? 'home' : predHome < predAway ? 'away' : 'draw';
-  const resultWinner = resultHome > resultAway ? 'home' : resultHome < resultAway ? 'away' : 'draw';
-  
-  if (predWinner === resultWinner) {
-    return 1;
-  }
-  
-  return 0;
+// Derivar el resultado real (L/E/V) de un marcador
+export const deriveMatchResult = (matchResult) => {
+  if (!matchResult) return null;
+  const { home_score: home, away_score: away } = matchResult;
+  if (home == null || away == null) return null;
+  if (home > away) return 'L';
+  if (away > home) return 'V';
+  return 'E';
+};
+
+// Calcular puntos por prediccion (predictedResult: 'L'|'E'|'V', matchResult: {home_score, away_score})
+export const calculatePredictionPoints = (predictedResult, matchResult) => {
+  if (!predictedResult || !matchResult) return 0;
+
+  const actualResult = deriveMatchResult(matchResult);
+  if (!actualResult) return 0;
+
+  return predictedResult === actualResult ? 1 : 0;
 };
 
 // Calcular total de puntos
 export const calculateTotalPoints = (predictions, matchResults) => {
   if (!predictions || !matchResults) return 0;
-  
+
   let total = 0;
   predictions.forEach(prediction => {
     const matchResult = matchResults.find(m => m.match_id === prediction.match_id);
     if (matchResult) {
-      total += calculatePredictionPoints(prediction, matchResult);
+      total += calculatePredictionPoints(prediction.result, matchResult);
     }
   });
-  
+
   return total;
 };
 
 // Determinar si es ganador
 export const isWinner = (points) => {
-  return points >= 13; // MÃ­nimo 13 puntos para ganar
+  return points >= 8; // Mínimo 8 puntos (de 12) para ganar
 };
 
-// Calcular probabilidad de ganar basado en puntaje
+// Calcular probabilidad de ganar basado en puntaje (sobre 12 posibles)
 export const calculateProbability = (points) => {
-  if (points >= 25) return 'Muy alta';
-  if (points >= 20) return 'Alta';
-  if (points >= 15) return 'Media';
-  if (points >= 10) return 'Baja';
+  if (points >= 11) return 'Muy alta';
+  if (points >= 9) return 'Alta';
+  if (points >= 7) return 'Media';
+  if (points >= 5) return 'Baja';
   return 'Muy baja';
 };
 
-// Generar colores para puntos
+// Generar colores para puntos (sobre 12 posibles)
 export const getPointsColor = (points) => {
-  if (points >= 13) return '#52c41a'; // Verde - Ganador
-  if (points >= 10) return '#1890ff'; // Azul - Bueno
-  if (points >= 7) return '#faad14'; // Amarillo - Regular
+  if (points >= 8) return '#52c41a'; // Verde - Ganador
+  if (points >= 6) return '#1890ff'; // Azul - Bueno
+  if (points >= 4) return '#faad14'; // Amarillo - Regular
   return '#ff4d4f'; // Rojo - Bajo
 };
 
@@ -258,7 +253,7 @@ export const calculateEstimatedPrize = (betCount, prizePerCredit = 1950) => {
 };
 
 // Verificar si puede ganar
-export const canWinPrize = (points, minPoints = 13) => {
+export const canWinPrize = (points, minPoints = 8) => {
   return points >= minPoints;
 };
 

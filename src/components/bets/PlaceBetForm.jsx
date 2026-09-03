@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import {
   Card, Row, Col, Typography, Button,
-  InputNumber, Alert,
+  Alert,
   message, notification, Spin, Divider, Tag,
   Modal, Grid
 } from 'antd';
@@ -83,8 +83,7 @@ const PlaceBetForm = () => {
       sortedMatches.forEach(match => {
         initialPredictions[match.id] = {
           match_id: match.id,
-          home_score: null,
-          away_score: null
+          result: null
         };
       });
       
@@ -145,8 +144,7 @@ const PlaceBetForm = () => {
     try {
       const predictionArray = Object.values(predictions).map(p => ({
         match_id: p.match_id,
-        predicted_home_score: p.home_score,
-        predicted_away_score: p.away_score
+        predicted_result: p.result
       }));
       
       // Mostrar confirmación
@@ -187,7 +185,7 @@ const PlaceBetForm = () => {
                   </div>
                   <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                     <Tag color="green" icon={<CheckCircleOutlined />}>
-                      10 pronósticos guardados
+                      12 pronósticos guardados
                     </Tag>
                   </div>
                 </div>
@@ -216,15 +214,15 @@ const PlaceBetForm = () => {
     }
   };
 
-  const handleQuickFill = (matchId, result) => {
-    const [home, away] = result.split('-').map(Number);
-    handlePredictionChange(matchId, 'home_score', home);
-    handlePredictionChange(matchId, 'away_score', away);
-  };
+  const RESULT_OPTIONS = [
+    { key: 'L', label: 'Local', color: '#3b82f6' },
+    { key: 'E', label: 'Empate', color: '#94a3b8' },
+    { key: 'V', label: 'Visitante', color: '#ef4444' },
+  ];
 
   const MatchPredictionCard = ({ match, index }) => {
     const prediction = predictions[match.match_id] || {};
-    const filled = prediction.home_score != null && prediction.away_score != null;
+    const filled = prediction.result != null;
 
     return (
       <Card
@@ -273,33 +271,34 @@ const PlaceBetForm = () => {
           </div>
         </div>
 
-        {/* Inputs centrados */}
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 10 }}>
-          <InputNumber
-            min={0} max={15}
-            value={prediction.home_score ?? null}
-            onChange={(value) => handlePredictionChange(match.match_id, 'home_score', value)}
-            controls={false}
-            inputMode="numeric"
-            pattern="[0-9]*"
-            placeholder="0"
-            className="score-input"
-            style={{ width: 60, textAlign: 'center', border: '2px solid #1677ff', borderRadius: 8 }}
-            size="large"
-          />
-          <Text strong style={{ fontSize: 18 }}>-</Text>
-          <InputNumber
-            min={0} max={15}
-            value={prediction.away_score ?? null}
-            onChange={(value) => handlePredictionChange(match.match_id, 'away_score', value)}
-            controls={false}
-            inputMode="numeric"
-            pattern="[0-9]*"
-            placeholder="0"
-            className="score-input"
-            style={{ width: 60, textAlign: 'center', border: '2px solid #1677ff', borderRadius: 8 }}
-            size="large"
-          />
+        {/* Botones L/E/V */}
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 8 }}>
+          {RESULT_OPTIONS.map(opt => {
+            const selected = prediction.result === opt.key;
+            return (
+              <button
+                key={opt.key}
+                type="button"
+                className="result-btn"
+                onClick={() => handlePredictionChange(match.match_id, 'result', opt.key)}
+                style={{
+                  flex: 1,
+                  maxWidth: 100,
+                  padding: isDesktop ? '10px 4px' : '8px 4px',
+                  borderRadius: 8,
+                  border: `2px solid ${opt.color}`,
+                  background: selected ? opt.color : 'transparent',
+                  color: selected ? '#fff' : opt.color,
+                  fontWeight: 700,
+                  fontSize: isDesktop ? 13 : 11,
+                  cursor: 'pointer',
+                  transition: 'all .15s ease',
+                }}
+              >
+                {opt.label}
+              </button>
+            );
+          })}
         </div>
 
         {/* Estadio */}
@@ -343,7 +342,7 @@ const PlaceBetForm = () => {
   const isOpen = betDate.is_betting_open ?? betDate.status === 'open';
   const closedLabel = betDate.status === 'finished' ? 'finalizada' : 'cerrada';
   const completedCount = Object.values(predictions).filter(
-    p => p.home_score != null && p.away_score != null
+    p => p.result != null
   ).length;
 
 
@@ -603,9 +602,9 @@ const PlaceBetForm = () => {
       <div>
         {isOpen ? (
           <>
-            <Title level={4}>Pronostica los 10 partidos</Title>
+            <Title level={4}>Pronostica los 12 partidos</Title>
             <Text type="secondary" style={{ marginBottom: 16, display: 'block' }}>
-              Ingresa el marcador que crees que tendra cada partido
+              Elige si crees que gana el Local, hay Empate, o gana el Visitante
             </Text>
 
             <Divider style={{ margin: '12px 0' }} />
@@ -626,7 +625,7 @@ const PlaceBetForm = () => {
                 <Col>
                   <Text strong>Predicciones completadas:</Text>
                   <Tag color="blue" style={{ marginLeft: 8 }}>
-                    {Object.values(predictions).filter(p => p.home_score != null && p.away_score != null).length}/10
+                    {Object.values(predictions).filter(p => p.result != null).length}/12
                   </Tag>
                 </Col>
                 <Col>

@@ -258,7 +258,7 @@ const BetRanking = ({ betDateId }) => {
         const hasResult = finished && match && match.home_score !== null && match.away_score !== null;
         const points = hasResult
           ? calculatePredictionPoints(
-              { home_score: pred.predicted_home_score, away_score: pred.predicted_away_score },
+              pred.predicted_result,
               { home_score: match.home_score, away_score: match.away_score }
             )
           : 0;
@@ -309,7 +309,7 @@ const BetRanking = ({ betDateId }) => {
       title: 'Usuario',
       key: 'user',
       render: (_, record) => {
-        const isWinner = record.position === 1 && record.points >= 13;
+        const isWinner = record.position === 1 && record.points >= 8;
         const avatarSrc = getAvatarSrc(
           record.user_id === user?.id ? user?.avatar_url : userAvatars[record.user_id]
         );
@@ -343,12 +343,12 @@ const BetRanking = ({ betDateId }) => {
       dataIndex: 'points',
       key: 'points',
       render: (points, record) => {
-        const isWinner = record.position === 1 && points >= 13;
+        const isWinner = record.position === 1 && points >= 8;
         return (
           <Badge
             count={points}
             style={{
-              backgroundColor: isWinner ? '#d97706' : points >= 13 ? '#52c41a' : '#1890ff',
+              backgroundColor: isWinner ? '#d97706' : points >= 8 ? '#52c41a' : '#1890ff',
               fontSize: '13px',
             }}
           />
@@ -361,7 +361,7 @@ const BetRanking = ({ betDateId }) => {
       key: 'prize',
       responsive: ['md'],
       render: (_, record) => {
-        if (record.position === 1 && record.points >= 13) {
+        if (record.position === 1 && record.points >= 8) {
           return (
             <Text strong style={{ color: '#52c41a', fontSize: 12 }}>
               ${Number(prizePaidTotal || 0).toLocaleString()}
@@ -373,14 +373,14 @@ const BetRanking = ({ betDateId }) => {
       width: 100,
     },
     {
-      title: 'Exactos',
-      dataIndex: 'exact_scores',
-      key: 'exact_predictions',
+      title: 'Aciertos',
+      dataIndex: 'correct_picks',
+      key: 'correct_picks',
       responsive: ['md'],
-      render: (exact, record) => (
+      render: (correct) => (
         <Space size={3}>
           <FireOutlined style={{ fontSize: 11 }} />
-          <Text style={{ fontSize: 12 }}>{(exact ?? record.exact_predictions ?? 0)}/10</Text>
+          <Text style={{ fontSize: 12 }}>{correct ?? 0}/12</Text>
         </Space>
       ),
       width: 80,
@@ -635,14 +635,14 @@ const BetRanking = ({ betDateId }) => {
                 </span>
                 <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.65)', fontWeight: 500 }}>puntos</span>
                 <span style={{ fontSize: 13, color: '#67e8f9', fontWeight: 600, marginLeft: 4 }}>
-                  · {(userRanking.exact_scores ?? userRanking.exact_predictions ?? 0)} exactos
+                  · {(userRanking.correct_picks ?? 0)} aciertos
                 </span>
               </div>
             </Col>
 
             {/* Badge estado */}
             <Col flex="none">
-              {userRanking.points >= 13 && userPosition === 1 ? (
+              {userRanking.points >= 8 && userPosition === 1 ? (
                 <div style={{
                   background: 'linear-gradient(135deg, #f59e0b, #d97706)',
                   borderRadius: 10, padding: '8px 16px',
@@ -654,15 +654,15 @@ const BetRanking = ({ betDateId }) => {
                 </div>
               ) : (
                 <div style={{
-                  background: userRanking.points >= 13 ? 'rgba(52,211,153,0.2)' : 'rgba(255,255,255,0.1)',
-                  border: `1px solid ${userRanking.points >= 13 ? 'rgba(52,211,153,0.5)' : 'rgba(255,255,255,0.15)'}`,
+                  background: userRanking.points >= 8 ? 'rgba(52,211,153,0.2)' : 'rgba(255,255,255,0.1)',
+                  border: `1px solid ${userRanking.points >= 8 ? 'rgba(52,211,153,0.5)' : 'rgba(255,255,255,0.15)'}`,
                   borderRadius: 10, padding: '8px 14px', textAlign: 'center',
                 }}>
                   <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.55)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>
-                    {userRanking.points >= 13 ? 'Calificado' : 'Meta'}
+                    {userRanking.points >= 8 ? 'Calificado' : 'Meta'}
                   </div>
-                  <div style={{ fontSize: 15, fontWeight: 800, color: userRanking.points >= 13 ? '#34d399' : '#fff' }}>
-                    {userRanking.points >= 13 ? '✓ Premio' : `${13 - userRanking.points} pts más`}
+                  <div style={{ fontSize: 15, fontWeight: 800, color: userRanking.points >= 8 ? '#34d399' : '#fff' }}>
+                    {userRanking.points >= 8 ? '✓ Premio' : `${8 - userRanking.points} pts más`}
                   </div>
                 </div>
               )}
@@ -818,11 +818,12 @@ const BetRanking = ({ betDateId }) => {
                 const away = match?.away_team?.name || match?.away_team || '?';
                 const homeLogo = match?.home_team?.logo_url || match?.home_logo;
                 const awayLogo = match?.away_team?.logo_url || match?.away_logo;
+                const RESULT_LABELS = { L: 'Local', E: 'Empate', V: 'Visitante' };
                 const result = row.finished && match ? `${match.home_score} - ${match.away_score}` : null;
-                const pred = `${row.predicted_home_score} - ${row.predicted_away_score}`;
+                const pred = RESULT_LABELS[row.predicted_result] || '—';
                 const pts = row.points || 0;
-                const ptColor = pts === 3 ? '#22c55e' : pts === 1 ? '#60a5fa' : '#475569';
-                const ptBg   = pts === 3 ? 'rgba(34,197,94,0.15)' : pts === 1 ? 'rgba(96,165,250,0.15)' : (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)');
+                const ptColor = pts > 0 ? '#22c55e' : '#475569';
+                const ptBg   = pts > 0 ? 'rgba(34,197,94,0.15)' : (isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)');
 
                 return (
                   <div key={`${row.match_id}-${idx}`} style={{

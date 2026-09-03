@@ -66,18 +66,18 @@ const CommunityPredictionsPage = () => {
     return isDark ? '#4b6280' : '#6b7280';
   };
 
+  const RESULT_LABELS = { L: 'Local', E: 'Empate', V: 'Visitante' };
+
   const getPredictionResult = (pred) => {
     const st = String(pred.match_status || '').toLowerCase();
     const isFinished = st.includes('finalizado') || st === 'finished';
     if (!isFinished) return 'pending';
-    if (pred.points === 3) return 'exact';
-    if (pred.points === 1) return 'partial';
+    if (pred.points > 0) return 'hit';
     return 'miss';
   };
 
   const resultIcon = (result) => {
-    if (result === 'exact') return <CheckCircleOutlined style={{ color: '#22c55e' }} />;
-    if (result === 'partial') return <CheckCircleOutlined style={{ color: '#f59e0b' }} />;
+    if (result === 'hit') return <CheckCircleOutlined style={{ color: '#22c55e' }} />;
     if (result === 'miss') return <CloseCircleOutlined style={{ color: '#ef4444' }} />;
     return <MinusCircleOutlined style={{ color: '#94a3b8' }} />;
   };
@@ -173,8 +173,7 @@ const CommunityPredictionsPage = () => {
           >
             {data.participants.map((participant, idx) => {
               const rank = participant.rank ?? idx + 1;
-              const exact = participant.predictions.filter(p => p.points === 3).length;
-              const partial = participant.predictions.filter(p => p.points === 1).length;
+              const correct = participant.predictions.filter(p => p.points > 0).length;
 
               const panelHeader = (
                 <Row align="middle" gutter={12} wrap={false}>
@@ -202,14 +201,9 @@ const CommunityPredictionsPage = () => {
                     </Tag>
                   </Col>
                   {!isMobile && (
-                    <>
-                      <Col>
-                        <Tag color="green">✓ Exacto: {exact}</Tag>
-                      </Col>
-                      <Col>
-                        <Tag color="gold">~ Ganador: {partial}</Tag>
-                      </Col>
-                    </>
+                    <Col>
+                      <Tag color="green">✓ Aciertos: {correct}</Tag>
+                    </Col>
                   )}
                 </Row>
               );
@@ -235,7 +229,7 @@ const CommunityPredictionsPage = () => {
                   align: 'center',
                   render: (_, row) => (
                     <Tag color="blue" style={{ fontWeight: 700, fontSize: 13 }}>
-                      {row.predicted_home} - {row.predicted_away}
+                      {RESULT_LABELS[row.predicted_result] || '—'}
                     </Tag>
                   ),
                 },
@@ -249,7 +243,7 @@ const CommunityPredictionsPage = () => {
                     if (!isFinished) return <Tag>Pendiente</Tag>;
                     return (
                       <Tag color="default" style={{ fontWeight: 700, fontSize: 13 }}>
-                        {row.actual_home ?? '-'} - {row.actual_away ?? '-'}
+                        {row.actual_home ?? '-'} - {row.actual_away ?? '-'} ({RESULT_LABELS[row.actual_result] || '—'})
                       </Tag>
                     );
                   },
@@ -298,8 +292,7 @@ const CommunityPredictionsPage = () => {
                   />
                   {isMobile && (
                     <Row gutter={8} style={{ marginTop: 8 }}>
-                      <Col><Tag color="green">Exacto: {exact}</Tag></Col>
-                      <Col><Tag color="gold">Ganador: {partial}</Tag></Col>
+                      <Col><Tag color="green">Aciertos: {correct}</Tag></Col>
                     </Row>
                   )}
                 </Panel>

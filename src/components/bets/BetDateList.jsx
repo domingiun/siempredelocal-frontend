@@ -324,7 +324,7 @@ const BetDateList = () => {
         {/* Texto informativo */}
         <Text type="secondary" style={{ fontSize: 12, display: 'block', marginBottom: 12 }}>
           <FireOutlined style={{ marginRight: 4 }} />
-          {betDate.matches?.length || 0} partidos · Gratis · Mínimo 13 pts para ganar
+          {betDate.matches?.length || 0} partidos · Gratis · Mínimo 8 pts para ganar
         </Text>
 
         {/* Tag de acumulado solo en fechas abiertas/cerradas (fechas finalizadas ya lo muestran en la línea del premio) */}

@@ -26,7 +26,7 @@ const BetPage = () => {
           </div>
           <div className="bet-hero__meta">
             <span>🎯 1 crédito por fecha</span>
-            <span>📋 10 partidos por fecha</span>
+            <span>📋 12 partidos por fecha</span>
             <span>⚡ Resultados en tiempo real</span>
           </div>
         </div>
